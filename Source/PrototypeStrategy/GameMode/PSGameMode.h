@@ -24,6 +24,7 @@ public:
 	void SetFullSteps(int Full);
 
 	void MadeStep(int Index);
+	void CheckWin();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 	bool bIsWin = true;
@@ -33,6 +34,7 @@ public:
 protected:
 
 	class APSGameState* WState;
+	class APSBaseCharacter* BaseCharacter;
 };
 
 

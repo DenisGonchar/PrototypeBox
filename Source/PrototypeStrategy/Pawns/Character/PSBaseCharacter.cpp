@@ -8,6 +8,7 @@
 #include <Kismet/GameplayStatics.h>
 #include <Actors/Platforms/Parts/BlockPlatformPart.h>
 #include <GameMode/PSGameMode.h>
+#include <GameState/PSGameState.h>
 
 APSBaseCharacter::APSBaseCharacter()
 {
@@ -28,6 +29,7 @@ void APSBaseCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	GMode = Cast<APSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	
 	FullStep();
 
 	FLedgeDescription LedgeDescription;
@@ -107,7 +109,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 	
 	ABlockPlatformPart* BoxBlock = Cast<ABlockPlatformPart>(Box);
 	
-	EBoxType BoxType = EBoxType::None;
+	BoxType = EBoxType::None;
 	
 	if (IsValid(BoxBlock))
 	{
@@ -123,20 +125,21 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			MoveToPosition(BoxBlock);
 			break;
 		}
+
 		case EBoxType::Exit:
 		{
 			MoveToPosition(Box);
 
 			NextLevel = BoxBlock->GetOpenLevel();
-			
+
 			if (OpenLevel.IsBound())
 			{
 				OpenLevel.Broadcast(GMode->GetWin());
 			}
-			
-			
+
 			break;
 		}
+
 		case EBoxType::Cover:
 			break;
 
@@ -214,6 +217,11 @@ void APSBaseCharacter::FullStep()
 void APSBaseCharacter::SetFullSteps(int32 Step)
 {
 	FullStepIndex = Step;
+}
+
+EBoxType APSBaseCharacter::GetBoxType()
+{
+	return BoxType;
 }
 
 FName APSBaseCharacter::GetNameMap() const

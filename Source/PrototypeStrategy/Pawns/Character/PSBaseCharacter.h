@@ -66,6 +66,8 @@ public:
 	void FullStep();
 	void SetFullSteps(int32 Step);
 
+	EBoxType GetBoxType();
+
 	UFUNCTION(BlueprintCallable)
 	FName GetNameMap() const;
 	void SetNameMap(FName Map);
@@ -84,6 +86,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 	int StepIndex = 1;
 	int FullStepIndex = 1;
+
+	EBoxType BoxType;
 
 	FName NameMap;
 	FName NextLevel;

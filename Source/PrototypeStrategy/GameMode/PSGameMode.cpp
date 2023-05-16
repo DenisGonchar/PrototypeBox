@@ -3,6 +3,8 @@
 #include "PSGameMode.h"
 #include <GameState/PSGameState.h>
 #include <Kismet/GameplayStatics.h>
+#include "Pawns/Character/PSBaseCharacter.h"
+#include <PSTypes.h>
 
 
 APSGameMode::APSGameMode()
@@ -14,7 +16,7 @@ void APSGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	WState = Cast<APSGameState>(GetWorld()->GetGameState());
-
+	BaseCharacter = Cast<APSBaseCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 }
 
@@ -41,9 +43,20 @@ void APSGameMode::MadeStep(int Index)
 		WState->IncrementSteps(Index);
 		if (WState->GetSteps() >= FullSteps)
 		{
-			bIsWin = false;
-			FName CurrentName = (FName)UGameplayStatics::GetCurrentLevelName(GetWorld());
-			UGameplayStatics::OpenLevel(GetWorld(), CurrentName);
+			if (BaseCharacter->GetBoxType() != EBoxType::Exit)
+			{
+				CheckWin();
+			}
+				
 		}
+
 	}
+}
+
+void APSGameMode::CheckWin()
+{	
+	bIsWin = false;
+	FName CurrentName = (FName)UGameplayStatics::GetCurrentLevelName(GetWorld());
+	UGameplayStatics::OpenLevel(GetWorld(), CurrentName);
+
 }
