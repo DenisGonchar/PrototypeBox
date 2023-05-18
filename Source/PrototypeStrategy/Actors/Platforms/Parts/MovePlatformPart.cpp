@@ -48,8 +48,7 @@ void AMovePlatformPart::DirectionDynamicType(APSPlatformPart* Box)
 
 		for (int i = 0; i < MaxStepIndex; i++)
 		{
-			//UE_LOG(LogTemp, Warning, TEXT(" for = %i"), i);
-
+			
 			if (Direction != EMoveCharacterDirection::None)
 			{
 				FLedgeDescription LedgeDescription;
@@ -97,6 +96,14 @@ void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 	case EBoxType::Exit:
 	{
 		
+		SetActorLocation(FloorLocation);
+
+		break;
+	}
+
+	case EBoxType::Teleport:
+	{
+
 		SetActorLocation(FloorLocation);
 
 		break;

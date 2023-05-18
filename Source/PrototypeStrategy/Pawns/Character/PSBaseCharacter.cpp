@@ -36,9 +36,22 @@ void APSBaseCharacter::BeginPlay()
 
 	if (LedgeDetertorComponent->StartDetectDown(LedgeDescription))
 	{
-		
-		MoveToLocationType(LedgeDescription.BoxMesh);
+		ABlockPlatformPart* BoxBlock = Cast<ABlockPlatformPart>(LedgeDescription.BoxMesh);
+		if (IsValid(BoxBlock))
+		{
+			BoxType = BoxBlock->GetBoxType();
 
+			switch (BoxType)
+			{
+				case EBoxType::Path:
+				{
+					MoveToPositionStart(BoxBlock);
+				
+					break;
+				}
+			}
+		}
+		
 	}
 }
 
@@ -108,8 +121,6 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 {	
 	
 	ABlockPlatformPart* BoxBlock = Cast<ABlockPlatformPart>(Box);
-	
-	BoxType = EBoxType::None;
 	
 	if (IsValid(BoxBlock))
 	{
@@ -197,6 +208,15 @@ void APSBaseCharacter::MoveToPosition(APSPlatformPart* Box)
 	Step(StepIndex);
 
 }
+
+void APSBaseCharacter::MoveToPositionStart(APSPlatformPart* Box)
+{
+	FVector FloorLocation = Box->GetActorLocation();
+	FloorLocation.Z = GetActorLocation().Z;
+
+	SetActorLocation(FloorLocation);
+}
+
 
 void APSBaseCharacter::Step(int Index)
 {

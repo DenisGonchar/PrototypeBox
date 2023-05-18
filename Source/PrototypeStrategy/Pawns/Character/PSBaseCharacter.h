@@ -61,6 +61,7 @@ public:
 	void MovementDirection(EMoveCharacterDirection Direction);
 	void MoveToLocationType(APSPlatformPart* Box);
 	void MoveToPosition(APSPlatformPart* Box);
+	void MoveToPositionStart(APSPlatformPart* Box);
 
 	void Step(int Index);
 	void FullStep();
@@ -87,7 +88,7 @@ protected:
 	int StepIndex = 1;
 	int FullStepIndex = 1;
 
-	EBoxType BoxType;
+	EBoxType BoxType = EBoxType::None;
 
 	FName NameMap;
 	FName NextLevel;
