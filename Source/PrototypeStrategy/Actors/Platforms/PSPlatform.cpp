@@ -127,19 +127,15 @@ void APSPlatform::SpawnPlatformPartFloor()
 	
 	for (int t = 0; t < ArrayTeleport.Num(); t++)
 	{
-		if (t == 0)
+		if( t ==  ArrayTeleport.Num())
 		{
-			ArrayTeleport[t]->SetTeleport(ArrayTeleport[t + 1]);
+			ArrayTeleport[t]->SetTeleport(ArrayTeleport[0]);
 			ArrayTeleport[t]->SetActivator(ActivatorTeleport);
-
+			break;
 		}
-		else if (t == 1)
-		{
-			ArrayTeleport[t]->SetTeleport(ArrayTeleport[t - 1]);
-			ArrayTeleport[t]->SetActivator(ActivatorTeleport);
-
-		}
-
+		
+		ArrayTeleport[t]->SetTeleport(ArrayTeleport[t + 1]);
+		ArrayTeleport[t]->SetActivator(ActivatorTeleport);
 	}
 }
 
