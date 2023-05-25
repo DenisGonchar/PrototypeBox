@@ -200,13 +200,17 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 
 void APSBaseCharacter::MoveToPosition(APSPlatformPart* Box)
 {
-	FVector FloorLocation = Box->GetActorLocation();
-	FloorLocation.Z = GetActorLocation().Z;
+	if (IsValid(Box))
+	{
+		FVector FloorLocation = Box->GetActorLocation();
+		FloorLocation.Z = GetActorLocation().Z;
 
-	SetActorLocation(FloorLocation);
+		SetActorLocation(FloorLocation);
 
-	Step(StepIndex);
+		Step(StepIndex);
 
+	}
+	
 }
 
 void APSBaseCharacter::MoveToPositionStart(APSPlatformPart* Box)

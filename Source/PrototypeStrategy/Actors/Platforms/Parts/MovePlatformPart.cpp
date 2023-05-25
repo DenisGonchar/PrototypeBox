@@ -46,7 +46,7 @@ void AMovePlatformPart::DirectionDynamicType(APSPlatformPart* Box)
 	{
 		MoveToLocationFloor(Box);
 
-		for (int i = 0; i < MaxStepIndex; i++)
+		for (int i = 0; i < ActiveMaxStepIndex; i++)
 		{
 			
 			if (Direction != EMoveCharacterDirection::None)

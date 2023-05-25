@@ -35,8 +35,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param")
 	EDynamic DynamicType = EDynamic::None;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param")
-	int MaxStepIndex = 10.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Active")
+	int ActiveMaxStepIndex = 10.0f;
 
 	EMoveCharacterDirection Direction;
 };
