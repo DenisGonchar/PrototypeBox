@@ -17,12 +17,21 @@ class PROTOTYPESTRATEGY_API ALimitedMovePlatformPart : public AMovePlatformPart
 public:
 	ALimitedMovePlatformPart();
 	void GenerateMoveLimit();
-	//bool MoveDirection(EMoveCharacterDirection Direc);
+	virtual bool MoveDirection(EMoveCharacterDirection Direc) override;
+
+	virtual void BeginPlay() override;
 
 protected:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 		int moveLimit;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		int startLimit;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 		bool bUseRandomLimit = true;
+
+	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
+		void CheckAndChangeColorCode(int limitOnStart ,int currentLimit);
+		
 };

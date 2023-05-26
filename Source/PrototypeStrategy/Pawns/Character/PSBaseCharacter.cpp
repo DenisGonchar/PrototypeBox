@@ -31,7 +31,7 @@ void APSBaseCharacter::BeginPlay()
 	GMode = Cast<APSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
 	FullStep();
-
+	
 	FLedgeDescription LedgeDescription;
 
 	if (LedgeDetertorComponent->StartDetectDown(LedgeDescription))
@@ -40,7 +40,6 @@ void APSBaseCharacter::BeginPlay()
 		if (IsValid(BoxBlock))
 		{
 			BoxType = BoxBlock->GetBoxType();
-
 			switch (BoxType)
 			{
 				case EBoxType::Path:
@@ -119,14 +118,11 @@ void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 
 void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 {	
-	
 	ABlockPlatformPart* BoxBlock = Cast<ABlockPlatformPart>(Box);
 	
 	if (IsValid(BoxBlock))
 	{
-
 		BoxType = BoxBlock->GetBoxType();
-
 	}
 
 	switch (BoxType)
