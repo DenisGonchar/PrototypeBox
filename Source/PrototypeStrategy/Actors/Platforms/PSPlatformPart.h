@@ -7,6 +7,9 @@
 #include "PSTypes.h"
 #include "PSPlatformPart.generated.h"
 
+class UActivatorCoverComponent;
+class ACoverPlatformPart;
+
 UCLASS()
 class PROTOTYPESTRATEGY_API APSPlatformPart : public AActor
 {
@@ -22,10 +25,24 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	UActivatorCoverComponent* ActivatorCoverComponent; 
+	UActivatorCoverComponent* GetActivatorCoverComponent() const;
+	
 	EBoxType GetBoxType() const;
+
+	void SetCoverPart(ACoverPlatformPart* Actor);
+	ACoverPlatformPart* GetCoverPart() const;
+
+	void SetLevelType(ELevelType World);
+	ELevelType GetLevelType() const;
+
 protected:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param | Type")
 	EBoxType BoxType = EBoxType::None;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param | Type")
+	ELevelType LevelType = ELevelType::Level;
+
+	ACoverPlatformPart* BaseCover; 
 };

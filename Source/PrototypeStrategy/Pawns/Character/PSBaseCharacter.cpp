@@ -9,6 +9,8 @@
 #include <Actors/Platforms/Parts/BlockPlatformPart.h>
 #include <GameMode/PSGameMode.h>
 #include <GameState/PSGameState.h>
+#include "Actors/Platforms/Parts/TeleportPlatformPart.h"
+#include "Actors/Platforms/Parts/CoverPlatformPart.h"
 
 APSBaseCharacter::APSBaseCharacter()
 {
@@ -49,9 +51,11 @@ void APSBaseCharacter::BeginPlay()
 					break;
 				}
 			}
-		}
-		
+		}	
 	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Purple, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(LevelType)));
+
 }
 
 void APSBaseCharacter::EndPlay(const EEndPlayReason::Type Reason)
@@ -148,8 +152,23 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 		}
 
 		case EBoxType::Cover:
-			break;
+		{
+			ACoverPlatformPart* BoxCover = Cast<ACoverPlatformPart>(BoxBlock);
+			
+			if (IsValid(BoxCover))
+			{
+				MoveToPosition(Box);
 
+				BoxCover->ActivatorCover();
+				
+				LevelType = BoxCover->GetLevelType();
+				GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Purple, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(LevelType)));
+
+			}
+			
+			break;
+		}
+		
 		case EBoxType::Teleport:
 		{
 			ATeleportPlatformPart* BoxTeleport = Cast<ATeleportPlatformPart>(BoxBlock);
@@ -242,6 +261,11 @@ void APSBaseCharacter::SetFullSteps(int32 Step)
 EBoxType APSBaseCharacter::GetBoxType()
 {
 	return BoxType;
+}
+
+ELevelType APSBaseCharacter::GetLevelType()
+{
+	return LevelType;
 }
 
 FName APSBaseCharacter::GetNameMap() const

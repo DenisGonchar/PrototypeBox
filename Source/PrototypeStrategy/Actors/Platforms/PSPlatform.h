@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "PSPlatformPart.h"
 #include <PSTypes.h>
-#include "Parts/TeleportPlatformPart.h"
 #include "PSPlatform.generated.h"
+
+class APSPlatformPart;
+class ATeleportPlatformPart;
+class ACoverPlatformPart;
 
 UCLASS()
 class PROTOTYPESTRATEGY_API APSPlatform : public AActor
@@ -53,7 +55,11 @@ private:
 	
 	ATeleportPlatformPart* ActivatorTeleport;
 	
+	ACoverPlatformPart* CoverPart;
+	
 	TArray<ATeleportPlatformPart*> ArrayTeleport;
+
+	TArray <APSPlatformPart* > ArrayPlatformPart;
 
 	TArray<TSubclassOf<APSPlatformPart>> Floor;
 

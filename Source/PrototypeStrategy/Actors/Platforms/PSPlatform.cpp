@@ -8,6 +8,7 @@
 #include "Parts/TeleportPlatformPart.h"
 #include <Pawns/Character/PSBaseCharacter.h>
 #include <Kismet/GameplayStatics.h>
+#include "Parts/CoverPlatformPart.h"
 
 APSPlatform::APSPlatform()
 {
@@ -90,6 +91,11 @@ void APSPlatform::SpawnPlatformPartFloor()
 		
 		APSPlatformPart* SpawnActors = GetWorld()->SpawnActor<APSPlatformPart>(GridParts[l], SpawnLocation, FRotator::ZeroRotator);
 		
+		if (IsValid(SpawnActors))
+		{
+			ArrayPlatformPart.Add(SpawnActors);
+		}
+
 		ATeleportPlatformPart* Part = Cast<ATeleportPlatformPart>(SpawnActors);
 		if (IsValid(Part))
 		{
@@ -121,10 +127,33 @@ void APSPlatform::SpawnPlatformPartFloor()
 			}
 		}
 
+		ACoverPlatformPart* Cover = Cast<ACoverPlatformPart>(SpawnActors);
+		if (IsValid(Cover))
+		{
+			EBoxType GetType = Cover->GetBoxType();
+
+			if (GetType == EBoxType::Cover)
+			{
+				CoverPart = Cover;
+			}
+
+		}
+
+
 		Y++;
 	
 	}
 	
+	for (int p = 0; p < ArrayPlatformPart.Num(); p++)
+	{
+		if (IsValid(CoverPart))
+		{
+			ArrayPlatformPart[p]->SetCoverPart(CoverPart);
+
+			UE_LOG(LogTemp, Warning, TEXT("Type Level %i = %s"), p, *UEnum::GetValueAsString(ArrayPlatformPart[p]->GetLevelType()));
+		}
+	}
+
 	for (int t = 0; t < ArrayTeleport.Num(); t++)
 	{
 		if( t ==  ArrayTeleport.Num()-1)
