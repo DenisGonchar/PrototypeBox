@@ -3,6 +3,7 @@
 
 #include "Actors/Platforms/Parts/BlockPlatformPart.h"
 #include "MovePlatformPart.h"
+#include "../PSPlatformPart.h"
 
 ABlockPlatformPart::ABlockPlatformPart()
 {
@@ -37,4 +38,22 @@ void ABlockPlatformPart::SetOpenLevel(FName Map)
 FTeleportInfo ABlockPlatformPart::GetTeleportInfo() const
 {
 	return TeleportInfo;
+}
+
+bool ABlockPlatformPart::GetbIsActivatorCover() const
+{
+	return bIsActivatorCover;
+}
+
+void ABlockPlatformPart::NewLevelType()
+{
+	Super::NewLevelType();
+
+	
+	
+}
+
+void ABlockPlatformPart::ActivatorCover()
+{
+
 }

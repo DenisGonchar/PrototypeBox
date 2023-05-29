@@ -20,13 +20,19 @@ public:
 
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Teleport")
+	FTeleportInfo TeleportInfo;
+
 	FName GetOpenLevel() const;
 	void SetOpenLevel(FName Map);
 
 	FTeleportInfo GetTeleportInfo() const;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Teleport")
-	FTeleportInfo TeleportInfo;
+	bool GetbIsActivatorCover() const;
+
+	virtual void NewLevelType() override;
+
+	virtual void ActivatorCover();
 
 protected:
 	
@@ -38,9 +44,9 @@ protected:
 
 	FName OpenLevel;
 
-	
+	bool bIsActivatorCover = true;
+
 private:
 	
-
 	
 };

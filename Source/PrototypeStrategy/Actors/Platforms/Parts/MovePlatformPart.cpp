@@ -93,6 +93,14 @@ void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 		break;
 	}
 
+	case EBoxType::Cover:
+	{
+
+		SetActorLocation(FloorLocation);
+
+		break;
+	}
+
 	case EBoxType::Exit:
 	{
 		
@@ -119,6 +127,13 @@ void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 EDynamic AMovePlatformPart::GetDynamicType() const
 {
 	return DynamicType;
+}
+
+void AMovePlatformPart::NewLevelType()
+{
+	Super::NewLevelType();
+
+
 }
 
 float AMovePlatformPart::GetMoveDistance() const

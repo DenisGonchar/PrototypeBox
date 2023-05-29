@@ -2,13 +2,17 @@
 #include "Actors/Platforms/PSPlatformPart.h"
 #include "Components/ActivatorCoverComponent.h"
 #include "Parts/CoverPlatformPart.h"
+#include "Components/SceneComponent.h"
 
 APSPlatformPart::APSPlatformPart()
 {
  	PrimaryActorTick.bCanEverTick = true;
 	
+	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+	SetRootComponent(SceneComponent);
+
 	BoxMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BoxComponent"));
-	SetRootComponent(BoxMesh);
+	BoxMesh->SetupAttachment(SceneComponent);
 	
 	ActivatorCoverComponent = CreateDefaultSubobject<UActivatorCoverComponent>(TEXT("ActivatorCoverComponent"));
 
@@ -18,13 +22,15 @@ void APSPlatformPart::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
+	BaseMaterial = BoxMesh->GetMaterial(0);
+
 }
 
 void APSPlatformPart::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	
 }
 
 UActivatorCoverComponent* APSPlatformPart::GetActivatorCoverComponent() const
@@ -56,11 +62,42 @@ ACoverPlatformPart* APSPlatformPart::GetCoverPart() const
 void APSPlatformPart::SetLevelType(ELevelType World)
 {
 	LevelType = World;
-	UE_LOG(LogTemp, Warning, TEXT("Type Level = %s"), *UEnum::GetValueAsString(LevelType));
+
+	//TODO
+	//add new virtual void 
+
+	NewLevelType();
+
 }
 
 ELevelType APSPlatformPart::GetLevelType() const
 {
 	return LevelType;
+}
+
+void APSPlatformPart::NewLevelType()
+{
+	switch (LevelType)
+	{
+		case ELevelType::Level:
+		{
+			if (IsValid(BaseMaterial))
+			{
+				BoxMesh->SetMaterial(0, BaseMaterial);
+
+			}
+			break;
+
+		}
+		case ELevelType::UnderCover:
+		{
+			if (IsValid(MaterialCaver))
+			{
+				BoxMesh->SetMaterial(0, MaterialCaver);
+			}
+
+			break;
+		}
+	}
 }
 

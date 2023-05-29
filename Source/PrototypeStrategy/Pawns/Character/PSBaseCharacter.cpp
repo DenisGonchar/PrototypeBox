@@ -11,6 +11,7 @@
 #include <GameState/PSGameState.h>
 #include "Actors/Platforms/Parts/TeleportPlatformPart.h"
 #include "Actors/Platforms/Parts/CoverPlatformPart.h"
+#include "Actors/Platforms/Parts/PathPlatformPart.h"
 
 APSBaseCharacter::APSBaseCharacter()
 {
@@ -133,7 +134,32 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 	{
 		case EBoxType::Path:
 		{
-			MoveToPosition(BoxBlock);
+			switch (LevelType)
+			{
+				case ELevelType::Level:
+				{
+					MoveToPosition(Box);
+
+					break;
+				}
+
+				case ELevelType::UnderCover:
+				{
+					if (BoxBlock->GetbIsActivatorCover())
+					{
+						BoxBlock->ActivatorCover();
+						
+						MoveToPosition(Box);
+					}
+
+// 					APathPlatformPart* BoxPath = Cast<APathPlatformPart>(BoxBlock);
+// 					if (IsValid(BoxPath))
+// 					{
+// 						
+// 					}
+				}
+			}
+
 			break;
 		}
 
