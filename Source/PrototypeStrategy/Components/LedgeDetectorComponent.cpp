@@ -415,17 +415,21 @@ bool ULedgeDetectorComponent::BoxDetectHitBlock(FHitResult Hit)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("ULedgeDetectorComponent::BoxDetectHitBlock = Wall")));
 			
-			AWallPlatformPart* BoxWall = Cast<AWallPlatformPart>(BoxPart);
-			if (IsValid(BoxWall))
+			if (CachedActorOwner->GetDynamicType() == EDynamic::Active)
 			{
-				if (BoxWall->GetLevelType() == ELevelType::UnderCover)
+				AWallPlatformPart* BoxWall = Cast<AWallPlatformPart>(BoxPart);
+				if (IsValid(BoxWall))
 				{
-					if (BoxWall->GetWallType() == EWallType::CrackedWall)
+					if (BoxWall->GetLevelType() == ELevelType::UnderCover)
 					{
-						BoxWall->DeadBox();
+						if (BoxWall->GetWallType() == EWallType::CrackedWall)
+						{
+							BoxWall->DeadBox();
 
-						return true;
+							return true;
+						}
 					}
+
 				}
 
 			}
