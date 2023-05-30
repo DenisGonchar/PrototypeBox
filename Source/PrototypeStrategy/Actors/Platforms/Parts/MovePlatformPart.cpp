@@ -116,6 +116,12 @@ void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 
 		break;
 	}
+	case EBoxType::Wall:
+	{
+		
+		GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, FString::Printf(TEXT("MovePart = Wall")));
+		break;
+	}
 
 	default:
 		break;

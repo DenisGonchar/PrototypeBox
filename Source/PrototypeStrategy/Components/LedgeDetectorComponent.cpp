@@ -11,6 +11,7 @@
 #include <Utils/PSTraceUtils.h>
 #include <Actors/Platforms/PSPlatformPart.h>
 #include "Actors/Platforms/Parts/MovePlatformPart.h"
+#include "Actors/Platforms/Parts/WallPlatformPart.h"
 
 
 void ULedgeDetectorComponent::BeginPlay()
@@ -256,6 +257,14 @@ bool ULedgeDetectorComponent::BoxDetectLedge(OUT FLedgeDescription& LedgeDescrip
 				ForwardCkeck = false;
 
 			}
+			else
+			{
+				if (BoxDetectHitBlock(ForwardCheckHitResult))
+				{
+					ForwardCkeck = false;
+				}
+
+			}
 		
 			break;
 		}
@@ -269,6 +278,14 @@ bool ULedgeDetectorComponent::BoxDetectLedge(OUT FLedgeDescription& LedgeDescrip
 			{
 				ForwardCkeck = false;
 			}
+			else
+			{
+				if (BoxDetectHitBlock(ForwardCheckHitResult))
+				{
+					ForwardCkeck = false;
+				}
+
+			}
 
 			break;
 		}
@@ -280,6 +297,14 @@ bool ULedgeDetectorComponent::BoxDetectLedge(OUT FLedgeDescription& LedgeDescrip
 			if (!PSTraceUtils::LineTraceSingleByChannel(GetWorld(), ForwardCheckHitResult, Start, End, ECC_Visibility, QueryParams, FCollisionResponseParams::DefaultResponseParam, bIsDebugEnabled, DrawTime, DrawColor))
 			{
 				ForwardCkeck = false;
+			}
+			else
+			{
+				if (BoxDetectHitBlock(ForwardCheckHitResult))
+				{
+					ForwardCkeck = false;
+				}
+
 			}
 
 			break;
@@ -293,7 +318,14 @@ bool ULedgeDetectorComponent::BoxDetectLedge(OUT FLedgeDescription& LedgeDescrip
 			{
 				ForwardCkeck = false;
 			}
+			else
+			{
+				if (BoxDetectHitBlock(ForwardCheckHitResult))
+				{
+					ForwardCkeck = false;
+				}
 
+			}
 
 			break;
 		}
@@ -329,24 +361,87 @@ bool ULedgeDetectorComponent::BoxDetectLedge(OUT FLedgeDescription& LedgeDescrip
 
 bool ULedgeDetectorComponent::DetectHitBlock(FHitResult Hit)
 {
-	AMovePlatformPart* Box = Cast<AMovePlatformPart>(Hit.Actor);
+	//AMovePlatformPart* Box = Cast<AMovePlatformPart>(Hit.Actor);
 	
-	if (IsValid(Box))
-	{
+	APSPlatformPart* BoxPart = Cast<APSPlatformPart>(Hit.Actor);
 
-		if (Box->GetBoxType() == EBoxType::Wall)
+	EBoxType PartType = BoxPart->GetBoxType();
+
+	switch (PartType)
+	{
+		case EBoxType::Dynamic:
 		{
+			AMovePlatformPart* Box = Cast<AMovePlatformPart>(Hit.Actor);
+
+			if (IsValid(Box))
+			{
+
+// 				if (Box->GetBoxType() == EBoxType::Wall)
+// 				{
+// 					return false;
+// 				}
+
+				if (Box->MoveDirection(CharacterDirection))
+				{
+					return true;
+				}
+
+			}
+
 			return false;
 		}
 
-		if (Box->MoveDirection(CharacterDirection))
+		case EBoxType::Wall:
 		{
-			return true;
+			//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("ULedgeDetectorComponent::DetectHitBlock = Wall")));
+			//TODO player crashes into a wall
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool ULedgeDetectorComponent::BoxDetectHitBlock(FHitResult Hit)
+{
+	APSPlatformPart* BoxPart = Cast<APSPlatformPart>(Hit.Actor);
+
+	EBoxType PartType = BoxPart->GetBoxType();
+	
+	switch (PartType)
+	{
+		case EBoxType::Wall :
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("ULedgeDetectorComponent::BoxDetectHitBlock = Wall")));
+			
+			AWallPlatformPart* BoxWall = Cast<AWallPlatformPart>(BoxPart);
+			if (IsValid(BoxWall))
+			{
+				if (BoxWall->GetLevelType() == ELevelType::UnderCover)
+				{
+					if (BoxWall->GetWallType() == EWallType::CrackedWall)
+					{
+						BoxWall->DeadBox();
+
+						return true;
+					}
+				}
+
+			}
+
+			return false;
+			break;
+		}
+
+		case EBoxType::Dynamic:
+		{
+			return false;
+			break;
 		}
 
 	}
 
-	return false;
+	return true;
 }
-
 

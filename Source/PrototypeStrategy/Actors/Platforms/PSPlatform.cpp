@@ -94,6 +94,19 @@ void APSPlatform::SpawnPlatformPartFloor()
 		if (IsValid(SpawnActors))
 		{
 			ArrayPlatformPart.Add(SpawnActors);
+			
+			ABlockPlatformPart* Block = Cast<ABlockPlatformPart>(SpawnActors);
+			if (IsValid(Block->MovePlatform))
+			{
+				FVector SpawnLocationBlock = Block->GetActorLocation();
+				SpawnLocationBlock.Z += Block->GetSpawnDistance();
+
+				APSPlatformPart* SpawnBlock = GetWorld()->SpawnActor<APSPlatformPart>(Block->MovePlatform, SpawnLocationBlock, FRotator::ZeroRotator);
+				if (IsValid(SpawnBlock))
+				{
+					ArrayPlatformPart.Add(SpawnBlock);
+				}
+			}
 		}
 
 		ATeleportPlatformPart* Part = Cast<ATeleportPlatformPart>(SpawnActors);

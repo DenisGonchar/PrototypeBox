@@ -14,15 +14,6 @@ void ABlockPlatformPart::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (IsValid(MovePlatform))
-	{
-		FVector SpawnLocation = GetActorLocation();
-		SpawnLocation.Z += SpawnDistance;
-
-		APSPlatformPart* MoveBox = GetWorld()->SpawnActor<APSPlatformPart>(MovePlatform, SpawnLocation, FRotator::ZeroRotator);
-
-
-	}
 }
 
 FName ABlockPlatformPart::GetOpenLevel() const
@@ -43,6 +34,11 @@ FTeleportInfo ABlockPlatformPart::GetTeleportInfo() const
 bool ABlockPlatformPart::GetbIsActivatorCover() const
 {
 	return bIsActivatorCover;
+}
+
+float ABlockPlatformPart::GetSpawnDistance() const
+{
+	return SpawnDistance;
 }
 
 void ABlockPlatformPart::NewLevelType()

@@ -152,11 +152,6 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 						MoveToPosition(Box);
 					}
 
-// 					APathPlatformPart* BoxPath = Cast<APathPlatformPart>(BoxBlock);
-// 					if (IsValid(BoxPath))
-// 					{
-// 						
-// 					}
 				}
 			}
 

@@ -23,12 +23,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Teleport")
 	FTeleportInfo TeleportInfo;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
+	TSubclassOf<class APSPlatformPart> MovePlatform;
+
 	FName GetOpenLevel() const;
 	void SetOpenLevel(FName Map);
 
 	FTeleportInfo GetTeleportInfo() const;
-
 	bool GetbIsActivatorCover() const;
+	float GetSpawnDistance() const;
 
 	virtual void NewLevelType() override;
 
@@ -36,9 +39,7 @@ public:
 
 protected:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
-	TSubclassOf<class APSPlatformPart> MovePlatform;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 	float SpawnDistance = 150.0f;
 

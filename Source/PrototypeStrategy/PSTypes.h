@@ -59,6 +59,15 @@ enum class ETeleport : uint8
 
 };
 
+UENUM(BlueprintType)
+enum class EWallType : uint8
+{
+	None,
+	DefaultWall,
+	CrackedWall
+
+};
+
 USTRUCT(BlueprintType)
 struct FTeleportInfo
 {

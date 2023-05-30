@@ -41,6 +41,7 @@ public:
 	bool BoxDetectLedge(OUT FLedgeDescription& LedgeDescription, OUT EMoveCharacterDirection Direction);
 
 	bool DetectHitBlock(FHitResult Hit);
+	bool BoxDetectHitBlock(FHitResult Hit);
 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
