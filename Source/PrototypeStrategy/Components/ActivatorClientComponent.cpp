@@ -41,9 +41,6 @@ void UActivatorClientComponent::ActivatorSwitched(bool bIsOn)
 
 	}
 
-	if (OnActivatorClientOnSwitch.IsBound())
-	{
-		OnActivatorClientOnSwitch.Broadcast(bIsOn);
-	}
+	
 }
 

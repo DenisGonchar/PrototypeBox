@@ -7,6 +7,11 @@
 #include "PSTypes.h"
 #include "PSPlatformPart.generated.h"
 
+class UActivatorCoverComponent;
+class ACoverPlatformPart;
+class UMaterialInterface;
+class USceneComponent;
+
 UCLASS()
 class PROTOTYPESTRATEGY_API APSPlatformPart : public AActor
 {
@@ -15,17 +20,41 @@ class PROTOTYPESTRATEGY_API APSPlatformPart : public AActor
 public:	
 	APSPlatformPart();
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scene")
+	USceneComponent* SceneComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
 	UStaticMeshComponent* BoxMesh;
 
-	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
+	UMaterialInterface* MaterialCaver;
 
+	virtual void BeginPlay() override;
+	
 	virtual void Tick(float DeltaTime) override;
 
+	UActivatorCoverComponent* ActivatorCoverComponent; 
+	UActivatorCoverComponent* GetActivatorCoverComponent() const;
+	
 	EBoxType GetBoxType() const;
+
+	void SetCoverPart(ACoverPlatformPart* Actor);
+	ACoverPlatformPart* GetCoverPart() const;
+
+	void SetLevelType(ELevelType World);
+	ELevelType GetLevelType() const;
+
+	virtual void NewLevelType();
+
 protected:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param | Type")
 	EBoxType BoxType = EBoxType::None;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param | Type")
+	ELevelType LevelType = ELevelType::Level;
+
+	ACoverPlatformPart* BaseCover; 
+	
+	UMaterialInterface* BaseMaterial;
 };

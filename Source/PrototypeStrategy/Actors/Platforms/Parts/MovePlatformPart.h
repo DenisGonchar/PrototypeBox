@@ -26,6 +26,8 @@ public:
 	
 	EDynamic GetDynamicType() const;
 
+	virtual void NewLevelType() override;
+
 protected:
 	class ULedgeDetectorComponent* LedgeDetertorComponent;
 

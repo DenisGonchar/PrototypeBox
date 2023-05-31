@@ -3,6 +3,7 @@
 
 #include "Actors/Platforms/Parts/BlockPlatformPart.h"
 #include "MovePlatformPart.h"
+#include "../PSPlatformPart.h"
 
 ABlockPlatformPart::ABlockPlatformPart()
 {
@@ -13,15 +14,6 @@ void ABlockPlatformPart::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (IsValid(MovePlatform))
-	{
-		FVector SpawnLocation = GetActorLocation();
-		SpawnLocation.Z += SpawnDistance;
-
-		APSPlatformPart* MoveBox = GetWorld()->SpawnActor<APSPlatformPart>(MovePlatform, SpawnLocation, FRotator::ZeroRotator);
-
-
-	}
 }
 
 FName ABlockPlatformPart::GetOpenLevel() const
@@ -37,4 +29,27 @@ void ABlockPlatformPart::SetOpenLevel(FName Map)
 FTeleportInfo ABlockPlatformPart::GetTeleportInfo() const
 {
 	return TeleportInfo;
+}
+
+bool ABlockPlatformPart::GetbIsActivatorCover() const
+{
+	return bIsActivatorCover;
+}
+
+float ABlockPlatformPart::GetSpawnDistance() const
+{
+	return SpawnDistance;
+}
+
+void ABlockPlatformPart::NewLevelType()
+{
+	Super::NewLevelType();
+
+	
+	
+}
+
+void ABlockPlatformPart::ActivatorCover()
+{
+
 }

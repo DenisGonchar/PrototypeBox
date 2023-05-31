@@ -7,7 +7,6 @@
 #include <Actors/Platforms/Parts/TeleportPlatformPart.h>
 #include "ActivatorClientComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivatorClientOnSwitch, bool, bIsOn);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROTOTYPESTRATEGY_API UActivatorClientComponent : public UActorComponent
@@ -16,9 +15,6 @@ class PROTOTYPESTRATEGY_API UActivatorClientComponent : public UActorComponent
 
 public:
 	virtual void BeginPlay() override;
-
-	UPROPERTY(BlueprintAssignable)
-	FActivatorClientOnSwitch OnActivatorClientOnSwitch;
 
 	class ATeleportPlatformPart* BoxActivator;
 	

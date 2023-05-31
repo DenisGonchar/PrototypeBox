@@ -5,6 +5,14 @@
 
 const FName DebugCategoryLedgeDetection = FName("LedgeDetection");
 
+UENUM(BlueprintType)
+enum class ELevelType : uint8
+{
+	None,
+	Level,
+	UnderCover
+
+};
 
 UENUM(BlueprintType)
 enum class EMoveCharacterDirection : uint8
@@ -48,6 +56,15 @@ enum class ETeleport : uint8
 	Teleport
 	
 	
+
+};
+
+UENUM(BlueprintType)
+enum class EWallType : uint8
+{
+	None,
+	DefaultWall,
+	CrackedWall
 
 };
 

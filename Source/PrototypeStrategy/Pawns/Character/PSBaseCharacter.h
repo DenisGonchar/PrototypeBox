@@ -68,6 +68,7 @@ public:
 	void SetFullSteps(int32 Step);
 
 	EBoxType GetBoxType();
+	ELevelType GetLevelType();
 
 	UFUNCTION(BlueprintCallable)
 	FName GetNameMap() const;
@@ -89,6 +90,7 @@ protected:
 	int FullStepIndex = 1;
 
 	EBoxType BoxType = EBoxType::None;
+	ELevelType LevelType = ELevelType::Level;
 
 	FName NameMap;
 	FName NextLevel;
