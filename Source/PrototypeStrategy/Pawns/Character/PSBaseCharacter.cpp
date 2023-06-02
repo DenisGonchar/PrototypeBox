@@ -12,6 +12,7 @@
 #include "Actors/Platforms/Parts/TeleportPlatformPart.h"
 #include "Actors/Platforms/Parts/CoverPlatformPart.h"
 #include "Actors/Platforms/Parts/PathPlatformPart.h"
+#include "Actors/Platforms/Parts/ExitPlatformPart.h"
 
 APSBaseCharacter::APSBaseCharacter()
 {
@@ -160,15 +161,35 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 
 		case EBoxType::Exit:
 		{
+			AExitPlatformPart* ExitPart = Cast<AExitPlatformPart>(BoxBlock);
 			MoveToPosition(Box);
 
-			NextLevel = BoxBlock->GetOpenLevel();
-
-			if (OpenLevel.IsBound())
+			if (ExitPart->GetLevelType() == ELevelType::UnderCover)
 			{
-				OpenLevel.Broadcast(GMode->GetWin());
-			}
+				if (ExitPart->GetIsActivCaver())
+				{
+					NextLevel = ExitPart->GetOpenLevel();
 
+					if (OpenLevel.IsBound())
+					{
+						OpenLevel.Broadcast(GMode->GetWin());
+					}
+
+				}
+			}
+			else if (ExitPart->GetLevelType() == ELevelType::Level)
+			{
+				if (ExitPart->GetIsActivLevel())
+				{
+					NextLevel = ExitPart->GetOpenLevel();
+
+					if (OpenLevel.IsBound())
+					{
+						OpenLevel.Broadcast(GMode->GetWin());
+					}
+				}
+			}
+			
 			break;
 		}
 

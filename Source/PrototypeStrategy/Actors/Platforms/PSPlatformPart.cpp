@@ -75,6 +75,11 @@ ELevelType APSPlatformPart::GetLevelType() const
 	return LevelType;
 }
 
+UMaterialInterface* APSPlatformPart::GetBaseMaterial()
+{
+	return BaseMaterial;
+}
+
 void APSPlatformPart::NewLevelType()
 {
 	switch (LevelType)

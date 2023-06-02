@@ -44,6 +44,8 @@ public:
 	void SetLevelType(ELevelType World);
 	ELevelType GetLevelType() const;
 
+	UMaterialInterface* GetBaseMaterial();
+
 	virtual void NewLevelType();
 
 protected:

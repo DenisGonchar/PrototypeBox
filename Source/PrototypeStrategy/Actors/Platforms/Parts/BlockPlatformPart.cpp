@@ -16,16 +16,6 @@ void ABlockPlatformPart::BeginPlay()
 
 }
 
-FName ABlockPlatformPart::GetOpenLevel() const
-{
-	return OpenLevel;
-}
-
-void ABlockPlatformPart::SetOpenLevel(FName Map)
-{
-	OpenLevel = Map;
-}
-
 FTeleportInfo ABlockPlatformPart::GetTeleportInfo() const
 {
 	return TeleportInfo;

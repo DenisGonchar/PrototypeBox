@@ -9,6 +9,7 @@
 #include <Pawns/Character/PSBaseCharacter.h>
 #include <Kismet/GameplayStatics.h>
 #include "Parts/CoverPlatformPart.h"
+#include "Parts/ExitPlatformPart.h"
 
 APSPlatform::APSPlatform()
 {
@@ -129,14 +130,14 @@ void APSPlatform::SpawnPlatformPartFloor()
 			}
 		}
 		
-		ABlockPlatformPart* BlockPart = Cast<ABlockPlatformPart>(SpawnActors);
-		if (IsValid(BlockPart))
+		AExitPlatformPart* ExitPart = Cast<AExitPlatformPart>(SpawnActors);
+		if (IsValid(ExitPart))
 		{
-			EBoxType GetType = BlockPart->GetBoxType();
+			EBoxType GetType = ExitPart->GetBoxType();
 
 			if (GetType == EBoxType::Exit)
 			{
-				BlockPart->SetOpenLevel(ExitMap);
+				ExitPart->SetOpenLevel(ExitMap);
 			}
 		}
 
