@@ -7,7 +7,7 @@ bool PSTraceUtils::LineTraceSingleByChannel(const UWorld* World, struct FHitResu
 	bool bResult = false;
 
 	bResult = World->LineTraceSingleByChannel(OutHit, Start, End, TraceChannel, Params, ResponseParam);
-
+	bDrawDebug = true;
 #if ENABLE_DRAW_DEBUG
 
 	if (bDrawDebug)

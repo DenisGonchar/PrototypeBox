@@ -29,4 +29,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param | Type")
 	EWallType WallType = EWallType::DefaultWall;
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayDestroySequence();
+
 };

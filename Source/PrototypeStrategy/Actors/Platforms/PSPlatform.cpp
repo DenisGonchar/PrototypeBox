@@ -9,7 +9,7 @@
 #include <Pawns/Character/PSBaseCharacter.h>
 #include <Kismet/GameplayStatics.h>
 #include "Parts/CoverPlatformPart.h"
-#include "Parts/ExitPlatformPart.h"
+#include "Parts/MagneticPlatformPart.h"
 
 APSPlatform::APSPlatform()
 {
@@ -113,8 +113,6 @@ void APSPlatform::SpawnPlatformPartFloor()
 		ATeleportPlatformPart* Part = Cast<ATeleportPlatformPart>(SpawnActors);
 		if (IsValid(Part))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Teleport %.2f"), l);
-
 			EBoxType GetType = Part->GetBoxType();
 
 			if (GetType == EBoxType::Teleport)
@@ -129,15 +127,34 @@ void APSPlatform::SpawnPlatformPartFloor()
 				}
 			}
 		}
-		
-		AExitPlatformPart* ExitPart = Cast<AExitPlatformPart>(SpawnActors);
-		if (IsValid(ExitPart))
+
+		AMagneticPlatformPart* MagneticPart = Cast<AMagneticPlatformPart>(SpawnActors);
+		if (IsValid(MagneticPart))
 		{
-			EBoxType GetType = ExitPart->GetBoxType();
+			EBoxType GetType = MagneticPart->GetBoxType();
+			if (GetType == EBoxType::Magnetic)
+			{
+				if (MagneticPart->MagneticType == EMagneticType::Magnetic)
+				{
+					GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Emerald,"Array");
+					MagneticArray.Add(MagneticPart);
+				}
+				else if (MagneticPart->MagneticType == EMagneticType::Activator)
+				{
+					GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Emerald,"Activator1");
+					MagneticActivator = MagneticPart;
+				}
+			}
+		}
+		
+		ABlockPlatformPart* BlockPart = Cast<ABlockPlatformPart>(SpawnActors);
+		if (IsValid(BlockPart))
+		{
+			EBoxType GetType = BlockPart->GetBoxType();
 
 			if (GetType == EBoxType::Exit)
 			{
-				ExitPart->SetOpenLevel(ExitMap);
+				BlockPart->SetOpenLevel(ExitMap);
 			}
 		}
 
@@ -152,10 +169,12 @@ void APSPlatform::SpawnPlatformPartFloor()
 			}
 
 		}
-
-
-		Y++;
-	
+		Y++;	
+	}
+	if(IsValid(MagneticActivator))
+	{
+		GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Emerald,"Activator12");
+		MagneticActivator->MagneticParts = MagneticArray;
 	}
 	
 	for (int p = 0; p < ArrayPlatformPart.Num(); p++)

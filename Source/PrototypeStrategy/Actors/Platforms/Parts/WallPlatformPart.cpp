@@ -37,5 +37,5 @@ EWallType AWallPlatformPart::GetWallType() const
 
 void AWallPlatformPart::DeadBox()
 {
-	this->Destroy();
+	PlayDestroySequence();
 }

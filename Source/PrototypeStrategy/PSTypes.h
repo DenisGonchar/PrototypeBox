@@ -35,8 +35,8 @@ enum class EBoxType : uint8
 	Dynamic,
 	Exit,
 	Cover,
-	Teleport
-
+	Teleport,
+	Magnetic,
 };
 
 UENUM(BlueprintType)
@@ -54,9 +54,23 @@ enum class ETeleport : uint8
 	None,
 	Activator,
 	Teleport
-	
-	
+};
 
+UENUM(BlueprintType)
+enum class EMagneticType : uint8
+{
+	None,
+	Activator,
+	Polarizer,
+	Magnetic,
+};
+
+UENUM(BlueprintType)
+enum class EPolarizationType : uint8
+{
+	None,
+	Positive,
+	Negative,
 };
 
 UENUM(BlueprintType)
@@ -81,4 +95,19 @@ struct FTeleportInfo
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Teleport")
 	bool bIsTeleportType = false;
+};
+
+USTRUCT(BlueprintType)
+struct FMagneticData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Magnetic")
+	AActor* MagneticActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Magnetic")
+	FVector location;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Magnetic")
+	EPolarizationType polarization;
 };
