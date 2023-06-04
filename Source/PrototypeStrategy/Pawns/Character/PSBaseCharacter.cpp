@@ -9,6 +9,7 @@
 #include <Actors/Platforms/Parts/BlockPlatformPart.h>
 #include <GameMode/PSGameMode.h>
 #include <GameState/PSGameState.h>
+#include "Actors/Platforms/Parts/MagneticPlatformPart.h"
 #include "Actors/Platforms/Parts/TeleportPlatformPart.h"
 #include "Actors/Platforms/Parts/CoverPlatformPart.h"
 #include "Actors/Platforms/Parts/PathPlatformPart.h"
@@ -69,6 +70,34 @@ void APSBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APSBaseCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	AMagneticPlatformPart* magneticPart = Cast<AMagneticPlatformPart>(OtherActor);
+	
+	if(IsValid(magneticPart))
+	{
+		if(magneticPart->MagneticType == EMagneticType::Polarizer)
+		{
+			switch (PolarizationType)
+			{
+			case EPolarizationType::None:
+				PolarizationType = EPolarizationType::Positive;
+				break;
+			case EPolarizationType::Positive:
+				PolarizationType = EPolarizationType::Negative;
+				break;
+			case EPolarizationType::Negative:
+				PolarizationType = EPolarizationType::None;
+				break;			
+			default:
+				break;
+			}
+		}
+	}
 }
 
 float APSBaseCharacter::GetMoveDistance() const
@@ -153,6 +182,8 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 					}
 
 				}
+				default:
+					break;			
 			}
 
 			break;
@@ -229,6 +260,22 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 
 			break;
 		}
+		
+		//if move to magnetic activator
+		case EBoxType::Magnetic:
+		{
+			AMagneticPlatformPart* MagneticBox = Cast<AMagneticPlatformPart>(BoxBlock);
+
+			if (MagneticBox->MagneticType == EMagneticType::Activator)
+			{
+				MoveToPosition(Box);
+
+				MagneticBox->SwitchActivator();
+			}			
+		}
+		
+		default:
+			break;
 	}
 	
 
@@ -245,8 +292,12 @@ void APSBaseCharacter::MoveToPosition(APSPlatformPart* Box)
 
 		Step(StepIndex);
 
-	}
-	
+	}	
+}
+
+void APSBaseCharacter::MoveToPosition(FVector location)
+{	
+		SetActorLocation(location);	
 }
 
 void APSBaseCharacter::MoveToPositionStart(APSPlatformPart* Box)
@@ -255,6 +306,28 @@ void APSBaseCharacter::MoveToPositionStart(APSPlatformPart* Box)
 	FloorLocation.Z = GetActorLocation().Z;
 
 	SetActorLocation(FloorLocation);
+}
+
+void APSBaseCharacter::AddActualMagnetics(AMagneticPlatformPart* part)
+{
+	ActiveMagnetics.AddUnique(part);
+}
+
+void APSBaseCharacter::FindNearestMagnetic()
+{
+	float minDistance = 9999;
+	AMagneticPlatformPart* nearestPart = nullptr;
+	for(auto part : ActiveMagnetics)
+	{
+		float Distance = GetDistanceTo(part);
+		if(Distance < minDistance)
+		{
+			minDistance = Distance;
+			nearestPart = part;
+		}
+	}
+	ActiveMagnetics.Empty();
+	nearestPart->Magnetic(this);
 }
 
 

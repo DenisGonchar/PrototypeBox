@@ -40,6 +40,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual  void NotifyActorBeginOverlap(AActor* OtherActor) override;
+
 	float GetMoveDistance() const;
 
 	EMoveCharacterDirection GetCharacterDirection() const;
@@ -51,6 +53,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	class UStaticMeshComponent* CharacterMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EPolarizationType PolarizationType = EPolarizationType::None;
+
 	EMoveCharacterDirection CharacterDirection = EMoveCharacterDirection::None;
 
 	virtual void MoveTop();
@@ -60,8 +65,11 @@ public:
 	
 	void MovementDirection(EMoveCharacterDirection Direction);
 	void MoveToLocationType(APSPlatformPart* Box);
-	void MoveToPosition(APSPlatformPart* Box);
+	void MoveToPosition(APSPlatformPart* Box);	
+	void MoveToPosition(FVector Location);
 	void MoveToPositionStart(APSPlatformPart* Box);
+	void AddActualMagnetics(AMagneticPlatformPart* part);
+	void FindNearestMagnetic();
 
 	void Step(int Index);
 	void FullStep();
@@ -91,6 +99,8 @@ protected:
 
 	EBoxType BoxType = EBoxType::None;
 	ELevelType LevelType = ELevelType::Level;
+
+	TArray<AMagneticPlatformPart*> ActiveMagnetics;
 
 	FName NameMap;
 	FName NextLevel;

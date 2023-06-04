@@ -10,6 +10,7 @@
 class APSPlatformPart;
 class ATeleportPlatformPart;
 class ACoverPlatformPart;
+class AMagneticPlatformPart;
 
 UCLASS()
 class PROTOTYPESTRATEGY_API APSPlatform : public AActor
@@ -51,7 +52,10 @@ protected:
 	void SpawnPlatformPartFloor();
 	
 private:
-		
+
+	AMagneticPlatformPart* MagneticActivator;
+
+	TArray<AMagneticPlatformPart*> MagneticArray;
 	
 	ATeleportPlatformPart* ActivatorTeleport;
 	
