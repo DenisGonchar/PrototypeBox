@@ -88,7 +88,7 @@ void APSPlatform::SpawnPlatformPartFloor()
 		}
 
 		FVector SpawnLocation = GetRootComponent()->GetComponentLocation();
-		SpawnLocation.X = SpawnLocation.X + (X * Distance);
+		SpawnLocation.X = SpawnLocation.X + (-X * Distance);
 		SpawnLocation.Y += SpawnLocation.Y + (Y * Distance);
 		
 		APSPlatformPart* SpawnActors = GetWorld()->SpawnActor<APSPlatformPart>(GridParts[l], SpawnLocation, FRotator::ZeroRotator);
