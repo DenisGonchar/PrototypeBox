@@ -106,3 +106,9 @@ void APSPlatformPart::NewLevelType()
 	}
 }
 
+void APSPlatformPart::AcceptConstructionData()
+{
+	SetActorLocation(constructionData.location);
+	SetActorRotation(constructionData.rotation);
+}
+

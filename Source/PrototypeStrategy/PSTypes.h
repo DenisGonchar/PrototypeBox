@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/DataTable.h"
 
 #include "PSTypes.generated.h"
 
@@ -82,6 +83,13 @@ enum class EWallType : uint8
 
 };
 
+UENUM(BlueprintType)
+enum class EBlockConstructionType : uint8
+{
+	Floor,
+	OnFloor,
+};
+
 USTRUCT(BlueprintType)
 struct FTeleportInfo
 {
@@ -98,16 +106,48 @@ struct FTeleportInfo
 };
 
 USTRUCT(BlueprintType)
-struct FMagneticData
+struct FConstructionData : public FTableRowBase //для использования в DataTable
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Magnetic")
-	AActor* MagneticActor;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		UTexture2D* Image;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Magnetic")
-	FVector location;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		int countLimit = -1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Magnetic")
-	EPolarizationType polarization;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		EBlockConstructionType BlockConstructionType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		bool bIsMovable = false;
 };
+
+USTRUCT(BlueprintType)
+struct FConstructedBlockData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		UClass* Block;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		FVector location;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		FRotator rotation;
+};
+
+USTRUCT(BlueprintType)
+struct FLevelData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		FString levelName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		TArray<FConstructedBlockData> blocks;
+};
+
+
