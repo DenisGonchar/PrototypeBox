@@ -46,7 +46,7 @@ public:
 
 	UFUNCTION()
 		void SwitchActivator();
-		void Magnetic(APSBaseCharacter* player);
+		void Magnetic(class APSBaseCharacter* player);
 		void CheckPlayer();
 
 	UFUNCTION(BlueprintImplementableEvent)
