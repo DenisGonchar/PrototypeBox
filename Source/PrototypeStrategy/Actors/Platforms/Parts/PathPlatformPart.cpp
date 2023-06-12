@@ -2,6 +2,8 @@
 
 
 #include "Actors/Platforms/Parts/PathPlatformPart.h"
+#include "../Plugins/2D/Paper2D/Source/Paper2D/Classes/PaperFlipbookComponent.h"
+#include "PaperFlipbook.h"
 
 
 void APathPlatformPart::ActivatorCover()
@@ -10,9 +12,9 @@ void APathPlatformPart::ActivatorCover()
 
 	if (bIsActivatorCover)
 	{
-		if (IsValid(ActivatiorMaterial))
+		if (IsValid(ActivatiorFlipbook))
 		{
-			BoxMesh->SetMaterial(0, ActivatiorMaterial);
+			Flipbook->SetFlipbook(ActivatiorFlipbook);
 
 			bIsActivatorCover = false;
 		}
@@ -27,9 +29,9 @@ void APathPlatformPart::NewLevelType()
 	{
 		if (!bIsActivatorCover)
 		{
-			if (IsValid(ActivatiorMaterial))
+			if (IsValid(ActivatiorFlipbook))
 			{
-				BoxMesh->SetMaterial(0, ActivatiorMaterial);
+				Flipbook->SetFlipbook(ActivatiorFlipbook);
 
 			}
 		}

@@ -2,6 +2,9 @@
 
 
 #include "Actors/Platforms/Parts/ExitPlatformPart.h"
+#include "../Plugins/2D/Paper2D/Source/Paper2D/Classes/PaperFlipbookComponent.h"
+#include "PaperFlipbook.h"
+
 
 void AExitPlatformPart::BeginPlay()
 {
@@ -17,9 +20,9 @@ void AExitPlatformPart::NewLevelType()
 	{
 		if (bIsActivCaver && bIsActivLevel)
 		{
-			if (IsValid(BaseMaterial))
+			if (IsValid(BaseFlipbook))
 			{
-				BoxMesh->SetMaterial(0, BaseMaterial);
+				Flipbook->SetFlipbook(BaseFlipbook);
 			}
 		}
 		

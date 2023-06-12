@@ -65,6 +65,10 @@ void AMovePlatformPart::DirectionDynamicType(APSPlatformPart* Box)
 					break;
 				}
 			}
+			else
+			{
+				break;
+			}
 			
 		}
 

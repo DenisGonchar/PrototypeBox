@@ -23,6 +23,6 @@ public:
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
-	UMaterialInterface* ActivatiorMaterial;
+	UPaperFlipbook* ActivatiorFlipbook;
 
 };
