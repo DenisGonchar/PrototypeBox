@@ -175,13 +175,16 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 
 				case ELevelType::UnderCover:
 				{
-					if (BoxBlock->GetbIsActivatorCover())
+					if (IsValid(BoxBlock))
 					{
-						BoxBlock->ActivatorCover();
-						
-						MoveToPosition(Box);
-					}
+						if (BoxBlock->GetbIsActivatorCover())
+						{
+							BoxBlock->ActivatorCover();
 
+							MoveToPosition(Box);
+						}
+					}
+					
 				}
 				default:
 					break;			

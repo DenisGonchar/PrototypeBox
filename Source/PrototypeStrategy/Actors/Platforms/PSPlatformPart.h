@@ -11,6 +11,9 @@ class UActivatorCoverComponent;
 class ACoverPlatformPart;
 class UMaterialInterface;
 class USceneComponent;
+class UBoxComponent;
+class UPaperFlipbookComponent;
+class UPaperFlipbook;
 
 UCLASS()
 class PROTOTYPESTRATEGY_API APSPlatformPart : public AActor
@@ -23,11 +26,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scene")
 	USceneComponent* SceneComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
-	UStaticMeshComponent* BoxMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BoxComponent")
+	UBoxComponent* BoxComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
+	UPaperFlipbookComponent* Flipbook;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
-	UMaterialInterface* MaterialCaver;
+	UPaperFlipbook* FlipbookCaver;
+
 
 	virtual void BeginPlay() override;
 	
@@ -44,7 +51,7 @@ public:
 	void SetLevelType(ELevelType World);
 	ELevelType GetLevelType() const;
 
-	UMaterialInterface* GetBaseMaterial();
+	UPaperFlipbook* GetBaseFlibook();
 
 	virtual void NewLevelType();
 
@@ -58,5 +65,6 @@ protected:
 
 	ACoverPlatformPart* BaseCover; 
 	
-	UMaterialInterface* BaseMaterial;
+	UPaperFlipbook* BaseFlipbook;
+
 };
