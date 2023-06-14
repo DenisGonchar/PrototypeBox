@@ -53,6 +53,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	class UStaticMeshComponent* CharacterMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
+		FConstructedBlockData constructionData;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		EPolarizationType PolarizationType = EPolarizationType::None;
 
