@@ -424,7 +424,7 @@ bool ULedgeDetectorComponent::BoxDetectHitBlock(FHitResult Hit)
 					{
 						if (BoxWall->GetWallType() == EWallType::CrackedWall)
 						{
-							BoxWall->DeadBox();
+							BoxWall->StartDeadBox();
 
 							return true;
 						}
