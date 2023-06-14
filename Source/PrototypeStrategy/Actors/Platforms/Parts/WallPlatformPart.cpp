@@ -2,6 +2,9 @@
 
 
 #include "Actors/Platforms/Parts/WallPlatformPart.h"
+#include "PaperFlipbook.h"
+#include "PaperFlipbookComponent.h"
+#include "Components/BoxComponent.h"
 
 void AWallPlatformPart::ActivatorCover()
 {
@@ -23,7 +26,7 @@ void AWallPlatformPart::NewLevelType()
 {
 	Super::NewLevelType();
 
-	if (IsValid(MaterialCaver))
+	if (IsValid(FlipbookCaver))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, FString::Printf(TEXT("Cover")));
 
@@ -35,7 +38,19 @@ EWallType AWallPlatformPart::GetWallType() const
 	return WallType;
 }
 
-void AWallPlatformPart::DeadBox()
+void AWallPlatformPart::StartDeadBox()
 {
-	PlayDestroySequence();
+	BoxComponent->SetCollisionProfileName(TEXT("NoCollision"));
+	Flipbook->SetFlipbook(FlipbookDead);
+	Flipbook->PlayFromStart();
+	float Lenght = Flipbook->GetFlipbookLength();
+
+	GetWorldTimerManager().SetTimer(WallTimer, this, &AWallPlatformPart::EndDeadBox, Lenght - 0.1f, false);
+}
+
+void AWallPlatformPart::EndDeadBox()
+{
+	Flipbook->Stop();
+	GetWorld()->DestroyActor(this);
+
 }

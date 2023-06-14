@@ -16,14 +16,17 @@ class PROTOTYPESTRATEGY_API AWallPlatformPart : public ABlockPlatformPart
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
+	UPaperFlipbook* FlipbookDead;
+
 	virtual void ActivatorCover() override;
 
 	virtual void NewLevelType() override;
 
 	EWallType GetWallType() const;
 
-	void DeadBox();
-
+	void StartDeadBox();
+	void EndDeadBox();
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param | Type")
@@ -31,5 +34,8 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void PlayDestroySequence();
+
+	FTimerHandle WallTimer;
+	//FHitResult HitResult;
 
 };

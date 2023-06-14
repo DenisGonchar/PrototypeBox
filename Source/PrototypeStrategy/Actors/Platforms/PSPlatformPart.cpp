@@ -3,6 +3,9 @@
 #include "Components/ActivatorCoverComponent.h"
 #include "Parts/CoverPlatformPart.h"
 #include "Components/SceneComponent.h"
+#include "Components/BoxComponent.h"
+#include "PaperFlipbookComponent.h"
+#include "PaperFlipbook.h"
 
 APSPlatformPart::APSPlatformPart()
 {
@@ -11,9 +14,15 @@ APSPlatformPart::APSPlatformPart()
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	SetRootComponent(SceneComponent);
 
-	BoxMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BoxComponent"));
-	BoxMesh->SetupAttachment(SceneComponent);
-	
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	BoxComponent->SetupAttachment(SceneComponent);
+	BoxComponent->SetBoxExtent(FVector(75.0f, 75.0f, 75.0f), false);
+	BoxComponent->SetCollisionProfileName(TEXT("BlockAll"));
+
+	Flipbook = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("Flipbook"));
+	Flipbook->SetupAttachment(SceneComponent);
+	Flipbook->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
+
 	ActivatorCoverComponent = CreateDefaultSubobject<UActivatorCoverComponent>(TEXT("ActivatorCoverComponent"));
 
 }
@@ -22,7 +31,7 @@ void APSPlatformPart::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	BaseMaterial = BoxMesh->GetMaterial(0);
+	BaseFlipbook = Flipbook->GetFlipbook();
 
 }
 
@@ -75,9 +84,9 @@ ELevelType APSPlatformPart::GetLevelType() const
 	return LevelType;
 }
 
-UMaterialInterface* APSPlatformPart::GetBaseMaterial()
+UPaperFlipbook* APSPlatformPart::GetBaseFlibook()
 {
-	return BaseMaterial;
+	return BaseFlipbook;
 }
 
 void APSPlatformPart::NewLevelType()
@@ -86,9 +95,9 @@ void APSPlatformPart::NewLevelType()
 	{
 		case ELevelType::Level:
 		{
-			if (IsValid(BaseMaterial))
+			if (IsValid(BaseFlipbook))
 			{
-				BoxMesh->SetMaterial(0, BaseMaterial);
+				Flipbook->SetFlipbook(BaseFlipbook);
 
 			}
 			break;
@@ -96,9 +105,9 @@ void APSPlatformPart::NewLevelType()
 		}
 		case ELevelType::UnderCover:
 		{
-			if (IsValid(MaterialCaver))
+			if (IsValid(FlipbookCaver))
 			{
-				BoxMesh->SetMaterial(0, MaterialCaver);
+				Flipbook->SetFlipbook(FlipbookCaver);
 			}
 
 			break;
