@@ -147,6 +147,9 @@ struct FLevelData
 		FString levelName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		FVector playerLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
 		TArray<FConstructedBlockData> blocks;
 };
 
