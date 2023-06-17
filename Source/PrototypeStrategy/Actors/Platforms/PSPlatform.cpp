@@ -60,14 +60,17 @@ TArray<AActor*> APSPlatform::SpawnBlocks(TArray<FConstructedBlockData> blocks)
 	{
 		for (auto block : spawnedBlocks)
 		{
-			block->Destroy();
+			if (IsValid(block))
+			{
+				block->Destroy();
+			}
 		}
 		spawnedBlocks.Empty();
 	}
 
 	for (auto block : blocks)
 	{
-		spawnedBlocks.Add(GetWorld()->SpawnActor<AActor>(block.Block, block.location, FRotator::ZeroRotator));
+		spawnedBlocks.Add(GetWorld()->SpawnActor<AActor>(block.Block, block.location, block.rotation));
 	}
 	return spawnedBlocks;
 }

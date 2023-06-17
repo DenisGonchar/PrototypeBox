@@ -38,6 +38,7 @@ enum class EBoxType : uint8
 	Cover,
 	Teleport,
 	Magnetic,
+	Polarizator,
 };
 
 UENUM(BlueprintType)

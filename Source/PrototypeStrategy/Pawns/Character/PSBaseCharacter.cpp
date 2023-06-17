@@ -75,30 +75,7 @@ void APSBaseCharacter::Tick(float DeltaTime)
 
 void APSBaseCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	Super::NotifyActorBeginOverlap(OtherActor);
-
-	AMagneticPlatformPart* magneticPart = Cast<AMagneticPlatformPart>(OtherActor);
-	
-	if(IsValid(magneticPart))
-	{
-		if(magneticPart->MagneticType == EMagneticType::Polarizer)
-		{
-			switch (PolarizationType)
-			{
-			case EPolarizationType::None:
-				PolarizationType = EPolarizationType::Positive;
-				break;
-			case EPolarizationType::Positive:
-				PolarizationType = EPolarizationType::Negative;
-				break;
-			case EPolarizationType::Negative:
-				PolarizationType = EPolarizationType::None;
-				break;			
-			default:
-				break;
-			}
-		}
-	}
+	Super::NotifyActorBeginOverlap(OtherActor);	
 }
 
 float APSBaseCharacter::GetMoveDistance() const
@@ -296,6 +273,33 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 
 				MagneticBox->SwitchActivator();
 			}			
+		}
+
+		case EBoxType::Polarizator:
+		{
+			AMagneticPlatformPart* magneticPart = Cast<AMagneticPlatformPart>(BoxBlock);
+
+			if (IsValid(magneticPart))
+			{
+				if (magneticPart->MagneticType == EMagneticType::Polarizer)
+				{
+					switch (PolarizationType)
+					{
+					case EPolarizationType::None:
+						PolarizationType = EPolarizationType::Positive;
+						break;
+					case EPolarizationType::Positive:
+						PolarizationType = EPolarizationType::Negative;
+						break;
+					case EPolarizationType::Negative:
+						PolarizationType = EPolarizationType::None;
+						break;
+					default:
+						break;
+					}
+				}
+			}
+			MoveToPosition(Box);
 		}
 		
 		default:
