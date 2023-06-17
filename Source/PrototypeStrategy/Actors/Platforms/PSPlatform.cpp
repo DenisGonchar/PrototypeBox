@@ -203,13 +203,16 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 		MagneticActivator->MagneticParts = MagneticArray;
 	}
 	
-	for (int p = 0; p < ArrayPlatformPart.Num(); p++)
+	if (IsValid(CoverPart))
 	{
-		if (IsValid(CoverPart))
+		for (auto part : parts)
 		{
-			ArrayPlatformPart[p]->SetCoverPart(CoverPart);
-
-			UE_LOG(LogTemp, Warning, TEXT("Type Level %i = %s"), p, *UEnum::GetValueAsString(ArrayPlatformPart[p]->GetLevelType()));
+			APSPlatformPart* prt = Cast<APSPlatformPart>(part);
+			if(IsValid(prt))
+			{
+				prt->SetCoverPart(CoverPart);
+				UE_LOG(LogTemp, Warning, TEXT("Type Level %i = %s"), -1, *UEnum::GetValueAsString(prt->GetLevelType()));
+			}
 		}
 	}
 
