@@ -11,19 +11,20 @@ void ACoverPlatformPart::BeginPlay()
 }
 
 void ACoverPlatformPart::ActivatorCover()
-{
+{	
 	if (ELevelType::Level == CurrentLevel)
 	{
 		CurrentLevel = ELevelType::UnderCover;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, *UEnum::GetValueAsString(CurrentLevel));
 	}
 	else
 	{
 		CurrentLevel = ELevelType::Level;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, *UEnum::GetValueAsString(CurrentLevel));
 	}
 
 	if (OnActivatorCover.IsBound())
 	{
-		OnActivatorCover.Broadcast(CurrentLevel);
-	
+		OnActivatorCover.Broadcast(CurrentLevel);	
 	}
 }
