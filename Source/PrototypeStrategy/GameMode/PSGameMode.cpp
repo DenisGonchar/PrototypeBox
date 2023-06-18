@@ -41,15 +41,13 @@ void APSGameMode::MadeStep(int Index)
 	if (IsValid(WState))
 	{
 		WState->IncrementSteps(Index);
-		if (WState->GetSteps() >= FullSteps)
+		/*if (WState->GetSteps() >= FullSteps)
 		{
 			if (BaseCharacter->GetBoxType() != EBoxType::Exit)
 			{
 				CheckWin();
-			}
-				
-		}
-
+			}				
+		}*/
 	}
 }
 
@@ -58,5 +56,4 @@ void APSGameMode::CheckWin()
 	bIsWin = false;
 	FName CurrentName = (FName)UGameplayStatics::GetCurrentLevelName(GetWorld());
 	UGameplayStatics::OpenLevel(GetWorld(), CurrentName);
-
 }

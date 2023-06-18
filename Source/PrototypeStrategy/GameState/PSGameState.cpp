@@ -10,5 +10,5 @@ int APSGameState::GetSteps() const
 
 void APSGameState::IncrementSteps(int Index)
 {
-	//Steps += Index;
+	Steps += Index;
 }
