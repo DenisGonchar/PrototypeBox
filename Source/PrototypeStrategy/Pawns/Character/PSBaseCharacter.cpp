@@ -14,6 +14,7 @@
 #include "Actors/Platforms/Parts/CoverPlatformPart.h"
 #include "Actors/Platforms/Parts/PathPlatformPart.h"
 #include "Actors/Platforms/Parts/ExitPlatformPart.h"
+#include "PaperFlipbookComponent.h"
 
 APSBaseCharacter::APSBaseCharacter()
 {
@@ -22,8 +23,9 @@ APSBaseCharacter::APSBaseCharacter()
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
 	SetRootComponent(BoxComponent);
 
-	CharacterMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CharacterMesh"));
-	CharacterMesh->SetupAttachment(BoxComponent);
+	Flipbook = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("Flipbook"));
+	Flipbook->SetupAttachment(BoxComponent);
+	Flipbook->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 
 	LedgeDetertorComponent = CreateDefaultSubobject<ULedgeDetectorComponent>(TEXT("LedgeDetector"));
 

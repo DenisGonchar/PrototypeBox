@@ -23,6 +23,8 @@ struct FGetTeleportInfo
 
 };
 
+class UPaperFlipbookComponent;
+
 UCLASS()
 class PROTOTYPESTRATEGY_API APSBaseCharacter : public APawn
 {
@@ -50,8 +52,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UBoxComponent* BoxComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	class UStaticMeshComponent* CharacterMesh;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	//class UStaticMeshComponent* CharacterMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
+	UPaperFlipbookComponent* Flipbook;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
 		FConstructedBlockData constructionData;
