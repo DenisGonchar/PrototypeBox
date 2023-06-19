@@ -27,6 +27,7 @@ public:
 
 	void StartDeadBox();
 	void EndDeadBox();
+
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param | Type")
