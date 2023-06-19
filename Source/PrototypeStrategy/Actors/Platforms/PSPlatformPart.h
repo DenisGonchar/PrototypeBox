@@ -36,6 +36,9 @@ public:
 	UPaperFlipbook* FlipbookCaver;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
+		FConstructedBlockData constructionData;
+
 	virtual void BeginPlay() override;
 	
 	virtual void Tick(float DeltaTime) override;
@@ -62,6 +65,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param | Type")
 	ELevelType LevelType = ELevelType::Level;
+
+	UFUNCTION(BlueprintCallable)
+		void AcceptConstructionData();
 
 	ACoverPlatformPart* BaseCover; 
 	

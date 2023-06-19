@@ -14,7 +14,7 @@ APSPlatformPart::APSPlatformPart()
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	SetRootComponent(SceneComponent);
 
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	BoxComponent->SetupAttachment(SceneComponent);
 	BoxComponent->SetBoxExtent(FVector(75.0f, 75.0f, 75.0f), false);
 	BoxComponent->SetCollisionProfileName(TEXT("BlockAll"));
@@ -113,5 +113,11 @@ void APSPlatformPart::NewLevelType()
 			break;
 		}
 	}
+}
+
+void APSPlatformPart::AcceptConstructionData()
+{
+	SetActorLocation(constructionData.location);
+	SetActorRotation(constructionData.rotation);
 }
 

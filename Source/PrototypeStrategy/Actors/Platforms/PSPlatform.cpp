@@ -10,6 +10,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "Parts/CoverPlatformPart.h"
 #include "Parts/MagneticPlatformPart.h"
+#include "../../GameInstance/PSGameInstance.h"
 #include "Parts/ExitPlatformPart.h"
 
 APSPlatform::APSPlatform()
@@ -22,7 +23,12 @@ void APSPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpawnPlatformPartFloor();
+	if (levelName != "")
+	{
+		UPSGameInstance* gameInstance = Cast<UPSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+		SpawnBlocks(gameInstance->LoadLevel(levelName).blocks);
+		SpawnPlatformPartFloor(spawnedBlocks);
+	}
 
 	APSBaseCharacter* BSCharacter = Cast<APSBaseCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	if (IsValid(BSCharacter))
@@ -36,25 +42,42 @@ void APSPlatform::BeginPlay()
 void APSPlatform::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-
-
-
 }
 
 void APSPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
-
+/*
 TArray<TSubclassOf<APSPlatformPart>> APSPlatform::GetGridParts() const
 {
 	return GridParts;
+}*/
+
+TArray<AActor*> APSPlatform::SpawnBlocks(TArray<FConstructedBlockData> blocks)
+{	
+	if (spawnedBlocks.Num() > 0)
+	{
+		for (auto block : spawnedBlocks)
+		{
+			if (IsValid(block))
+			{
+				block->Destroy();
+			}
+		}
+		spawnedBlocks.Empty();
+	}
+
+	for (auto block : blocks)
+	{
+		spawnedBlocks.Add(GetWorld()->SpawnActor<AActor>(block.Block, block.location, block.rotation));
+	}
+	return spawnedBlocks;
 }
 
-void APSPlatform::SpawnPlatformPartFloor()
+void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 {
-	
+	/*
 	for (int i = 0; i <= MaxIndex - 1; i++)
 	{
 		Floor.Add(FloorPart);
@@ -78,9 +101,10 @@ void APSPlatform::SpawnPlatformPartFloor()
 
 	int X = 0;
 	int Y = 0;
-
-	for (int l = 0; l < GridParts.Num(); l++)
+	*/
+	for (auto part : parts)
 	{
+		/*
 		if (!(Y < HorizontalIndex))
 		{
 			Y = 0;
@@ -109,9 +133,11 @@ void APSPlatform::SpawnPlatformPartFloor()
 					ArrayPlatformPart.Add(SpawnBlock);
 				}
 			}
-		}
+		}*/
+		APSPlatformPart* Actor = Cast<APSPlatformPart>(part);
 
-		ATeleportPlatformPart* Part = Cast<ATeleportPlatformPart>(SpawnActors);
+
+		ATeleportPlatformPart* Part = Cast<ATeleportPlatformPart>(Actor);
 		if (IsValid(Part))
 		{
 			EBoxType GetType = Part->GetBoxType();
@@ -129,7 +155,7 @@ void APSPlatform::SpawnPlatformPartFloor()
 			}
 		}
 
-		AMagneticPlatformPart* MagneticPart = Cast<AMagneticPlatformPart>(SpawnActors);
+		AMagneticPlatformPart* MagneticPart = Cast<AMagneticPlatformPart>(Actor);
 		if (IsValid(MagneticPart))
 		{
 			EBoxType GetType = MagneticPart->GetBoxType();
@@ -148,7 +174,7 @@ void APSPlatform::SpawnPlatformPartFloor()
 			}
 		}
 		
-		AExitPlatformPart* ExitPart = Cast<AExitPlatformPart>(SpawnActors);
+		AExitPlatformPart* ExitPart = Cast<AExitPlatformPart>(Actor);
 		if (IsValid(ExitPart))
 		{
 			EBoxType GetType = ExitPart->GetBoxType();
@@ -159,7 +185,7 @@ void APSPlatform::SpawnPlatformPartFloor()
 			}
 		}
 
-		ACoverPlatformPart* Cover = Cast<ACoverPlatformPart>(SpawnActors);
+		ACoverPlatformPart* Cover = Cast<ACoverPlatformPart>(Actor);
 		if (IsValid(Cover))
 		{
 			EBoxType GetType = Cover->GetBoxType();
@@ -169,8 +195,7 @@ void APSPlatform::SpawnPlatformPartFloor()
 				CoverPart = Cover;
 			}
 
-		}
-		Y++;	
+		}	
 	}
 	if(IsValid(MagneticActivator))
 	{
@@ -178,13 +203,16 @@ void APSPlatform::SpawnPlatformPartFloor()
 		MagneticActivator->MagneticParts = MagneticArray;
 	}
 	
-	for (int p = 0; p < ArrayPlatformPart.Num(); p++)
+	if (IsValid(CoverPart))
 	{
-		if (IsValid(CoverPart))
+		for (auto part : parts)
 		{
-			ArrayPlatformPart[p]->SetCoverPart(CoverPart);
-
-			UE_LOG(LogTemp, Warning, TEXT("Type Level %i = %s"), p, *UEnum::GetValueAsString(ArrayPlatformPart[p]->GetLevelType()));
+			APSPlatformPart* prt = Cast<APSPlatformPart>(part);
+			if(IsValid(prt))
+			{
+				prt->SetCoverPart(CoverPart);
+				UE_LOG(LogTemp, Warning, TEXT("Type Level %i = %s"), -1, *UEnum::GetValueAsString(prt->GetLevelType()));
+			}
 		}
 	}
 
