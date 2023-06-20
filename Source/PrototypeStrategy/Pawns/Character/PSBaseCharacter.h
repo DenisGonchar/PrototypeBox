@@ -79,6 +79,10 @@ public:
 	void AddActualMagnetics(AMagneticPlatformPart* part);
 	void FindNearestMagnetic();
 
+	void NormalizePlayerFlipbook();
+	FTimerHandle spriteTimer;
+
+
 	void Step(int Index);
 	void FullStep();
 	void SetFullSteps(int32 Step);

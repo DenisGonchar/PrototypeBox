@@ -123,11 +123,27 @@ void APSBaseCharacter::MoveLeft()
 
 void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 {
+	
+	if (Direction == EMoveCharacterDirection::Top || Direction == EMoveCharacterDirection::Down)
+	{
+		Flipbook->SetRelativeScale3D(FVector(0.7f,0.5f, 0.5f));
+	}
+	else if (Direction == EMoveCharacterDirection::Left || Direction == EMoveCharacterDirection::Right)
+	{
+		Flipbook->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.7f));
+	}
 	FLedgeDescription LedgeDescription;
 	if (LedgeDetertorComponent->DetectLedge(LedgeDescription, CharacterDirection))
 	{
 		MoveToLocationType(LedgeDescription.BoxMesh);
 	}
+	GetWorldTimerManager().SetTimer(spriteTimer,this,&APSBaseCharacter::NormalizePlayerFlipbook,0.1f,false);
+}
+
+
+void APSBaseCharacter::NormalizePlayerFlipbook()
+{
+	Flipbook->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
 }
 
 void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
