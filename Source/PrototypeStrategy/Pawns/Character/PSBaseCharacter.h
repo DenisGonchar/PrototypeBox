@@ -66,6 +66,7 @@ public:
 
 	EMoveCharacterDirection CharacterDirection = EMoveCharacterDirection::None;
 
+#pragma region Move
 	virtual void MoveTop();
 	virtual void MoveDown();
 	virtual void MoveRight();
@@ -76,16 +77,25 @@ public:
 	void MoveToPosition(APSPlatformPart* Box);	
 	void MoveToPosition(FVector Location);
 	void MoveToPositionStart(APSPlatformPart* Box);
-	void AddActualMagnetics(AMagneticPlatformPart* part);
-	void FindNearestMagnetic();
 
 	void NormalizePlayerFlipbook();
 	FTimerHandle spriteTimer;
 
-
 	void Step(int Index);
 	void FullStep();
 	void SetFullSteps(int32 Step);
+
+#pragma endregion
+
+#pragma region Magntic
+	void AddActualMagnetics(AMagneticPlatformPart* part);
+	void FindNearestMagnetic();
+
+	bool IsMagneticFindStarted = false;
+	FTimerHandle startFindMagnetic;
+
+#pragma endregion
+
 
 	EBoxType GetBoxType();
 	ELevelType GetLevelType();

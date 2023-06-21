@@ -43,10 +43,8 @@ void AMagneticPlatformPart::UpdateStatus(bool newStatus)
 void AMagneticPlatformPart::ChangeMagneticsStatus(TArray<AMagneticPlatformPart*> parts, bool newStatus)
 {
 	UpdateStatus(newStatus);
-	GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Emerald,"Change");
 	for(auto part : MagneticParts)
-	{		
-		GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Emerald,part->GetName());
+	{
 		part->UpdateStatus(newStatus);
 	}
 }
@@ -82,7 +80,6 @@ void AMagneticPlatformPart::CheckPlayer()
 		if(IsValid(player))
 		{
 			player->AddActualMagnetics(this);
-			player->FindNearestMagnetic();
 		}
 	}
 }

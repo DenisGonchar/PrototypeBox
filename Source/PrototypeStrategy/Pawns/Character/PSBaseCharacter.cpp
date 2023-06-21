@@ -126,11 +126,11 @@ void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 	
 	if (Direction == EMoveCharacterDirection::Top || Direction == EMoveCharacterDirection::Down)
 	{
-		Flipbook->SetRelativeScale3D(FVector(0.7f,0.5f, 0.5f));
+		Flipbook->SetRelativeScale3D(FVector(0.6f,0.5f, 0.4f));
 	}
 	else if (Direction == EMoveCharacterDirection::Left || Direction == EMoveCharacterDirection::Right)
 	{
-		Flipbook->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.7f));
+		Flipbook->SetRelativeScale3D(FVector(0.4f, 0.5f, 0.6f));
 	}
 	FLedgeDescription LedgeDescription;
 	if (LedgeDetertorComponent->DetectLedge(LedgeDescription, CharacterDirection))
@@ -139,7 +139,6 @@ void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 	}
 	GetWorldTimerManager().SetTimer(spriteTimer,this,&APSBaseCharacter::NormalizePlayerFlipbook,0.1f,false);
 }
-
 
 void APSBaseCharacter::NormalizePlayerFlipbook()
 {
@@ -357,10 +356,17 @@ void APSBaseCharacter::MoveToPositionStart(APSPlatformPart* Box)
 void APSBaseCharacter::AddActualMagnetics(AMagneticPlatformPart* part)
 {
 	ActiveMagnetics.AddUnique(part);
+	FindNearestMagnetic();
+	if (!IsMagneticFindStarted)
+	{
+		GetWorldTimerManager().SetTimer(startFindMagnetic,this,&APSBaseCharacter::FindNearestMagnetic,0.1f,false);
+		IsMagneticFindStarted = true;
+	}
 }
 
 void APSBaseCharacter::FindNearestMagnetic()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Green, "FindNearestMagnetic");
 	float minDistance = 9999;
 	AMagneticPlatformPart* nearestPart = nullptr;
 	for(auto part : ActiveMagnetics)
@@ -372,8 +378,16 @@ void APSBaseCharacter::FindNearestMagnetic()
 			nearestPart = part;
 		}
 	}
+
+	for (auto part : ActiveMagnetics)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,4.f,FColor::Green,part->GetName());
+	}
 	ActiveMagnetics.Empty();
+	IsMagneticFindStarted = false;
+	GetWorldTimerManager().ClearTimer(startFindMagnetic);
 	nearestPart->Magnetic(this);
+	GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Black, nearestPart->GetName());
 }
 
 
