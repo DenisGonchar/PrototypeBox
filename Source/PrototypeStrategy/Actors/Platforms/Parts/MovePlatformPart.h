@@ -24,6 +24,8 @@ public:
 	void DirectionDynamicType(APSPlatformPart* Box);
 	void MoveToLocationFloor(APSPlatformPart* Box);
 	
+	void StartActive();
+
 	EDynamic GetDynamicType() const;
 
 	virtual void NewLevelType() override;
@@ -40,5 +42,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Active")
 	int ActiveMaxStepIndex = 10.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Active")
+	float ActiveTimeStep = 0.1f;
+
 	EMoveCharacterDirection Direction;
+
+	FTimerHandle DynamicTimer;
 };
