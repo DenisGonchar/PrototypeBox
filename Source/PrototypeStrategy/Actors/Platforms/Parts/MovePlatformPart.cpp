@@ -46,32 +46,8 @@ void AMovePlatformPart::DirectionDynamicType(APSPlatformPart* Box)
 	{
 		MoveToLocationFloor(Box);
 
-		for (int i = 0; i < ActiveMaxStepIndex; i++)
-		{
-			
-			if (Direction != EMoveCharacterDirection::None)
-			{
-				FLedgeDescription LedgeDescription;
-				if (LedgeDetertorComponent->BoxDetectLedge(LedgeDescription, Direction))
-				{
-					MoveToLocationFloor(LedgeDescription.BoxMesh);
-					UE_LOG(LogTemp, Warning, TEXT(" Move = %i"), i);
-
-				}
-				else
-				{
-					UE_LOG(LogTemp, Warning, TEXT(" else = %i"), i);
-
-					break;
-				}
-			}
-			else
-			{
-				break;
-			}
-			
-		}
-
+		GetWorldTimerManager().SetTimer(DynamicTimer, this, &AMovePlatformPart::StartActive, ActiveTimeStep, true);
+		
 		break;
 	}
 	default:
@@ -134,6 +110,33 @@ void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 
 }
 
+void AMovePlatformPart::StartActive()
+{
+	
+	if (Direction != EMoveCharacterDirection::None)
+	{
+		FLedgeDescription LedgeDescription;
+		if (LedgeDetertorComponent->BoxDetectLedge(LedgeDescription, Direction))
+		{
+			MoveToLocationFloor(LedgeDescription.BoxMesh);
+			UE_LOG(LogTemp, Warning, TEXT(" Move"));
+
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT(" else"));
+
+			GetWorldTimerManager().ClearTimer(DynamicTimer);
+				
+		}
+	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer(DynamicTimer);
+	}
+
+}
+
 EDynamic AMovePlatformPart::GetDynamicType() const
 {
 	return DynamicType;
@@ -145,6 +148,7 @@ void AMovePlatformPart::NewLevelType()
 
 
 }
+
 
 float AMovePlatformPart::GetMoveDistance() const
 {
