@@ -12,6 +12,7 @@
 #include "Parts/MagneticPlatformPart.h"
 #include "../../GameInstance/PSGameInstance.h"
 #include "Parts/ExitPlatformPart.h"
+#include "Parts/MirroredPlatformPart.h"
 
 APSPlatform::APSPlatform()
 {
@@ -159,16 +160,17 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 		if (IsValid(MagneticPart))
 		{
 			EBoxType GetType = MagneticPart->GetBoxType();
-			if (GetType == EBoxType::Magnetic)
+			if (GetType == EBoxType::Wall)
 			{
 				if (MagneticPart->MagneticType == EMagneticType::Magnetic)
 				{
-					GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Emerald,"Array");
 					MagneticArray.Add(MagneticPart);
 				}
-				else if (MagneticPart->MagneticType == EMagneticType::Activator)
+			}
+			else if (GetType == EBoxType::Magnetic)
+			{
+				if (MagneticPart->MagneticType == EMagneticType::Activator)
 				{
-					GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Emerald,"Activator1");
 					MagneticActivator = MagneticPart;
 				}
 			}
@@ -194,9 +196,31 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 			{
 				CoverPart = Cover;
 			}
+		}
 
-		}	
+		AMirroredPlatformPart* Mirror = Cast<AMirroredPlatformPart>(Actor);
+		if (IsValid(Mirror))
+		{
+			EBoxType GetType = Mirror->GetBoxType();
+
+			if (GetType == EBoxType::Mirrored)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, Mirror->GetName());
+				mirroredBlock = Mirror;
+			}
+			else if (GetType == EBoxType::MirroredClone)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 6.f, FColor::Blue, Mirror->GetName());
+				mirroredClones.Add(Mirror);
+			}
+		}
 	}
+
+	if (IsValid(mirroredBlock))
+	{
+		mirroredBlock->clones = mirroredClones;
+	}
+
 	if(IsValid(MagneticActivator))
 	{
 		MagneticActivator->MagneticParts = MagneticArray;

@@ -93,32 +93,29 @@ EMoveCharacterDirection APSBaseCharacter::GetCharacterDirection() const
 void APSBaseCharacter::MoveTop()
 {
 	CharacterDirection = EMoveCharacterDirection::Top;
-
+	IsPlayerStep = true;
 	MovementDirection(CharacterDirection);
 }
 
 void APSBaseCharacter::MoveDown()
 {
 	CharacterDirection = EMoveCharacterDirection::Down;
-
+	IsPlayerStep = true;
 	MovementDirection(CharacterDirection);
-
 }
 
 void APSBaseCharacter::MoveRight()
 {
 	CharacterDirection = EMoveCharacterDirection::Right;
-
+	IsPlayerStep = true;
 	MovementDirection(CharacterDirection);
-
 }
 
 void APSBaseCharacter::MoveLeft()
 {
 	CharacterDirection = EMoveCharacterDirection::Left;
-
+	IsPlayerStep = true;
 	MovementDirection(CharacterDirection);
-
 }
 
 void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
@@ -234,8 +231,6 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 				BoxCover->ActivatorCover();
 				
 				LevelType = BoxCover->GetLevelType();
-				GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Purple, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(LevelType)));
-
 			}
 			
 			break;
@@ -330,16 +325,18 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 
 void APSBaseCharacter::MoveToPosition(APSPlatformPart* Box)
 {
+	if (IsPlayerStep)
+	{
+		Step(StepIndex);
+	}
+
 	if (IsValid(Box))
 	{
 		FVector FloorLocation = Box->GetActorLocation();
 		FloorLocation.Z = GetActorLocation().Z;
-
-		SetActorLocation(FloorLocation);
-
-		Step(StepIndex);
-
-	}	
+		SetActorLocation(FloorLocation);			
+	}
+	
 }
 
 void APSBaseCharacter::MoveToPosition(FVector location)

@@ -59,12 +59,25 @@ void AMagneticPlatformPart::Magnetic(APSBaseCharacter* player)
 	if (IsValid(this))
 	{
 		EMoveCharacterDirection moveDirection = FindMagneticDirection(player);
-		GEngine->AddOnScreenDebugMessage(-1,3.f,FColor::Cyan,*UEnum::GetValueAsString(moveDirection));
+
+		player->IsPlayerStep = false;
 		
 		if (player->polarizationType == EPolarizationType::Negative)
 		{
 			if (polarization == EPolarizationType::Positive)
 			{
+				moveDirection = ReversDirection(moveDirection);
+				player->MovementDirection(moveDirection);
+			}
+			else if (polarization == EPolarizationType::Negative)
+			{
+				player->MovementDirection(moveDirection);
+			}
+		}
+		else if (player->polarizationType == EPolarizationType::Positive)
+		{
+			if (polarization == EPolarizationType::Positive)
+			{				
 				player->MovementDirection(moveDirection);
 			}
 			else if (polarization == EPolarizationType::Negative)
@@ -73,18 +86,6 @@ void AMagneticPlatformPart::Magnetic(APSBaseCharacter* player)
 				player->MovementDirection(moveDirection);
 			}
 		}
-		else if (player->polarizationType == EPolarizationType::Positive)
-		{
-			if (polarization == EPolarizationType::Positive)
-			{
-				moveDirection = ReversDirection(moveDirection);
-				player->MovementDirection(moveDirection);
-			}
-			else if (polarization == EPolarizationType::Negative)
-			{
-				player->MovementDirection(moveDirection);
-			}
-		}		
 	}
 }
 

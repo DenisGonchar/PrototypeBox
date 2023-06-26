@@ -24,7 +24,6 @@ void ALimitedMovePlatformPart::GenerateMoveLimit()
 
 bool ALimitedMovePlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 {
-	//GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Cyan,FString::FromInt(moveLimit));
 	if(moveLimit > 0)
 	{
 		moveLimit--;

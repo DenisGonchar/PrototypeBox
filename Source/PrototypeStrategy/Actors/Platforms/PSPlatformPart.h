@@ -24,16 +24,16 @@ public:
 	APSPlatformPart();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scene")
-	USceneComponent* SceneComponent;
+		USceneComponent* SceneComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BoxComponent")
-	UBoxComponent* BoxComponent;
+		UBoxComponent* BoxComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
-	UPaperFlipbookComponent* Flipbook;
+		UPaperFlipbookComponent* Flipbook;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
-	UPaperFlipbook* FlipbookCaver;
+		UPaperFlipbook* FlipbookCaver;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
@@ -61,10 +61,10 @@ public:
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param | Type")
-	EBoxType BoxType = EBoxType::None;
+		EBoxType BoxType = EBoxType::None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param | Type")
-	ELevelType LevelType = ELevelType::Level;
+		ELevelType LevelType = ELevelType::Level;
 
 	UFUNCTION(BlueprintCallable)
 		void AcceptConstructionData();

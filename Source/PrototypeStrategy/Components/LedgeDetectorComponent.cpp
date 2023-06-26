@@ -12,6 +12,7 @@
 #include <Actors/Platforms/PSPlatformPart.h>
 #include "Actors/Platforms/Parts/MovePlatformPart.h"
 #include "Actors/Platforms/Parts/WallPlatformPart.h"
+#include "Actors/Platforms/Parts/MirroredPlatformPart.h"
 
 
 void ULedgeDetectorComponent::BeginPlay()
@@ -217,6 +218,10 @@ bool ULedgeDetectorComponent::DetectLedge(OUT FLedgeDescription& LedgeDescriptio
 
 bool ULedgeDetectorComponent::BoxDetectLedge(OUT FLedgeDescription& LedgeDescription, OUT EMoveCharacterDirection Direction)
 {
+	if (!CachedActorOwner.IsValid())
+	{
+		return false;
+	}
 	CharacterDirection = Direction;
 
 	//UBoxComponent* BaxComponent = CachedPawnOwner->BoxComponent;
@@ -375,27 +380,35 @@ bool ULedgeDetectorComponent::DetectHitBlock(FHitResult Hit)
 
 			if (IsValid(Box))
 			{
-
-// 				if (Box->GetBoxType() == EBoxType::Wall)
-// 				{
-// 					return false;
-// 				}
-
 				if (Box->MoveDirection(CharacterDirection))
 				{
 					return true;
 				}
-
 			}
+			return false;
+		}
 
+		case EBoxType::Mirrored:
+		{
+			AMirroredPlatformPart* Box = Cast<AMirroredPlatformPart>(Hit.Actor);
+
+			if (IsValid(Box))
+			{
+				if (Box->MoveDirection(CharacterDirection))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		case EBoxType::MirroredClone:
+		{			
 			return false;
 		}
 
 		case EBoxType::Wall:
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("ULedgeDetectorComponent::DetectHitBlock = Wall")));
-			//TODO player crashes into a wall
-
 			return false;
 		}
 	}

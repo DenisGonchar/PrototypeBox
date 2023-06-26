@@ -49,6 +49,8 @@ public:
 	EMoveCharacterDirection GetCharacterDirection() const;
 
 public:		
+	bool IsPlayerStep = true;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UBoxComponent* BoxComponent;
 
@@ -133,4 +135,5 @@ protected:
 	class APSGameMode* GMode;
 	
 	TWeakObjectPtr<class APSPlatform>BasePlatform;
+
 };
