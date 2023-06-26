@@ -199,7 +199,6 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 	}
 	if(IsValid(MagneticActivator))
 	{
-		GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Emerald,"Activator12");
 		MagneticActivator->MagneticParts = MagneticArray;
 	}
 	

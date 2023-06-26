@@ -61,9 +61,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
 		FConstructedBlockData constructionData;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		EPolarizationType PolarizationType = EPolarizationType::None;
-
 	EMoveCharacterDirection CharacterDirection = EMoveCharacterDirection::None;
 
 #pragma region Move
@@ -94,6 +91,11 @@ public:
 	bool IsMagneticFindStarted = false;
 	FTimerHandle startFindMagnetic;
 
+	TArray<AMagneticPlatformPart*> ActiveMagnetics;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EPolarizationType polarizationType = EPolarizationType::None;
+
 #pragma endregion
 
 
@@ -122,7 +124,6 @@ protected:
 	EBoxType BoxType = EBoxType::None;
 	ELevelType LevelType = ELevelType::Level;
 
-	TArray<AMagneticPlatformPart*> ActiveMagnetics;
 
 	FName NameMap;
 	FName NextLevel;

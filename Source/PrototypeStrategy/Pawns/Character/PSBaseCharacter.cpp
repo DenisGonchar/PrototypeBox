@@ -132,8 +132,10 @@ void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 	{
 		Flipbook->SetRelativeScale3D(FVector(0.4f, 0.5f, 0.6f));
 	}
+
+
 	FLedgeDescription LedgeDescription;
-	if (LedgeDetertorComponent->DetectLedge(LedgeDescription, CharacterDirection))
+	if (LedgeDetertorComponent->DetectLedge(LedgeDescription, Direction))
 	{
 		MoveToLocationType(LedgeDescription.BoxMesh);
 	}
@@ -300,16 +302,16 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			{
 				if (magneticPart->MagneticType == EMagneticType::Polarizer)
 				{
-					switch (PolarizationType)
+					switch (polarizationType)
 					{
 					case EPolarizationType::None:
-						PolarizationType = EPolarizationType::Positive;
+						polarizationType = EPolarizationType::Positive;
 						break;
 					case EPolarizationType::Positive:
-						PolarizationType = EPolarizationType::Negative;
+						polarizationType = EPolarizationType::Negative;
 						break;
 					case EPolarizationType::Negative:
-						PolarizationType = EPolarizationType::None;
+						polarizationType = EPolarizationType::None;
 						break;
 					default:
 						break;
@@ -356,7 +358,6 @@ void APSBaseCharacter::MoveToPositionStart(APSPlatformPart* Box)
 void APSBaseCharacter::AddActualMagnetics(AMagneticPlatformPart* part)
 {
 	ActiveMagnetics.AddUnique(part);
-	FindNearestMagnetic();
 	if (!IsMagneticFindStarted)
 	{
 		GetWorldTimerManager().SetTimer(startFindMagnetic,this,&APSBaseCharacter::FindNearestMagnetic,0.1f,false);
@@ -366,9 +367,9 @@ void APSBaseCharacter::AddActualMagnetics(AMagneticPlatformPart* part)
 
 void APSBaseCharacter::FindNearestMagnetic()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Green, "FindNearestMagnetic");
 	float minDistance = 9999;
 	AMagneticPlatformPart* nearestPart = nullptr;
+
 	for(auto part : ActiveMagnetics)
 	{
 		float Distance = GetDistanceTo(part);
@@ -379,15 +380,14 @@ void APSBaseCharacter::FindNearestMagnetic()
 		}
 	}
 
-	for (auto part : ActiveMagnetics)
-	{
-		GEngine->AddOnScreenDebugMessage(-1,4.f,FColor::Green,part->GetName());
-	}
 	ActiveMagnetics.Empty();
 	IsMagneticFindStarted = false;
 	GetWorldTimerManager().ClearTimer(startFindMagnetic);
-	nearestPart->Magnetic(this);
-	GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Black, nearestPart->GetName());
+	if (IsValid(nearestPart))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Emerald, nearestPart->GetName());
+		nearestPart->Magnetic(this);
+	}
 }
 
 

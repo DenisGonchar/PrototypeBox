@@ -12,6 +12,8 @@
  */
 // Fill out your copyright notice in the Description page of Project Settings.
 
+class APSBaseCharacter;
+
 UCLASS()
 class PROTOTYPESTRATEGY_API AMagneticPlatformPart : public ABlockPlatformPart
 {
@@ -26,14 +28,13 @@ private:
 public:
 	void BeginPlay() override;
 
-
 	bool bIsActive = false;
 	
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 		EMagneticType MagneticType;
 
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
-		EPolarizationType polarization = EPolarizationType::None;
+		EPolarizationType polarization = EPolarizationType::Positive;
 
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 		TArray<AMagneticPlatformPart*> MagneticParts;
@@ -46,8 +47,11 @@ public:
 
 	UFUNCTION()
 		void SwitchActivator();
-		void Magnetic(class APSBaseCharacter* player);
+		void Magnetic(APSBaseCharacter* player);
 		void CheckPlayer();
+
+		EMoveCharacterDirection FindMagneticDirection(APSBaseCharacter* player);
+		EMoveCharacterDirection ReversDirection(EMoveCharacterDirection direction);
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void ChangeMaterial(bool value);

@@ -4,7 +4,7 @@
 
 #include "DrawDebugHelpers.h"
 #include "Pawns/Character/PSBaseCharacter.h"
-#include "Utils/PSTraceUtils.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 
 AMagneticPlatformPart::AMagneticPlatformPart()
@@ -56,30 +56,107 @@ void AMagneticPlatformPart::SwitchActivator()
 
 void AMagneticPlatformPart::Magnetic(APSBaseCharacter* player)
 {
-	float distance = GetDistanceTo(player);
-	int distanceInTiles = distance /150;
-	if(polarization == EPolarizationType::Negative)
+	if (IsValid(this))
 	{
+		EMoveCharacterDirection moveDirection = FindMagneticDirection(player);
+		GEngine->AddOnScreenDebugMessage(-1,3.f,FColor::Cyan,*UEnum::GetValueAsString(moveDirection));
 		
+		if (player->polarizationType == EPolarizationType::Negative)
+		{
+			if (polarization == EPolarizationType::Positive)
+			{
+				player->MovementDirection(moveDirection);
+			}
+			else if (polarization == EPolarizationType::Negative)
+			{
+				moveDirection = ReversDirection(moveDirection);
+				player->MovementDirection(moveDirection);
+			}
+		}
+		else if (player->polarizationType == EPolarizationType::Positive)
+		{
+			if (polarization == EPolarizationType::Positive)
+			{
+				moveDirection = ReversDirection(moveDirection);
+				player->MovementDirection(moveDirection);
+			}
+			else if (polarization == EPolarizationType::Negative)
+			{
+				player->MovementDirection(moveDirection);
+			}
+		}		
 	}
-	else if(polarization == EPolarizationType::Positive)
+}
+
+EMoveCharacterDirection AMagneticPlatformPart::FindMagneticDirection(APSBaseCharacter* player)
+{
+	FVector playerLocation = player->GetActorLocation();
+	FVector magneticLocation = GetActorLocation();
+	
+	if (playerLocation.X == magneticLocation.X)
 	{
-		
+		if (magneticLocation.Y < playerLocation.Y)
+		{
+			return EMoveCharacterDirection::Left;
+		}
+		else
+		{
+			return EMoveCharacterDirection::Right;
+		}
 	}
+	else if(playerLocation.Y == magneticLocation.Y)
+	{
+		if (magneticLocation.X < playerLocation.X)
+		{
+			return EMoveCharacterDirection::Down;
+		}
+		else
+		{
+			return EMoveCharacterDirection::Top;
+		}
+	}
+	return EMoveCharacterDirection::None;
+}
+
+EMoveCharacterDirection AMagneticPlatformPart::ReversDirection(EMoveCharacterDirection direction)
+{
+	switch (direction)
+	{
+		case EMoveCharacterDirection::Top:
+			return EMoveCharacterDirection::Down;
+			break;
+		case EMoveCharacterDirection::Down:
+			return EMoveCharacterDirection::Top;
+			break;
+		case EMoveCharacterDirection::Right:
+			return EMoveCharacterDirection::Left;
+			break;
+		case EMoveCharacterDirection::Left:
+			return EMoveCharacterDirection::Right;
+			break;
+		default:
+			break;
+	}
+	return EMoveCharacterDirection::None;
 }
 
 void AMagneticPlatformPart::CheckPlayer()
 {
 	FVector traceEndLocation, startLocation;
-	startLocation = FVector(GetActorLocation().X,GetActorLocation().Y,GetActorLocation().Z + 250);
-	traceEndLocation = GetActorLocation() + (GetActorForwardVector() * 800);
-	PSTraceUtils::LineTraceSingleByChannel(GetWorld() ,traceResult ,startLocation ,traceEndLocation, ECC_Visibility);
-	if(traceResult.Actor != nullptr)
+	//startLocation = FVector(GetActorLocation().X,GetActorLocation().Y,GetActorLocation().Z + 150);
+	startLocation = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
+	traceEndLocation = GetActorLocation() + (GetActorForwardVector() * 650);
+	TArray<AActor*> actToIgnore;
+	actToIgnore.Add(this);
+	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(),startLocation,traceEndLocation,ETraceTypeQuery::TraceTypeQuery1,false, actToIgnore, EDrawDebugTrace::ForDuration, traceResult, true))
 	{
-		APSBaseCharacter* player = Cast<APSBaseCharacter>(traceResult.Actor);
-		if(IsValid(player))
+		if (traceResult.Actor != nullptr)
 		{
-			player->AddActualMagnetics(this);
+			APSBaseCharacter* player = Cast<APSBaseCharacter>(traceResult.Actor);
+			if (IsValid(player))
+			{
+				player->AddActualMagnetics(this);
+			}
 		}
 	}
 }
