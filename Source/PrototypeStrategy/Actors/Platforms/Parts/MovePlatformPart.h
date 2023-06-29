@@ -22,7 +22,7 @@ public:
 
 	virtual bool MoveDirection(EMoveCharacterDirection Direc);
 	void DirectionDynamicType(APSPlatformPart* Box);
-	void MoveToLocationFloor(APSPlatformPart* Box);
+	virtual void MoveToLocationFloor(APSPlatformPart* Box);
 	
 	void StartActive();
 

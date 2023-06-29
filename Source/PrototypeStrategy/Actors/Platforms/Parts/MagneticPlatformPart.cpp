@@ -144,7 +144,6 @@ EMoveCharacterDirection AMagneticPlatformPart::ReversDirection(EMoveCharacterDir
 void AMagneticPlatformPart::CheckPlayer()
 {
 	FVector traceEndLocation, startLocation;
-	//startLocation = FVector(GetActorLocation().X,GetActorLocation().Y,GetActorLocation().Z + 150);
 	startLocation = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
 	traceEndLocation = GetActorLocation() + (GetActorForwardVector() * 650);
 	TArray<AActor*> actToIgnore;
