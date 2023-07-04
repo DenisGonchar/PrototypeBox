@@ -9,21 +9,19 @@ AMovePlatformPart::AMovePlatformPart()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	LedgeDetertorComponent = CreateDefaultSubobject<ULedgeDetectorComponent>(TEXT("LedgeDetector"));
-
+	LedgeDetectorComponent = CreateDefaultSubobject<ULedgeDetectorComponent>(TEXT("LedgeDetector"));
 }
 
 void AMovePlatformPart::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 bool AMovePlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 {
 	Direction = Direc;	
 	FLedgeDescription LedgeDescription;
-	if (LedgeDetertorComponent->BoxDetectLedge(LedgeDescription, Direc))
+	if (LedgeDetectorComponent->BoxDetectLedge(LedgeDescription, Direc))
 	{
 		DirectionDynamicType(LedgeDescription.BoxMesh);
 
@@ -37,21 +35,21 @@ void AMovePlatformPart::DirectionDynamicType(APSPlatformPart* Box)
 {
 	switch (DynamicType)
 	{
-	case EDynamic::Passive:
-	{
-		MoveToLocationFloor(Box);
-		break;
-	}	
-	case EDynamic::Active:
-	{
-		MoveToLocationFloor(Box);
+		case EDynamic::Passive:
+		{
+			MoveToLocationFloor(Box);
+			break;
+		}	
+		case EDynamic::Active:
+		{
+			MoveToLocationFloor(Box);
 
-		GetWorldTimerManager().SetTimer(DynamicTimer, this, &AMovePlatformPart::StartActive, ActiveTimeStep, true);
+			GetWorldTimerManager().SetTimer(DynamicTimer, this, &AMovePlatformPart::StartActive, ActiveTimeStep, true);
 		
-		break;
-	}
-	default:
-		break;
+			break;
+		}
+		default:
+			break;
 	}
 }
 
@@ -116,7 +114,7 @@ void AMovePlatformPart::StartActive()
 	if (Direction != EMoveCharacterDirection::None)
 	{
 		FLedgeDescription LedgeDescription;
-		if (LedgeDetertorComponent->BoxDetectLedge(LedgeDescription, Direction))
+		if (LedgeDetectorComponent->BoxDetectLedge(LedgeDescription, Direction))
 		{
 			MoveToLocationFloor(LedgeDescription.BoxMesh);
 			UE_LOG(LogTemp, Warning, TEXT(" Move"));

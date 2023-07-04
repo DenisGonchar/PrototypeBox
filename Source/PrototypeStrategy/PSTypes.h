@@ -139,6 +139,12 @@ struct FConstructedBlockData
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
 		FRotator rotation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		EPolarizationType polarizationType = EPolarizationType::None;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Constructor")
+		int moveLimit = -1;
 };
 
 USTRUCT(BlueprintType)

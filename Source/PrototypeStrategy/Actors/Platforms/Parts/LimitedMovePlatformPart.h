@@ -21,15 +21,18 @@ public:
 
 	virtual void BeginPlay() override;
 
-protected:
+	void IncrementMoveLimit();
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		bool bUseRandomLimit = false;
+
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 		int moveLimit;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		int startLimit;
+protected:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		bool bUseRandomLimit = true;
+		int startLimit;
 
 	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
 		void CheckAndChangeColorCode(int limitOnStart ,int currentLimit);

@@ -31,7 +31,7 @@ public:
 	virtual void NewLevelType() override;
 
 protected:
-	class ULedgeDetectorComponent* LedgeDetertorComponent;
+	class ULedgeDetectorComponent* LedgeDetectorComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Param")
 	float MoveDistance = 150.0f;
