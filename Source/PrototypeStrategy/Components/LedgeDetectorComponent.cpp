@@ -10,9 +10,12 @@
 #include <Kismet/GameplayStatics.h>
 #include <Utils/PSTraceUtils.h>
 #include <Actors/Platforms/PSPlatformPart.h>
+
+#include "PaperFlipbookComponent.h"
 #include "Actors/Platforms/Parts/MovePlatformPart.h"
 #include "Actors/Platforms/Parts/WallPlatformPart.h"
 #include "Actors/Platforms/Parts/MirroredPlatformPart.h"
+#include "Actors/Platforms/Parts/WallColorPlatformPart.h"
 
 
 void ULedgeDetectorComponent::BeginPlay()
@@ -409,6 +412,20 @@ bool ULedgeDetectorComponent::DetectHitBlock(FHitResult Hit)
 
 		case EBoxType::Wall:
 		{
+			AWallColorPlatformPart* WallColor = Cast<AWallColorPlatformPart>(Hit.Actor);
+				
+			if (IsValid(WallColor))
+			{
+				if (WallColor->GetLevelType() == ELevelType::UnderCover )
+				{
+					if (WallColor->GetWallType() == EWallType::ColorWall)
+					{
+						return true;	
+					}
+					
+				}
+				
+			}
 			return false;
 		}
 	}
@@ -445,6 +462,26 @@ bool ULedgeDetectorComponent::BoxDetectHitBlock(FHitResult Hit)
 
 				}
 
+			}
+				
+			if (CachedActorOwner->GetDynamicType() == EDynamic::Passive)
+			{
+				AWallColorPlatformPart* BoxWallColor = Cast<AWallColorPlatformPart>(BoxPart);
+				if (IsValid(BoxWallColor))
+				{
+					if (BoxWallColor->GetLevelType() == ELevelType::UnderCover)
+					{
+						if (BoxWallColor->GetWallType() == EWallType::ColorWall)
+						{
+							//BoxWallColor->StartDeadBox();
+							
+							
+							return true;
+						}
+					}
+				}
+
+				
 			}
 
 			return false;

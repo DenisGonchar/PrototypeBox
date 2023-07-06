@@ -5,6 +5,9 @@
 #include <Components/LedgeDetectorComponent.h>
 #include <PSTypes.h>
 
+#include "PaperFlipbookComponent.h"
+#include "WallColorPlatformPart.h"
+
 AMovePlatformPart::AMovePlatformPart()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -50,6 +53,11 @@ void AMovePlatformPart::DirectionDynamicType(APSPlatformPart* Box)
 		
 		break;
 	}
+	case EDynamic::Limited:
+		{
+			MoveToLocationFloor(Box);
+			break;
+		}
 	default:
 		break;
 	}
@@ -100,7 +108,24 @@ void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 	{
 		
 		GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, FString::Printf(TEXT("MovePart = Wall")));
-		break;
+		AWallColorPlatformPart* ColorWall = Cast<AWallColorPlatformPart>(Box);
+		if (IsValid(ColorWall))
+		{
+			switch (ColorWall->GetWallType())
+			{
+			case EWallType::None: break;
+			case EWallType::DefaultWall: break;
+			case EWallType::CrackedWall: break;
+			case EWallType::ColorWall:
+				{
+					SetActorLocation(FloorLocation);
+					break;
+				}
+			default: ;
+			}
+			
+		}
+			break;
 	}
 
 	default:

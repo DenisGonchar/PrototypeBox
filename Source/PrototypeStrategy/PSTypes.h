@@ -3,6 +3,7 @@
 
 #include "PSTypes.generated.h"
 
+class UPaperFlipbook;
 
 const FName DebugCategoryLedgeDetection = FName("LedgeDetection");
 
@@ -32,7 +33,6 @@ enum class EBoxType : uint8
 	None,
 	Path,
 	Wall, 
-	CrackedWall,
 	Dynamic,
 	Exit,
 	Cover,
@@ -48,7 +48,8 @@ enum class EDynamic : uint8
 {
 	None,
 	Passive,
-	Active
+	Active,
+	Limited
 
 };
 
@@ -82,7 +83,8 @@ enum class EWallType : uint8
 {
 	None,
 	DefaultWall,
-	CrackedWall
+	CrackedWall,
+	ColorWall
 
 };
 
@@ -157,3 +159,20 @@ struct FLevelData
 };
 
 
+USTRUCT(BlueprintType)
+struct FColorsType : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	/*
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Params");
+	float Percent = 0.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Params");
+	UPaperFlipbook* Material = nullptr;
+
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Params");
+	TMap<float, UPaperFlipbook*> Materials;
+	
+};

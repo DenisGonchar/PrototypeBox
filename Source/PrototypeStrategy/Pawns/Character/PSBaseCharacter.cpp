@@ -15,6 +15,7 @@
 #include "Actors/Platforms/Parts/PathPlatformPart.h"
 #include "Actors/Platforms/Parts/ExitPlatformPart.h"
 #include "PaperFlipbookComponent.h"
+#include "Actors/Platforms/Parts/WallColorPlatformPart.h"
 
 APSBaseCharacter::APSBaseCharacter()
 {
@@ -315,7 +316,16 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			}
 			MoveToPosition(Box);
 		}
-		
+
+	case EBoxType::Wall:
+	{
+		/*AWallColorPlatformPart* WallColor = Cast<AWallColorPlatformPart>(BoxBlock);
+		if (IsValid(WallColor))
+		{
+			
+		}*/
+		MoveToPosition(Box);
+	}
 		default:
 			break;
 	}
