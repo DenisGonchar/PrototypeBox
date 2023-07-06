@@ -21,8 +21,6 @@ public:
 
 	virtual void BeginPlay() override;
 
-	void IncrementMoveLimit();
-
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 		bool bUseRandomLimit = false;
 

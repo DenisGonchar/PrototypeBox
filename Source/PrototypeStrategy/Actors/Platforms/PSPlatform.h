@@ -43,6 +43,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 	TArray<TSubclassOf<APSPlatformPart>> GridParts;
 	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
+		TArray<int> moveLimits;
+
 	UFUNCTION(BlueprintCallable)
 		void SpawnPlatformPartFloor(TArray<AActor*> parts);
 
