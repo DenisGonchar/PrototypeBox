@@ -42,7 +42,7 @@ void AWallColorPlatformPart::NewLevelType()
 	
 }
 
-void AWallColorPlatformPart::SetMoveActor(UPaperFlipbook* ActorFlipbook)
+void AWallColorPlatformPart::SetMoveMaterials(UPaperFlipbook* ActorFlipbook /*= nullptr*/, UPaperSprite* ActorSprite /*= nullptr*/)
 {
 	if (ActorFlipbook != nullptr)
 	{
@@ -51,11 +51,21 @@ void AWallColorPlatformPart::SetMoveActor(UPaperFlipbook* ActorFlipbook)
 		{
 			if (PawnFlipbook == FlipbookCaver)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Purple, FString::Printf(TEXT("True")));
+				GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Purple, FString::Printf(TEXT(" Flipbook = True")));
 
 			}
 		}
-		
+	}
+	if (ActorSprite != nullptr)
+	{
+		PawnSprite = ActorSprite;
+		if (IsValid(PawnSprite))
+		{
+			if (PawnSprite /*== SpiteCover*/ )
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Purple, FString::Printf(TEXT("Sprite = True")));
+			}
+		}
 	}
 }
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "PaperSprite.h"
 #include "Engine/DataTable.h"
 
 #include "PSTypes.generated.h"
@@ -158,21 +159,25 @@ struct FLevelData
 		TArray<FConstructedBlockData> blocks;
 };
 
+USTRUCT(BlueprintType)
+struct FMaterialsType
+{
+	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Params");
+	UPaperFlipbook* FlipbookMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Params");
+	UPaperSprite* SpriteMaterial;
+	
+};
 USTRUCT(BlueprintType)
 struct FColorsType : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	/*
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Params");
-	float Percent = 0.0f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Params");
-	UPaperFlipbook* Material = nullptr;
 
-	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Params");
-	TMap<float, UPaperFlipbook*> Materials;
+	TMap<float, FMaterialsType> Materials;
 	
 };

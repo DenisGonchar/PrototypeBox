@@ -7,6 +7,7 @@
 #include "PSTypes.h"
 #include "PSPlatformPart.generated.h"
 
+class UPaperSpriteComponent;
 class UActivatorCoverComponent;
 class ACoverPlatformPart;
 class UMaterialInterface;
@@ -32,8 +33,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
 		UPaperFlipbookComponent* Flipbook;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
+	UPaperSpriteComponent* Sprite;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
 		UPaperFlipbook* FlipbookCaver;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
+	UPaperSprite* SpriteCaver;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
@@ -72,5 +79,6 @@ protected:
 	ACoverPlatformPart* BaseCover; 
 	
 	UPaperFlipbook* BaseFlipbook;
+	UPaperSprite* BaseSprite;
 
 };

@@ -73,7 +73,7 @@ void ALimitedMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 				{
 				case EWallType::ColorWall:
 					{
-						ColorWall->SetMoveActor(Flipbook->GetFlipbook());
+						ColorWall->SetMoveMaterials(Flipbook->GetFlipbook(), nullptr);
 						break;
 					}
 				

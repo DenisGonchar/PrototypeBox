@@ -20,7 +20,7 @@ public:
 
 	virtual void NewLevelType() override;
 
-	void SetMoveActor(UPaperFlipbook* ActorFlipbook);
+	void SetMoveMaterials(UPaperFlipbook* ActorFlipbook = nullptr, UPaperSprite* ActorSprite = nullptr);
 protected:
 	virtual void BeginPlay() override;
 
@@ -29,4 +29,5 @@ private:
 	FVector StartBoxLocation = FVector::ZeroVector;
 
 	UPaperFlipbook* PawnFlipbook;
+	UPaperSprite* PawnSprite;
 };
