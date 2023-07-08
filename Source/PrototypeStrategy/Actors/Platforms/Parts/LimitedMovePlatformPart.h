@@ -19,9 +19,21 @@ public:
 	void GenerateMoveLimit();
 	virtual bool MoveDirection(EMoveCharacterDirection Direc) override;
 
+	virtual void DirectionDynamicType(APSPlatformPart* Box);
+	virtual void MoveToLocationFloor(APSPlatformPart* Box);
+	
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Params | Tables")
+	UDataTable* ColorTable = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Params | Tables")
+	FName NameColorWall;
+
 protected:
+	UPROPERTY(BlueprintReadOnly)
+	FColorsType ColorMaterials;
+
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 		int moveLimit;
 
@@ -33,5 +45,6 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
 		void CheckAndChangeColorCode(int limitOnStart ,int currentLimit);
-		
+
+	bool bIsMoving = true;
 };

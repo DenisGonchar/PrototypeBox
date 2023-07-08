@@ -1,8 +1,10 @@
 #pragma once
+#include "PaperSprite.h"
 #include "Engine/DataTable.h"
 
 #include "PSTypes.generated.h"
 
+class UPaperFlipbook;
 
 const FName DebugCategoryLedgeDetection = FName("LedgeDetection");
 
@@ -32,13 +34,14 @@ enum class EBoxType : uint8
 	None,
 	Path,
 	Wall, 
-	CrackedWall,
 	Dynamic,
 	Exit,
 	Cover,
 	Teleport,
 	Magnetic,
 	Polarizator,
+	Mirrored,
+	MirroredClone,
 };
 
 UENUM(BlueprintType)
@@ -46,7 +49,8 @@ enum class EDynamic : uint8
 {
 	None,
 	Passive,
-	Active
+	Active,
+	Limited
 
 };
 
@@ -80,7 +84,8 @@ enum class EWallType : uint8
 {
 	None,
 	DefaultWall,
-	CrackedWall
+	CrackedWall,
+	ColorWall
 
 };
 
@@ -154,4 +159,25 @@ struct FLevelData
 		TArray<FConstructedBlockData> blocks;
 };
 
+USTRUCT(BlueprintType)
+struct FMaterialsType
+{
+	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Params");
+	UPaperFlipbook* FlipbookMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Params");
+	UPaperSprite* SpriteMaterial;
+	
+};
+USTRUCT(BlueprintType)
+struct FColorsType : public FTableRowBase
+{
+	GENERATED_BODY()
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Params");
+	TMap<float, FMaterialsType> Materials;
+	
+};

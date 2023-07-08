@@ -49,6 +49,8 @@ public:
 	EMoveCharacterDirection GetCharacterDirection() const;
 
 public:		
+	bool IsPlayerStep = true;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UBoxComponent* BoxComponent;
 
@@ -61,11 +63,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
 		FConstructedBlockData constructionData;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		EPolarizationType PolarizationType = EPolarizationType::None;
-
 	EMoveCharacterDirection CharacterDirection = EMoveCharacterDirection::None;
 
+#pragma region Move
 	virtual void MoveTop();
 	virtual void MoveDown();
 	virtual void MoveRight();
@@ -76,16 +76,30 @@ public:
 	void MoveToPosition(APSPlatformPart* Box);	
 	void MoveToPosition(FVector Location);
 	void MoveToPositionStart(APSPlatformPart* Box);
-	void AddActualMagnetics(AMagneticPlatformPart* part);
-	void FindNearestMagnetic();
 
 	void NormalizePlayerFlipbook();
 	FTimerHandle spriteTimer;
 
-
 	void Step(int Index);
 	void FullStep();
 	void SetFullSteps(int32 Step);
+
+#pragma endregion
+
+#pragma region Magntic
+	void AddActualMagnetics(AMagneticPlatformPart* part);
+	void FindNearestMagnetic();
+
+	bool IsMagneticFindStarted = false;
+	FTimerHandle startFindMagnetic;
+
+	TArray<AMagneticPlatformPart*> ActiveMagnetics;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EPolarizationType polarizationType = EPolarizationType::None;
+
+#pragma endregion
+
 
 	EBoxType GetBoxType();
 	ELevelType GetLevelType();
@@ -112,7 +126,6 @@ protected:
 	EBoxType BoxType = EBoxType::None;
 	ELevelType LevelType = ELevelType::Level;
 
-	TArray<AMagneticPlatformPart*> ActiveMagnetics;
 
 	FName NameMap;
 	FName NextLevel;
@@ -122,4 +135,5 @@ protected:
 	class APSGameMode* GMode;
 	
 	TWeakObjectPtr<class APSPlatform>BasePlatform;
+
 };

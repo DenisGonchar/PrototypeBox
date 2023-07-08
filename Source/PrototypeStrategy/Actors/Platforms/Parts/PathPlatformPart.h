@@ -25,4 +25,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
 	UPaperFlipbook* ActivatiorFlipbook;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
+	UPaperSprite* ActivatiorSprite;
+
 };

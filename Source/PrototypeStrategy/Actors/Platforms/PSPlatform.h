@@ -5,12 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include <PSTypes.h>
+#include "Parts/MirroredPlatformPart.h"
 #include "PSPlatform.generated.h"
 
 class APSPlatformPart;
 class ATeleportPlatformPart;
 class ACoverPlatformPart;
 class AMagneticPlatformPart;
+//class AMirroredPlatformPart;
 
 UCLASS()
 class PROTOTYPESTRATEGY_API APSPlatform : public AActor
@@ -64,17 +66,18 @@ protected:
 private:
 
 	AMagneticPlatformPart* MagneticActivator;
-
 	TArray<AMagneticPlatformPart*> MagneticArray;
 	
+	ACoverPlatformPart* CoverPart;	
+
 	ATeleportPlatformPart* ActivatorTeleport;
-	
-	ACoverPlatformPart* CoverPart;
-	
 	TArray<ATeleportPlatformPart*> ArrayTeleport;
 
 	TArray <APSPlatformPart* > ArrayPlatformPart;
 
 	TArray<TSubclassOf<APSPlatformPart>> Floor;
+
+	TArray<AMirroredPlatformPart*> mirroredClones;
+	AMirroredPlatformPart* mirroredBlock;
 
 };

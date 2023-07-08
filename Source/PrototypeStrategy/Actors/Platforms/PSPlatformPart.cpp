@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "PaperFlipbookComponent.h"
 #include "PaperFlipbook.h"
+#include "PaperSpriteComponent.h"
 
 APSPlatformPart::APSPlatformPart()
 {
@@ -23,6 +24,10 @@ APSPlatformPart::APSPlatformPart()
 	Flipbook->SetupAttachment(SceneComponent);
 	Flipbook->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 
+	Sprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("Sprite"));
+	Sprite->SetupAttachment(SceneComponent);
+	Sprite->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
+	
 	ActivatorCoverComponent = CreateDefaultSubobject<UActivatorCoverComponent>(TEXT("ActivatorCoverComponent"));
 
 }
@@ -30,8 +35,15 @@ APSPlatformPart::APSPlatformPart()
 void APSPlatformPart::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	BaseFlipbook = Flipbook->GetFlipbook();
+
+	if (IsValid(Flipbook))
+	{
+		BaseFlipbook = Flipbook->GetFlipbook();
+	}
+	if (IsValid(Sprite))
+	{
+		BaseSprite = Sprite->GetSprite();
+	}
 
 }
 
@@ -100,6 +112,12 @@ void APSPlatformPart::NewLevelType()
 				Flipbook->SetFlipbook(BaseFlipbook);
 
 			}
+
+			if (IsValid(BaseSprite))
+			{
+				Sprite->SetSprite(BaseSprite);
+			}
+				
 			break;
 
 		}
@@ -109,7 +127,12 @@ void APSPlatformPart::NewLevelType()
 			{
 				Flipbook->SetFlipbook(FlipbookCaver);
 			}
-
+				
+			if (IsValid(SpriteCaver))
+			{
+				Sprite->SetSprite(SpriteCaver);
+			}
+				
 			break;
 		}
 	}

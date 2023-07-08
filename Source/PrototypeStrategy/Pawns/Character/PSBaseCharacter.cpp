@@ -15,6 +15,7 @@
 #include "Actors/Platforms/Parts/PathPlatformPart.h"
 #include "Actors/Platforms/Parts/ExitPlatformPart.h"
 #include "PaperFlipbookComponent.h"
+#include "Actors/Platforms/Parts/WallColorPlatformPart.h"
 
 APSBaseCharacter::APSBaseCharacter()
 {
@@ -93,32 +94,29 @@ EMoveCharacterDirection APSBaseCharacter::GetCharacterDirection() const
 void APSBaseCharacter::MoveTop()
 {
 	CharacterDirection = EMoveCharacterDirection::Top;
-
+	IsPlayerStep = true;
 	MovementDirection(CharacterDirection);
 }
 
 void APSBaseCharacter::MoveDown()
 {
 	CharacterDirection = EMoveCharacterDirection::Down;
-
+	IsPlayerStep = true;
 	MovementDirection(CharacterDirection);
-
 }
 
 void APSBaseCharacter::MoveRight()
 {
 	CharacterDirection = EMoveCharacterDirection::Right;
-
+	IsPlayerStep = true;
 	MovementDirection(CharacterDirection);
-
 }
 
 void APSBaseCharacter::MoveLeft()
 {
 	CharacterDirection = EMoveCharacterDirection::Left;
-
+	IsPlayerStep = true;
 	MovementDirection(CharacterDirection);
-
 }
 
 void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
@@ -126,20 +124,21 @@ void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 	
 	if (Direction == EMoveCharacterDirection::Top || Direction == EMoveCharacterDirection::Down)
 	{
-		Flipbook->SetRelativeScale3D(FVector(0.7f,0.5f, 0.5f));
+		Flipbook->SetRelativeScale3D(FVector(0.6f,0.5f, 0.4f));
 	}
 	else if (Direction == EMoveCharacterDirection::Left || Direction == EMoveCharacterDirection::Right)
 	{
-		Flipbook->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.7f));
+		Flipbook->SetRelativeScale3D(FVector(0.4f, 0.5f, 0.6f));
 	}
+
+
 	FLedgeDescription LedgeDescription;
-	if (LedgeDetertorComponent->DetectLedge(LedgeDescription, CharacterDirection))
+	if (LedgeDetertorComponent->DetectLedge(LedgeDescription, Direction))
 	{
 		MoveToLocationType(LedgeDescription.BoxMesh);
 	}
 	GetWorldTimerManager().SetTimer(spriteTimer,this,&APSBaseCharacter::NormalizePlayerFlipbook,0.1f,false);
 }
-
 
 void APSBaseCharacter::NormalizePlayerFlipbook()
 {
@@ -233,8 +232,6 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 				BoxCover->ActivatorCover();
 				
 				LevelType = BoxCover->GetLevelType();
-				GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Purple, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(LevelType)));
-
 			}
 			
 			break;
@@ -301,16 +298,16 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			{
 				if (magneticPart->MagneticType == EMagneticType::Polarizer)
 				{
-					switch (PolarizationType)
+					switch (polarizationType)
 					{
 					case EPolarizationType::None:
-						PolarizationType = EPolarizationType::Positive;
+						polarizationType = EPolarizationType::Positive;
 						break;
 					case EPolarizationType::Positive:
-						PolarizationType = EPolarizationType::Negative;
+						polarizationType = EPolarizationType::Negative;
 						break;
 					case EPolarizationType::Negative:
-						PolarizationType = EPolarizationType::None;
+						polarizationType = EPolarizationType::None;
 						break;
 					default:
 						break;
@@ -319,7 +316,16 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			}
 			MoveToPosition(Box);
 		}
-		
+
+	case EBoxType::Wall:
+	{
+		/*AWallColorPlatformPart* WallColor = Cast<AWallColorPlatformPart>(BoxBlock);
+		if (IsValid(WallColor))
+		{
+			
+		}*/
+		MoveToPosition(Box);
+	}
 		default:
 			break;
 	}
@@ -329,16 +335,18 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 
 void APSBaseCharacter::MoveToPosition(APSPlatformPart* Box)
 {
+	if (IsPlayerStep)
+	{
+		Step(StepIndex);
+	}
+
 	if (IsValid(Box))
 	{
 		FVector FloorLocation = Box->GetActorLocation();
 		FloorLocation.Z = GetActorLocation().Z;
-
-		SetActorLocation(FloorLocation);
-
-		Step(StepIndex);
-
-	}	
+		SetActorLocation(FloorLocation);			
+	}
+	
 }
 
 void APSBaseCharacter::MoveToPosition(FVector location)
@@ -357,12 +365,18 @@ void APSBaseCharacter::MoveToPositionStart(APSPlatformPart* Box)
 void APSBaseCharacter::AddActualMagnetics(AMagneticPlatformPart* part)
 {
 	ActiveMagnetics.AddUnique(part);
+	if (!IsMagneticFindStarted)
+	{
+		GetWorldTimerManager().SetTimer(startFindMagnetic,this,&APSBaseCharacter::FindNearestMagnetic,0.1f,false);
+		IsMagneticFindStarted = true;
+	}
 }
 
 void APSBaseCharacter::FindNearestMagnetic()
 {
 	float minDistance = 9999;
 	AMagneticPlatformPart* nearestPart = nullptr;
+
 	for(auto part : ActiveMagnetics)
 	{
 		float Distance = GetDistanceTo(part);
@@ -372,8 +386,15 @@ void APSBaseCharacter::FindNearestMagnetic()
 			nearestPart = part;
 		}
 	}
+
 	ActiveMagnetics.Empty();
-	nearestPart->Magnetic(this);
+	IsMagneticFindStarted = false;
+	GetWorldTimerManager().ClearTimer(startFindMagnetic);
+	if (IsValid(nearestPart))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Emerald, nearestPart->GetName());
+		nearestPart->Magnetic(this);
+	}
 }
 
 

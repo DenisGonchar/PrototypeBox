@@ -4,6 +4,7 @@
 #include "Actors/Platforms/Parts/PathPlatformPart.h"
 #include "../Plugins/2D/Paper2D/Source/Paper2D/Classes/PaperFlipbookComponent.h"
 #include "PaperFlipbook.h"
+#include "PaperSpriteComponent.h"
 
 
 void APathPlatformPart::ActivatorCover()
@@ -18,6 +19,13 @@ void APathPlatformPart::ActivatorCover()
 
 			bIsActivatorCover = false;
 		}
+		if (IsValid(ActivatiorSprite))
+		{
+			Sprite->SetSprite(ActivatiorSprite);
+
+			bIsActivatorCover = false;
+		}
+		
 	}
 }
 
@@ -33,6 +41,10 @@ void APathPlatformPart::NewLevelType()
 			{
 				Flipbook->SetFlipbook(ActivatiorFlipbook);
 
+			}
+			if (IsValid(ActivatiorSprite))
+			{
+				Sprite->SetSprite(ActivatiorSprite);
 			}
 		}
 	}

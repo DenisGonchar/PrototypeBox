@@ -4,6 +4,7 @@
 #include "Actors/Platforms/Parts/ExitPlatformPart.h"
 #include "../Plugins/2D/Paper2D/Source/Paper2D/Classes/PaperFlipbookComponent.h"
 #include "PaperFlipbook.h"
+#include "PaperSpriteComponent.h"
 
 
 void AExitPlatformPart::BeginPlay()
@@ -23,6 +24,11 @@ void AExitPlatformPart::NewLevelType()
 			if (IsValid(BaseFlipbook))
 			{
 				Flipbook->SetFlipbook(BaseFlipbook);
+			}
+			
+			if (IsValid(BaseSprite))
+			{
+				Sprite->SetSprite(BaseSprite);
 			}
 		}
 		

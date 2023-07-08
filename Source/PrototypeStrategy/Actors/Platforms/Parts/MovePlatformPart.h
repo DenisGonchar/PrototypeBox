@@ -21,8 +21,8 @@ public:
 	float GetMoveDistance() const;
 
 	virtual bool MoveDirection(EMoveCharacterDirection Direc);
-	void DirectionDynamicType(APSPlatformPart* Box);
-	void MoveToLocationFloor(APSPlatformPart* Box);
+	virtual void DirectionDynamicType(APSPlatformPart* Box);
+	virtual void MoveToLocationFloor(APSPlatformPart* Box);
 	
 	void StartActive();
 
