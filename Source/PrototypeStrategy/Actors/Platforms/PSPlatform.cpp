@@ -219,6 +219,10 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 	if (IsValid(mirroredBlock))
 	{
 		mirroredBlock->clones = mirroredClones;
+		for (auto clone : mirroredClones)
+		{
+			clone->generalMirrored = mirroredBlock;
+		}
 	}
 
 	if(IsValid(MagneticActivator))

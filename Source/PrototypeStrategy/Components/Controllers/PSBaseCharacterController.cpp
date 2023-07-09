@@ -17,8 +17,10 @@ void APSBaseCharacterController::SetupInputComponent()
 	InputComponent->BindAction("MoveRight", EInputEvent::IE_Pressed, this, &APSBaseCharacterController::MoveRight);
 	InputComponent->BindAction("MoveLeft", EInputEvent::IE_Pressed, this, &APSBaseCharacterController::MoveLeft);
 
-
-
+	InputComponent->BindAction("ResetTop", EInputEvent::IE_Pressed, this, &APSBaseCharacterController::MoveTop);
+	InputComponent->BindAction("ResetDown", EInputEvent::IE_Pressed, this, &APSBaseCharacterController::MoveDown);
+	InputComponent->BindAction("ResetRight", EInputEvent::IE_Pressed, this, &APSBaseCharacterController::MoveRight);
+	InputComponent->BindAction("ResetLeft", EInputEvent::IE_Pressed, this, &APSBaseCharacterController::MoveLeft);
 }
 
 void APSBaseCharacterController::MoveTop()
