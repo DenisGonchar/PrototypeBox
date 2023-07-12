@@ -34,14 +34,13 @@ public:
 		UPaperFlipbookComponent* Flipbook;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
-	UPaperSpriteComponent* Sprite;
+		UPaperSpriteComponent* Sprite;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
 		UPaperFlipbook* FlipbookCaver;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
-	UPaperSprite* SpriteCaver;
-
+		UPaperSprite* SpriteCaver;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
 		FConstructedBlockData constructionData;
@@ -55,8 +54,8 @@ public:
 	
 	EBoxType GetBoxType() const;
 
-	void SetCoverPart(ACoverPlatformPart* Actor);
-	ACoverPlatformPart* GetCoverPart() const;
+	void SetCoverPart(TArray<ACoverPlatformPart*> Actors);
+	TArray<ACoverPlatformPart*> GetCoverPart() const;
 
 	void SetLevelType(ELevelType World);
 	ELevelType GetLevelType() const;
@@ -76,7 +75,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void AcceptConstructionData();
 
-	ACoverPlatformPart* BaseCover; 
+	TArray<ACoverPlatformPart*> BaseCover;
 	
 	UPaperFlipbook* BaseFlipbook;
 	UPaperSprite* BaseSprite;

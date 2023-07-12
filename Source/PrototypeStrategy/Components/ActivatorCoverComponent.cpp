@@ -21,12 +21,10 @@ void UActivatorCoverComponent::SetCover()
 		BoxCover = CachedBasePlatformPartOwner->GetCoverPart();
 	}
 
-	if (IsValid(BoxCover))
+	for (auto cover : BoxCover)
 	{
-		BoxCover->OnActivatorCover.AddUObject(this, &UActivatorCoverComponent::ActivatorCover);
+		cover->OnActivatorCover.AddUObject(this, &UActivatorCoverComponent::ActivatorCover);
 	}
-
-
 }
 
 void UActivatorCoverComponent::ActivatorCover(ELevelType World)

@@ -52,6 +52,12 @@ void ATeleportPlatformPart::SwitchActivator()
 	if (TeleportInfo.TeleportType == ETeleport::Activator)
 	{
 		TeleportInfo.bIsTeleportType = !TeleportInfo.bIsTeleportType;
+		bIsActive = bIsActive ? false : true;
+
+		for (auto telep : teleports)
+		{
+			telep->SwitchTeleportFlipbook(bIsActive);
+		}
 
 		if (OnActivatorSwitched.IsBound())
 		{

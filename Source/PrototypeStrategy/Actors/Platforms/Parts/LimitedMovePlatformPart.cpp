@@ -12,11 +12,6 @@ ALimitedMovePlatformPart::ALimitedMovePlatformPart()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
-	if(bUseRandomLimit)
-	{
-		GenerateMoveLimit();
-	}
-	startLimit = moveLimit;
 }
 
 void ALimitedMovePlatformPart::GenerateMoveLimit()
@@ -113,6 +108,19 @@ void ALimitedMovePlatformPart::BeginPlay()
 		}
 
 	}*/
+
+	FTimerHandle timer;
+	GetWorldTimerManager().SetTimer(timer, this, &ALimitedMovePlatformPart::UpdateLimits,0.1f,false);	
+}
+
+void ALimitedMovePlatformPart::UpdateLimits()
+{
+	if (bUseRandomLimit)
+	{
+		GenerateMoveLimit();
+	}
+	startLimit = moveLimit;
+
 	CheckAndChangeColorCode(startLimit, moveLimit);
 }
 

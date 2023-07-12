@@ -22,11 +22,29 @@ void AMagneticPlatformPart::BeginPlay()
 }
 
 
+void AMagneticPlatformPart::SwitchSprite(EPolarizationType newPolarization)
+{
+	switch (newPolarization)
+	{
+		case EPolarizationType::None:
+			ChangeBlockSprite(PositivePolarizationSprite);
+			break;
+		case EPolarizationType::Positive:
+			ChangeBlockSprite(NegativePolarizationSprite);
+			break;
+		case EPolarizationType::Negative:
+			ChangeBlockSprite(NonPolarizationSprite);
+			break;
+		default:
+			break;
+	}
+}
+
 void AMagneticPlatformPart::UpdateStatus(bool newStatus)
 {
 	bIsActive = newStatus;
 	ChangeMaterial(bIsActive);
-	
+
 	if(bIsActive && MagneticType == EMagneticType::Magnetic)
 	{
 		GetWorldTimerManager().SetTimer(magneticTimer, this, &AMagneticPlatformPart::CheckPlayer, 0.2f, true);

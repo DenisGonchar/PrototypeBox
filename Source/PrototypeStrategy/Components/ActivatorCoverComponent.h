@@ -18,7 +18,7 @@ public:
 	
 	virtual void BeginPlay() override;
 
-	ACoverPlatformPart* BoxCover; 
+	TArray<ACoverPlatformPart*> BoxCover;
 
 	void SetCover();
 

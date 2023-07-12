@@ -29,6 +29,8 @@ public:
 	void BeginPlay() override;
 
 	bool bIsActive = false;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		bool bIsHaveBadplate = false;
 	
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 		EMagneticType MagneticType;
@@ -38,6 +40,19 @@ public:
 
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 		TArray<AMagneticPlatformPart*> MagneticParts;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Polarizer")
+		UPaperSprite* NonPolarizationSprite;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Polarizer")
+		UPaperSprite* PositivePolarizationSprite;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Polarizer")
+		UPaperSprite* NegativePolarizationSprite;
+	
+	UFUNCTION(BlueprintImplementableEvent)
+		void ChangeBlockSprite(UPaperSprite* newSprite);
+
+	void SwitchSprite(EPolarizationType newPolarization);
+
 
 	UFUNCTION()
 		void UpdateStatus(bool newStatus);

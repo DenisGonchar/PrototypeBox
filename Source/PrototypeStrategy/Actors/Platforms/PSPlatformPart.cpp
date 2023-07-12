@@ -29,7 +29,6 @@ APSPlatformPart::APSPlatformPart()
 	Sprite->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 	
 	ActivatorCoverComponent = CreateDefaultSubobject<UActivatorCoverComponent>(TEXT("ActivatorCoverComponent"));
-
 }
 
 void APSPlatformPart::BeginPlay()
@@ -64,18 +63,18 @@ EBoxType APSPlatformPart::GetBoxType() const
 	return BoxType;
 }
 
-void APSPlatformPart::SetCoverPart(ACoverPlatformPart* Actor)
+void APSPlatformPart::SetCoverPart(TArray<ACoverPlatformPart*> Actors)
 {
-	if (IsValid(Actor))
+	if (Actors.Num() > 0)
 	{
-		BaseCover = Actor;
+		BaseCover = Actors;
 
 		GetActivatorCoverComponent()->SetCover();
 	}
 
 }
 
-ACoverPlatformPart* APSPlatformPart::GetCoverPart() const
+TArray<ACoverPlatformPart*> APSPlatformPart::GetCoverPart() const
 {
 	return BaseCover;
 }

@@ -300,18 +300,19 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 				{
 					switch (polarizationType)
 					{
-					case EPolarizationType::None:
-						polarizationType = EPolarizationType::Positive;
-						break;
-					case EPolarizationType::Positive:
-						polarizationType = EPolarizationType::Negative;
-						break;
-					case EPolarizationType::Negative:
-						polarizationType = EPolarizationType::None;
-						break;
+						case EPolarizationType::None:
+							polarizationType = EPolarizationType::Positive;
+							break;
+						case EPolarizationType::Positive:
+							polarizationType = EPolarizationType::Negative;
+							break;
+						case EPolarizationType::Negative:
+							polarizationType = EPolarizationType::None;
+							break;
 					default:
 						break;
 					}
+					magneticPart->SwitchSprite(polarizationType);
 				}
 			}
 			MoveToPosition(Box);
