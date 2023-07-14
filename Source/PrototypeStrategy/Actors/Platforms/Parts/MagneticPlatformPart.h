@@ -51,6 +51,16 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void ChangeBlockSprite(UPaperSprite* newSprite);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params | Cover")
+		bool bIsActivCaver = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params | Cover")
+		bool bIsActivLevel = false;
+
+	virtual void NewLevelType() override;
+		void MoveMagnetic(EMoveCharacterDirection moveDirection);
+		FVector GetLocationByDirection(EMoveCharacterDirection Direction);
+
 	void SwitchSprite(EPolarizationType newPolarization);
 
 
@@ -62,14 +72,17 @@ public:
 
 	UFUNCTION()
 		void SwitchActivator();
-		void Magnetic(APSBaseCharacter* player);
+		void MagneticPlayer(APSBaseCharacter* player);
+		void Magnetic(AMagneticPlatformPart* magneticPart);
 		void CheckPlayer();
 
-		EMoveCharacterDirection FindMagneticDirection(APSBaseCharacter* player);
+		EMoveCharacterDirection FindMagneticDirection(FVector location);
 		EMoveCharacterDirection ReversDirection(EMoveCharacterDirection direction);
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void ChangeMaterial(bool value);
+
+protected:
 
 	
 	

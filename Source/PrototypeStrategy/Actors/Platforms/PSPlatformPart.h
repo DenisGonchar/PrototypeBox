@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "PSTypes.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
 #include "PSPlatformPart.generated.h"
 
 class UPaperSpriteComponent;
@@ -34,18 +36,29 @@ public:
 		UPaperFlipbookComponent* Flipbook;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
+		UAudioComponent* Audio;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
 		UPaperSpriteComponent* Sprite;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
 		UPaperFlipbook* FlipbookCaver;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
 		UPaperSprite* SpriteCaver;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
 		FConstructedBlockData constructionData;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+		USoundBase* interactSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+		USoundBase* moveSound;
+
 	virtual void BeginPlay() override;
+
+	void PlaySound(USoundBase* soudToPlay);
 	
 	virtual void Tick(float DeltaTime) override;
 

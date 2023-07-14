@@ -47,6 +47,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 		TArray<int> moveLimits;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
+		bool MagneticStatusOmStaet = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 		TArray<ALimitedMovePlatformPart*> limitedBlocks;
 
 	UFUNCTION(BlueprintCallable)

@@ -39,27 +39,19 @@ bool AMovePlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 void AMovePlatformPart::DirectionDynamicType(APSPlatformPart* Box)
 {
 	switch (DynamicType)
-	{
-	case EDynamic::Passive:
-	{
-		MoveToLocationFloor(Box);
-		break;
-	}	
-	case EDynamic::Active:
-	{
-		MoveToLocationFloor(Box);
-
-		GetWorldTimerManager().SetTimer(DynamicTimer, this, &AMovePlatformPart::StartActive, ActiveTimeStep, true);
-		
-		break;
-	}
-	case EDynamic::Limited:
+	{	
+		case EDynamic::Active:
 		{
 			MoveToLocationFloor(Box);
+			PlaySound(moveSound);
+			GetWorldTimerManager().SetTimer(DynamicTimer, this, &AMovePlatformPart::StartActive, ActiveTimeStep, true);
+		
 			break;
 		}
-	default:
-		break;
+		default:
+			PlaySound(moveSound);
+			MoveToLocationFloor(Box);
+			break;
 	}
 }
 
@@ -73,63 +65,30 @@ void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 
 	switch (Type)
 	{
-	case EBoxType::Path:
-	{
-		
-		SetActorLocation(FloorLocation);
-
-		break;
-	}
-
-	case EBoxType::Cover:
-	{
-
-		SetActorLocation(FloorLocation);
-
-		break;
-	}
-
-	case EBoxType::Exit:
-	{
-		
-		SetActorLocation(FloorLocation);
-
-		break;
-	}
-
-	case EBoxType::Teleport:
-	{
-
-		SetActorLocation(FloorLocation);
-
-		break;
-	}
-	case EBoxType::Wall:
-	{
-		
-		GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, FString::Printf(TEXT("MovePart = Wall")));
-		AWallColorPlatformPart* ColorWall = Cast<AWallColorPlatformPart>(Box);
-		if (IsValid(ColorWall))
-		{
-			switch (ColorWall->GetWallType())
+		case EBoxType::Wall:
+		{		
+			GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, FString::Printf(TEXT("MovePart = Wall")));
+			AWallColorPlatformPart* ColorWall = Cast<AWallColorPlatformPart>(Box);
+			if (IsValid(ColorWall))
 			{
-			case EWallType::None: break;
-			case EWallType::DefaultWall: break;
-			case EWallType::CrackedWall: break;
-			case EWallType::ColorWall:
+				switch (ColorWall->GetWallType())
 				{
-					SetActorLocation(FloorLocation);
-					break;
+					case EWallType::ColorWall:
+					{
+						SetActorLocation(FloorLocation);
+						break;
+					}
+					default: 
+						break;
 				}
-			default: ;
-			}
 			
+			}
+				break;
 		}
-			break;
-	}
 
-	default:
-		break;
+		default:
+			SetActorLocation(FloorLocation);
+			break;
 	}
 	
 
@@ -150,9 +109,8 @@ void AMovePlatformPart::StartActive()
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT(" else"));
-
-			GetWorldTimerManager().ClearTimer(DynamicTimer);
-				
+			PlaySound(interactSound);
+			GetWorldTimerManager().ClearTimer(DynamicTimer);				
 		}
 	}
 	else

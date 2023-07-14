@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Actors/Platforms/Parts/BlockPlatformPart.h"
 //#include <Components/ActivatorClientComponent.h>
+#include "PaperFlipbookComponent.h"
+#include "PaperSpriteComponent.h"
 #include "TeleportPlatformPart.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnActivatorSwitched, bool);
@@ -49,5 +51,13 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void SwitchTeleportFlipbook(bool isActive);
+
+	virtual void NewLevelType() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params | Cover")
+		bool bIsActivCaver = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params | Cover")
+		bool bIsActivLevel = false;
 
 };

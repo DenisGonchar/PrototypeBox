@@ -21,7 +21,6 @@ void AMagneticPlatformPart::BeginPlay()
 	}
 }
 
-
 void AMagneticPlatformPart::SwitchSprite(EPolarizationType newPolarization)
 {
 	switch (newPolarization)
@@ -51,11 +50,35 @@ void AMagneticPlatformPart::UpdateStatus(bool newStatus)
 	}
 	else
 	{
-		if(!GetWorldTimerManager().TimerExists(magneticTimer))
+		if(GetWorldTimerManager().TimerExists(magneticTimer))
 		{
 			GetWorldTimerManager().ClearTimer(magneticTimer);
 		}
 	}
+}
+
+void AMagneticPlatformPart::NewLevelType()
+{
+	Super::NewLevelType();
+
+	if (GetLevelType() == ELevelType::UnderCover)
+	{
+		if (bIsActivCaver && bIsActivLevel)
+		{
+			if (BaseFlipbook)
+			{
+				Flipbook->SetFlipbook(BaseFlipbook);
+			}
+
+			if (BaseSprite)
+			{
+				Sprite->SetSprite(BaseSprite);
+			}
+		}
+
+	}
+
+
 }
 
 void AMagneticPlatformPart::ChangeMagneticsStatus(TArray<AMagneticPlatformPart*> parts, bool newStatus)
@@ -72,11 +95,11 @@ void AMagneticPlatformPart::SwitchActivator()
 	ChangeMagneticsStatus(MagneticParts,!bIsActive);
 }
 
-void AMagneticPlatformPart::Magnetic(APSBaseCharacter* player)
+void AMagneticPlatformPart::MagneticPlayer(APSBaseCharacter* player)
 {
 	if (IsValid(this))
 	{
-		EMoveCharacterDirection moveDirection = FindMagneticDirection(player);
+		EMoveCharacterDirection moveDirection = FindMagneticDirection(player->GetActorLocation());
 
 		player->IsPlayerStep = false;
 		
@@ -107,14 +130,46 @@ void AMagneticPlatformPart::Magnetic(APSBaseCharacter* player)
 	}
 }
 
-EMoveCharacterDirection AMagneticPlatformPart::FindMagneticDirection(APSBaseCharacter* player)
+void AMagneticPlatformPart::Magnetic(AMagneticPlatformPart* magneticPart)
 {
-	FVector playerLocation = player->GetActorLocation();
+	if (IsValid(this))
+	{
+		EMoveCharacterDirection moveDirection = FindMagneticDirection(magneticPart->GetActorLocation());
+
+		if (magneticPart->polarization == EPolarizationType::Negative)
+		{
+			if (polarization == EPolarizationType::Positive)
+			{
+				moveDirection = ReversDirection(moveDirection);
+				MoveMagnetic(moveDirection);
+			}
+			else if (polarization == EPolarizationType::Negative)
+			{
+				MoveMagnetic(moveDirection);
+			}
+		}
+		else if (magneticPart->polarization == EPolarizationType::Positive)
+		{
+			if (polarization == EPolarizationType::Positive)
+			{
+				MoveMagnetic(moveDirection);
+			}
+			else if (polarization == EPolarizationType::Negative)
+			{
+				moveDirection = ReversDirection(moveDirection);
+				MoveMagnetic(moveDirection);
+			}
+		}
+	}
+}
+
+EMoveCharacterDirection AMagneticPlatformPart::FindMagneticDirection(FVector location)
+{
 	FVector magneticLocation = GetActorLocation();
 	
-	if (playerLocation.X == magneticLocation.X)
+	if (location.X == magneticLocation.X)
 	{
-		if (magneticLocation.Y < playerLocation.Y)
+		if (magneticLocation.Y < location.Y)
 		{
 			return EMoveCharacterDirection::Left;
 		}
@@ -123,9 +178,9 @@ EMoveCharacterDirection AMagneticPlatformPart::FindMagneticDirection(APSBaseChar
 			return EMoveCharacterDirection::Right;
 		}
 	}
-	else if(playerLocation.Y == magneticLocation.Y)
+	else if(location.Y == magneticLocation.Y)
 	{
-		if (magneticLocation.X < playerLocation.X)
+		if (magneticLocation.X < location.X)
 		{
 			return EMoveCharacterDirection::Down;
 		}
@@ -175,8 +230,62 @@ void AMagneticPlatformPart::CheckPlayer()
 			{
 				player->AddActualMagnetics(this);
 			}
+			else
+			{
+				AMagneticPlatformPart* magnetic = Cast<AMagneticPlatformPart>(traceResult.Actor);
+				if (IsValid(magnetic))
+				{
+					if (magnetic->MagneticType == EMagneticType::Magnetic)
+					{
+						if (!magnetic->bIsHaveBadplate)
+						{
+							magnetic->Magnetic(this);
+						}
+					}					
+				}
+			}
 		}
 	}
+}
+
+void AMagneticPlatformPart::MoveMagnetic(EMoveCharacterDirection moveDirection)
+{
+	FHitResult hit;
+	TArray<AActor*> actToIgnore;
+	actToIgnore.Add(this);
+	FVector location = GetLocationByDirection(moveDirection);
+	if (!UKismetSystemLibrary::BoxTraceSingle(GetWorld(), location, location, FVector(25.f,25.f,25.f), FRotator(), TraceTypeQuery1, true, actToIgnore, EDrawDebugTrace::ForDuration, hit, true))
+	{
+		//if (hit.Actor == nullptr)
+		//{
+			SetActorLocation(location);
+		//}
+	}
+}
+
+FVector AMagneticPlatformPart::GetLocationByDirection(EMoveCharacterDirection Direction)
+{
+	switch (Direction)
+	{
+		case EMoveCharacterDirection::Top:
+			return GetActorLocation() + FVector(150.f, 0.f, 0.f);
+			break;
+		case EMoveCharacterDirection::Down:
+			return GetActorLocation() - FVector(150.f, 0.f, 0.f);
+			break;
+		case EMoveCharacterDirection::Left:
+			return GetActorLocation() - FVector(0.f, 150.f, 0.f);
+			break;
+		case EMoveCharacterDirection::Right:
+			return GetActorLocation() + FVector(0.f, 150.f, 0.f);
+			break;
+		case EMoveCharacterDirection::None:
+			return GetActorLocation();
+			break;
+		default:
+			break;
+	}
+	return GetActorLocation();
 }
 
 

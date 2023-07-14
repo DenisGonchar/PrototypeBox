@@ -158,6 +158,8 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 	{
 		case EBoxType::Path:
 		{
+			APathPlatformPart* Path = Cast<APathPlatformPart>(Box);
+			Path->PlaySound(Path->interactSound);
 			switch (LevelType)
 			{
 				case ELevelType::Level:
@@ -191,7 +193,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 		{
 			AExitPlatformPart* ExitPart = Cast<AExitPlatformPart>(BoxBlock);
 			MoveToPosition(Box);
-
+			ExitPart->PlaySound(ExitPart->interactSound);
 			if (ExitPart->GetLevelType() == ELevelType::UnderCover)
 			{
 				if (ExitPart->GetIsActivCaver())
@@ -228,7 +230,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			if (IsValid(BoxCover))
 			{
 				MoveToPosition(Box);
-
+				BoxCover->PlaySound(BoxCover->interactSound);
 				BoxCover->ActivatorCover();
 				
 				LevelType = BoxCover->GetLevelType();
@@ -256,7 +258,8 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 					{
 						FVector FloorLocation = BoxTeleport->GetTeleport()->GetActorLocation();
 						FloorLocation.Z = GetActorLocation().Z;
-
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), BoxTeleport->interactSound, BoxTeleport->GetActorLocation());
+						BoxTeleport->PlaySound(BoxTeleport->interactSound);
 						SetActorLocation(FloorLocation);
 						
 						Step(StepIndex);
@@ -285,7 +288,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			if (MagneticBox->MagneticType == EMagneticType::Activator)
 			{
 				MoveToPosition(Box);
-
+				MagneticBox->PlaySound(MagneticBox->interactSound);
 				MagneticBox->SwitchActivator();
 			}			
 		}
@@ -298,6 +301,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			{
 				if (magneticPart->MagneticType == EMagneticType::Polarizer)
 				{
+					magneticPart->PlaySound(magneticPart->interactSound);
 					switch (polarizationType)
 					{
 						case EPolarizationType::None:
@@ -325,6 +329,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 		{
 			
 		}*/
+		BoxBlock->PlaySound(BoxBlock->moveSound);
 		MoveToPosition(Box);
 	}
 		default:
@@ -394,7 +399,7 @@ void APSBaseCharacter::FindNearestMagnetic()
 	if (IsValid(nearestPart))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Emerald, nearestPart->GetName());
-		nearestPart->Magnetic(this);
+		nearestPart->MagneticPlayer(this);
 	}
 }
 

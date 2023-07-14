@@ -27,6 +27,9 @@ APSPlatformPart::APSPlatformPart()
 	Sprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("Sprite"));
 	Sprite->SetupAttachment(SceneComponent);
 	Sprite->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
+
+	Audio = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
+	Audio->SetupAttachment(SceneComponent);
 	
 	ActivatorCoverComponent = CreateDefaultSubobject<UActivatorCoverComponent>(TEXT("ActivatorCoverComponent"));
 }
@@ -44,6 +47,12 @@ void APSPlatformPart::BeginPlay()
 		BaseSprite = Sprite->GetSprite();
 	}
 
+}
+
+void APSPlatformPart::PlaySound(USoundBase* soudToPlay)
+{
+	Audio->SetSound(soudToPlay);
+	Audio->Play(1.f);
 }
 
 void APSPlatformPart::Tick(float DeltaTime)

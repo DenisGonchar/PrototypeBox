@@ -455,7 +455,7 @@ bool ULedgeDetectorComponent::BoxDetectHitBlock(FHitResult Hit)
 						if (BoxWall->GetWallType() == EWallType::CrackedWall)
 						{
 							BoxWall->StartDeadBox();
-
+							BoxWall->PlaySound(BoxWall->moveSound);
 							return true;
 						}
 					}
