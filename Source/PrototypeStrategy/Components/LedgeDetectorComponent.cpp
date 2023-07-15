@@ -473,8 +473,7 @@ bool ULedgeDetectorComponent::BoxDetectHitBlock(FHitResult Hit)
 					{
 						if (BoxWallColor->GetWallType() == EWallType::ColorWall)
 						{
-							//BoxWallColor->StartDeadBox();
-							
+							//BoxWallColor->StartDeadBox();	
 							
 							return true;
 						}
