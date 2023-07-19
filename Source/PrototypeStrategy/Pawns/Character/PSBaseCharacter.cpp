@@ -119,30 +119,42 @@ void APSBaseCharacter::MoveLeft()
 	MovementDirection(CharacterDirection);
 }
 
+void APSBaseCharacter::PlayFlipbookAnim()
+{
+	if (Flipbook->GetRelativeScale3D().Equals(targetScale, 0.1f))
+	{
+		GetWorldTimerManager().PauseTimer(playFlipbookAnimHandle);
+		GetWorldTimerManager().ClearTimer(playFlipbookAnimHandle);
+	}
+	Flipbook->SetRelativeScale3D(Flipbook->GetRelativeScale3D() + deltaScale);
+}
+
 void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 {
+	if (!bIsMoveFinished)
+	{
+		return;
+	}
 	
 	if (Direction == EMoveCharacterDirection::Top || Direction == EMoveCharacterDirection::Down)
-	{
-		Flipbook->SetRelativeScale3D(FVector(0.6f,0.5f, 0.4f));
+	{		
+		startScale = Flipbook->GetRelativeScale3D();
+		targetScale = FVector(0.6f, 0.5f, 0.4f);
+		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
 	}
 	else if (Direction == EMoveCharacterDirection::Left || Direction == EMoveCharacterDirection::Right)
 	{
-		Flipbook->SetRelativeScale3D(FVector(0.4f, 0.5f, 0.6f));
+		startScale = Flipbook->GetRelativeScale3D();
+		targetScale = FVector(0.4f, 0.5f, 0.6f);
+		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
 	}
-
+	GetWorldTimerManager().SetTimer(playFlipbookAnimHandle, this, &APSBaseCharacter::PlayFlipbookAnim, scaleChangeSpeed, true);
 
 	FLedgeDescription LedgeDescription;
 	if (LedgeDetertorComponent->DetectLedge(LedgeDescription, Direction))
 	{
 		MoveToLocationType(LedgeDescription.BoxMesh);
 	}
-	GetWorldTimerManager().SetTimer(spriteTimer,this,&APSBaseCharacter::NormalizePlayerFlipbook,0.1f,false);
-}
-
-void APSBaseCharacter::NormalizePlayerFlipbook()
-{
-	Flipbook->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
 }
 
 void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
@@ -350,14 +362,45 @@ void APSBaseCharacter::MoveToPosition(APSPlatformPart* Box)
 	{
 		FVector FloorLocation = Box->GetActorLocation();
 		FloorLocation.Z = GetActorLocation().Z;
-		SetActorLocation(FloorLocation);			
+		startLocation = GetActorLocation();
+		targetLocation = FloorLocation;
+		deltaLocation = (startLocation - targetLocation) * moveTimerSpeed;
+		deltaLocation = deltaLocation * -2.f;
+		bIsMoveFinished = false;
+		GetWorldTimerManager().SetTimer(moveTimerHandle, this, &APSBaseCharacter::MoveCharacterOnTimer, moveTimerSpeed, true);					
+	}	
+}
+
+void APSBaseCharacter::MoveCharacterOnTimer()
+{
+	if (targetLocation == GetActorLocation())
+	{		
+		GetWorldTimerManager().PauseTimer(moveTimerHandle);
+		GetWorldTimerManager().ClearTimer(moveTimerHandle);
+		bIsMoveFinished = true;
+		if (GetWorldTimerManager().IsTimerActive(playFlipbookAnimHandle))
+		{
+			GetWorldTimerManager().PauseTimer(playFlipbookAnimHandle);
+			GetWorldTimerManager().ClearTimer(playFlipbookAnimHandle);
+		}
+		startScale = Flipbook->GetRelativeScale3D();
+		targetScale = FVector(0.5f, 0.5f, 0.5f);
+		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
+
+		GetWorldTimerManager().SetTimer(playFlipbookAnimHandle, this, &APSBaseCharacter::PlayFlipbookAnim, scaleChangeSpeed, true);
+		return;
 	}
-	
+	SetActorLocation(GetActorLocation() + deltaLocation);
 }
 
 void APSBaseCharacter::MoveToPosition(FVector location)
 {	
-		SetActorLocation(location);	
+	startLocation = GetActorLocation();
+	targetLocation = location;
+	deltaLocation = (deltaLocation - targetLocation) * moveTimerSpeed;
+	deltaLocation = deltaLocation * -2.f;
+	bIsMoveFinished = false;
+	GetWorldTimerManager().SetTimer(moveTimerHandle, this, &APSBaseCharacter::MoveCharacterOnTimer, moveTimerSpeed, true);
 }
 
 void APSBaseCharacter::MoveToPositionStart(APSPlatformPart* Box)
@@ -373,7 +416,7 @@ void APSBaseCharacter::AddActualMagnetics(AMagneticPlatformPart* part)
 	ActiveMagnetics.AddUnique(part);
 	if (!IsMagneticFindStarted)
 	{
-		GetWorldTimerManager().SetTimer(startFindMagnetic,this,&APSBaseCharacter::FindNearestMagnetic,0.1f,false);
+		GetWorldTimerManager().SetTimer(startFindMagnetic, this, &APSBaseCharacter::FindNearestMagnetic, 0.1f, false);
 		IsMagneticFindStarted = true;
 	}
 }
