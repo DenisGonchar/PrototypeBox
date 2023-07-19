@@ -27,9 +27,11 @@ APSPlatformPart::APSPlatformPart()
 	Sprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("Sprite"));
 	Sprite->SetupAttachment(SceneComponent);
 	Sprite->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
+
+	Audio = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
+	Audio->SetupAttachment(SceneComponent);
 	
 	ActivatorCoverComponent = CreateDefaultSubobject<UActivatorCoverComponent>(TEXT("ActivatorCoverComponent"));
-
 }
 
 void APSPlatformPart::BeginPlay()
@@ -45,6 +47,12 @@ void APSPlatformPart::BeginPlay()
 		BaseSprite = Sprite->GetSprite();
 	}
 
+}
+
+void APSPlatformPart::PlaySound(USoundBase* soudToPlay)
+{
+	Audio->SetSound(soudToPlay);
+	Audio->Play(1.f);
 }
 
 void APSPlatformPart::Tick(float DeltaTime)
@@ -64,18 +72,18 @@ EBoxType APSPlatformPart::GetBoxType() const
 	return BoxType;
 }
 
-void APSPlatformPart::SetCoverPart(ACoverPlatformPart* Actor)
+void APSPlatformPart::SetCoverPart(TArray<ACoverPlatformPart*> Actors)
 {
-	if (IsValid(Actor))
+	if (Actors.Num() > 0)
 	{
-		BaseCover = Actor;
+		BaseCover = Actors;
 
 		GetActivatorCoverComponent()->SetCover();
 	}
 
 }
 
-ACoverPlatformPart* APSPlatformPart::GetCoverPart() const
+TArray<ACoverPlatformPart*> APSPlatformPart::GetCoverPart() const
 {
 	return BaseCover;
 }

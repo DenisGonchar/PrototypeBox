@@ -30,21 +30,24 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Params | Tables")
 	FName NameColorWall;
 
-protected:
-	UPROPERTY(BlueprintReadOnly)
-	FColorsType ColorMaterials;
-
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 		int moveLimit;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		int startLimit;
+		bool bUseRandomLimit = false;
+
+protected:
+	UPROPERTY(BlueprintReadOnly)
+		FColorsType ColorMaterials;	
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		bool bUseRandomLimit = true;
+		int startLimit;
+
 
 	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
 		void CheckAndChangeColorCode(int limitOnStart ,int currentLimit);
+
+	void UpdateLimits();
 
 	bool bIsMoving = true;
 };

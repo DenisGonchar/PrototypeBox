@@ -84,6 +84,25 @@ public:
 	void FullStep();
 	void SetFullSteps(int32 Step);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float moveTimerSpeed = 0.05f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float scaleChangeSpeed = 0.05f;
+
+	FTimerHandle moveTimerHandle;
+	FVector deltaLocation;
+	FVector targetLocation;
+	FVector startLocation;
+	bool bIsMoveFinished = true;
+	void MoveCharacterOnTimer();
+
+	FTimerHandle playFlipbookAnimHandle;
+	void PlayFlipbookAnim();
+	FVector targetScale;
+	FVector startScale;
+	FVector deltaScale;
+
 #pragma endregion
 
 #pragma region Magntic

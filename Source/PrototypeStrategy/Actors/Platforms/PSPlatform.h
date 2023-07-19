@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include <PSTypes.h>
 #include "Parts/MirroredPlatformPart.h"
+#include "Parts/LimitedMovePlatformPart.h"
 #include "PSPlatform.generated.h"
 
 class APSPlatformPart;
@@ -45,6 +46,10 @@ protected:
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 		TArray<int> moveLimits;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
+		bool MagneticStatusOmStaet = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
+		TArray<ALimitedMovePlatformPart*> limitedBlocks;
 
 	UFUNCTION(BlueprintCallable)
 		void SpawnPlatformPartFloor(TArray<AActor*> parts);
@@ -71,7 +76,7 @@ private:
 	AMagneticPlatformPart* MagneticActivator;
 	TArray<AMagneticPlatformPart*> MagneticArray;
 	
-	ACoverPlatformPart* CoverPart;	
+	TArray<ACoverPlatformPart*> CoverPart;	
 
 	ATeleportPlatformPart* ActivatorTeleport;
 	TArray<ATeleportPlatformPart*> ArrayTeleport;

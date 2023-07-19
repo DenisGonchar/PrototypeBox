@@ -40,6 +40,7 @@ EWallType AWallPlatformPart::GetWallType() const
 
 void AWallPlatformPart::StartDeadBox()
 {
+	PlaySound(interactSound);
 	BoxComponent->SetCollisionProfileName(TEXT("NoCollision"));
 	Flipbook->SetFlipbook(FlipbookDead);
 	Flipbook->PlayFromStart();

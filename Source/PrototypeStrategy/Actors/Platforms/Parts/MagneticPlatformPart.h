@@ -29,6 +29,8 @@ public:
 	void BeginPlay() override;
 
 	bool bIsActive = false;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		bool bIsHaveBadplate = false;
 	
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 		EMagneticType MagneticType;
@@ -39,6 +41,29 @@ public:
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 		TArray<AMagneticPlatformPart*> MagneticParts;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Polarizer")
+		UPaperSprite* NonPolarizationSprite;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Polarizer")
+		UPaperSprite* PositivePolarizationSprite;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Polarizer")
+		UPaperSprite* NegativePolarizationSprite;
+	
+	UFUNCTION(BlueprintImplementableEvent)
+		void ChangeBlockSprite(UPaperSprite* newSprite);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params | Cover")
+		bool bIsActivCaver = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params | Cover")
+		bool bIsActivLevel = false;
+
+	virtual void NewLevelType() override;
+		void MoveMagnetic(EMoveCharacterDirection moveDirection);
+		FVector GetLocationByDirection(EMoveCharacterDirection Direction);
+
+	void SwitchSprite(EPolarizationType newPolarization);
+
+
 	UFUNCTION()
 		void UpdateStatus(bool newStatus);
 
@@ -47,14 +72,17 @@ public:
 
 	UFUNCTION()
 		void SwitchActivator();
-		void Magnetic(APSBaseCharacter* player);
+		void MagneticPlayer(APSBaseCharacter* player);
+		void Magnetic(AMagneticPlatformPart* magneticPart);
 		void CheckPlayer();
 
-		EMoveCharacterDirection FindMagneticDirection(APSBaseCharacter* player);
+		EMoveCharacterDirection FindMagneticDirection(FVector location);
 		EMoveCharacterDirection ReversDirection(EMoveCharacterDirection direction);
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void ChangeMaterial(bool value);
+
+protected:
 
 	
 	

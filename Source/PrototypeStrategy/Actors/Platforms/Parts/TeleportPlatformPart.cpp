@@ -52,6 +52,23 @@ void ATeleportPlatformPart::SwitchActivator()
 	if (TeleportInfo.TeleportType == ETeleport::Activator)
 	{
 		TeleportInfo.bIsTeleportType = !TeleportInfo.bIsTeleportType;
+		bIsActive = bIsActive ? false : true;
+
+		if (bIsActive)
+		{
+			PlaySound(moveSound);
+		}
+		else
+		{
+			if (!Audio->bIsPaused)
+			{
+				Audio->Stop();
+			}
+		}
+		for (auto telep : teleports)
+		{
+			telep->SwitchTeleportFlipbook(bIsActive);
+		}
 
 		if (OnActivatorSwitched.IsBound())
 		{
@@ -63,5 +80,29 @@ void ATeleportPlatformPart::SwitchActivator()
 			OnActivator.Broadcast(TeleportInfo.bIsTeleportType);
 		}
 	}
+}
+
+void ATeleportPlatformPart::NewLevelType()
+{
+	Super::NewLevelType();
+
+	if (GetLevelType() == ELevelType::UnderCover)
+	{
+		if (bIsActivCaver && bIsActivLevel)
+		{
+			if (BaseFlipbook)
+			{
+				Flipbook->SetFlipbook(BaseFlipbook);
+			}
+
+			if (BaseSprite)
+			{
+				Sprite->SetSprite(BaseSprite);
+			}
+		}
+
+	}
+
+
 }
 

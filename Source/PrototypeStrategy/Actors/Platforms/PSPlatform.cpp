@@ -194,8 +194,14 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 
 			if (GetType == EBoxType::Cover)
 			{
-				CoverPart = Cover;
+				CoverPart.Add(Cover);
 			}
+		}
+
+		ALimitedMovePlatformPart* Limited = Cast<ALimitedMovePlatformPart>(Actor);
+		if (IsValid(Limited))
+		{
+			limitedBlocks.Add(Limited);
 		}
 
 		AMirroredPlatformPart* Mirror = Cast<AMirroredPlatformPart>(Actor);
@@ -230,7 +236,7 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 		MagneticActivator->MagneticParts = MagneticArray;
 	}
 	
-	if (IsValid(CoverPart))
+	if (CoverPart.Num() > 0)
 	{
 		for (auto part : parts)
 		{
@@ -242,7 +248,11 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 			}
 		}
 	}
-
+	
+	if(IsValid(ActivatorTeleport))
+	{
+		ActivatorTeleport->teleports = ArrayTeleport;
+	}
 	for (int t = 0; t < ArrayTeleport.Num(); t++)
 	{
 		if( t ==  ArrayTeleport.Num()-1)
@@ -254,6 +264,19 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 		
 		ArrayTeleport[t]->SetTeleport(ArrayTeleport[t + 1]);
 		ArrayTeleport[t]->SetActivator(ActivatorTeleport);		
+	}
+
+	for (int t = 0; t < limitedBlocks.Num(); t++)
+	{
+		if (moveLimits.IsValidIndex(t))
+		{
+			GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Blue, limitedBlocks[t]->GetName());
+			limitedBlocks[t]->moveLimit = moveLimits[t];
+		}
+		else
+		{
+			limitedBlocks[t]->bUseRandomLimit = true;
+		}
 	}
 }
 

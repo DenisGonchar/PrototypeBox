@@ -119,30 +119,42 @@ void APSBaseCharacter::MoveLeft()
 	MovementDirection(CharacterDirection);
 }
 
+void APSBaseCharacter::PlayFlipbookAnim()
+{
+	if (Flipbook->GetRelativeScale3D().Equals(targetScale, 0.1f))
+	{
+		GetWorldTimerManager().PauseTimer(playFlipbookAnimHandle);
+		GetWorldTimerManager().ClearTimer(playFlipbookAnimHandle);
+	}
+	Flipbook->SetRelativeScale3D(Flipbook->GetRelativeScale3D() + deltaScale);
+}
+
 void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 {
+	if (!bIsMoveFinished)
+	{
+		return;
+	}
 	
 	if (Direction == EMoveCharacterDirection::Top || Direction == EMoveCharacterDirection::Down)
-	{
-		Flipbook->SetRelativeScale3D(FVector(0.6f,0.5f, 0.4f));
+	{		
+		startScale = Flipbook->GetRelativeScale3D();
+		targetScale = FVector(0.6f, 0.5f, 0.4f);
+		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
 	}
 	else if (Direction == EMoveCharacterDirection::Left || Direction == EMoveCharacterDirection::Right)
 	{
-		Flipbook->SetRelativeScale3D(FVector(0.4f, 0.5f, 0.6f));
+		startScale = Flipbook->GetRelativeScale3D();
+		targetScale = FVector(0.4f, 0.5f, 0.6f);
+		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
 	}
-
+	GetWorldTimerManager().SetTimer(playFlipbookAnimHandle, this, &APSBaseCharacter::PlayFlipbookAnim, scaleChangeSpeed, true);
 
 	FLedgeDescription LedgeDescription;
 	if (LedgeDetertorComponent->DetectLedge(LedgeDescription, Direction))
 	{
 		MoveToLocationType(LedgeDescription.BoxMesh);
 	}
-	GetWorldTimerManager().SetTimer(spriteTimer,this,&APSBaseCharacter::NormalizePlayerFlipbook,0.1f,false);
-}
-
-void APSBaseCharacter::NormalizePlayerFlipbook()
-{
-	Flipbook->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
 }
 
 void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
@@ -158,6 +170,8 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 	{
 		case EBoxType::Path:
 		{
+			APathPlatformPart* Path = Cast<APathPlatformPart>(Box);
+			Path->PlaySound(Path->interactSound);
 			switch (LevelType)
 			{
 				case ELevelType::Level:
@@ -191,7 +205,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 		{
 			AExitPlatformPart* ExitPart = Cast<AExitPlatformPart>(BoxBlock);
 			MoveToPosition(Box);
-
+			ExitPart->PlaySound(ExitPart->interactSound);
 			if (ExitPart->GetLevelType() == ELevelType::UnderCover)
 			{
 				if (ExitPart->GetIsActivCaver())
@@ -228,7 +242,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			if (IsValid(BoxCover))
 			{
 				MoveToPosition(Box);
-
+				BoxCover->PlaySound(BoxCover->interactSound);
 				BoxCover->ActivatorCover();
 				
 				LevelType = BoxCover->GetLevelType();
@@ -256,7 +270,8 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 					{
 						FVector FloorLocation = BoxTeleport->GetTeleport()->GetActorLocation();
 						FloorLocation.Z = GetActorLocation().Z;
-
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), BoxTeleport->interactSound, BoxTeleport->GetActorLocation());
+						BoxTeleport->PlaySound(BoxTeleport->interactSound);
 						SetActorLocation(FloorLocation);
 						
 						Step(StepIndex);
@@ -285,7 +300,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			if (MagneticBox->MagneticType == EMagneticType::Activator)
 			{
 				MoveToPosition(Box);
-
+				MagneticBox->PlaySound(MagneticBox->interactSound);
 				MagneticBox->SwitchActivator();
 			}			
 		}
@@ -298,20 +313,22 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			{
 				if (magneticPart->MagneticType == EMagneticType::Polarizer)
 				{
+					magneticPart->PlaySound(magneticPart->interactSound);
 					switch (polarizationType)
 					{
-					case EPolarizationType::None:
-						polarizationType = EPolarizationType::Positive;
-						break;
-					case EPolarizationType::Positive:
-						polarizationType = EPolarizationType::Negative;
-						break;
-					case EPolarizationType::Negative:
-						polarizationType = EPolarizationType::None;
-						break;
+						case EPolarizationType::None:
+							polarizationType = EPolarizationType::Positive;
+							break;
+						case EPolarizationType::Positive:
+							polarizationType = EPolarizationType::Negative;
+							break;
+						case EPolarizationType::Negative:
+							polarizationType = EPolarizationType::None;
+							break;
 					default:
 						break;
 					}
+					magneticPart->SwitchSprite(polarizationType);
 				}
 			}
 			MoveToPosition(Box);
@@ -324,6 +341,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 		{
 			
 		}*/
+		BoxBlock->PlaySound(BoxBlock->moveSound);
 		MoveToPosition(Box);
 	}
 		default:
@@ -344,14 +362,45 @@ void APSBaseCharacter::MoveToPosition(APSPlatformPart* Box)
 	{
 		FVector FloorLocation = Box->GetActorLocation();
 		FloorLocation.Z = GetActorLocation().Z;
-		SetActorLocation(FloorLocation);			
+		startLocation = GetActorLocation();
+		targetLocation = FloorLocation;
+		deltaLocation = (startLocation - targetLocation) * moveTimerSpeed;
+		deltaLocation = deltaLocation * -2.f;
+		bIsMoveFinished = false;
+		GetWorldTimerManager().SetTimer(moveTimerHandle, this, &APSBaseCharacter::MoveCharacterOnTimer, moveTimerSpeed, true);					
+	}	
+}
+
+void APSBaseCharacter::MoveCharacterOnTimer()
+{
+	if (targetLocation == GetActorLocation())
+	{		
+		GetWorldTimerManager().PauseTimer(moveTimerHandle);
+		GetWorldTimerManager().ClearTimer(moveTimerHandle);
+		bIsMoveFinished = true;
+		if (GetWorldTimerManager().IsTimerActive(playFlipbookAnimHandle))
+		{
+			GetWorldTimerManager().PauseTimer(playFlipbookAnimHandle);
+			GetWorldTimerManager().ClearTimer(playFlipbookAnimHandle);
+		}
+		startScale = Flipbook->GetRelativeScale3D();
+		targetScale = FVector(0.5f, 0.5f, 0.5f);
+		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
+
+		GetWorldTimerManager().SetTimer(playFlipbookAnimHandle, this, &APSBaseCharacter::PlayFlipbookAnim, scaleChangeSpeed, true);
+		return;
 	}
-	
+	SetActorLocation(GetActorLocation() + deltaLocation);
 }
 
 void APSBaseCharacter::MoveToPosition(FVector location)
 {	
-		SetActorLocation(location);	
+	startLocation = GetActorLocation();
+	targetLocation = location;
+	deltaLocation = (deltaLocation - targetLocation) * moveTimerSpeed;
+	deltaLocation = deltaLocation * -2.f;
+	bIsMoveFinished = false;
+	GetWorldTimerManager().SetTimer(moveTimerHandle, this, &APSBaseCharacter::MoveCharacterOnTimer, moveTimerSpeed, true);
 }
 
 void APSBaseCharacter::MoveToPositionStart(APSPlatformPart* Box)
@@ -367,7 +416,7 @@ void APSBaseCharacter::AddActualMagnetics(AMagneticPlatformPart* part)
 	ActiveMagnetics.AddUnique(part);
 	if (!IsMagneticFindStarted)
 	{
-		GetWorldTimerManager().SetTimer(startFindMagnetic,this,&APSBaseCharacter::FindNearestMagnetic,0.1f,false);
+		GetWorldTimerManager().SetTimer(startFindMagnetic, this, &APSBaseCharacter::FindNearestMagnetic, 0.1f, false);
 		IsMagneticFindStarted = true;
 	}
 }
@@ -393,7 +442,7 @@ void APSBaseCharacter::FindNearestMagnetic()
 	if (IsValid(nearestPart))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Emerald, nearestPart->GetName());
-		nearestPart->Magnetic(this);
+		nearestPart->MagneticPlayer(this);
 	}
 }
 
