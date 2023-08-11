@@ -110,8 +110,8 @@ bool ULedgeDetectorComponent::DetectLedge(OUT FLedgeDescription& LedgeDescriptio
 
 			if (!PSTraceUtils::LineTraceSingleByChannel(GetWorld(), ForwardCheckHitResult, Start, End, ECC_Visibility, QueryParams, FCollisionResponseParams::DefaultResponseParam, bIsDebugEnabled, DrawTime, DrawColor))
 			{
+				bIsNeedPush = false;
 				ForwardCkeck = false;
-
 			}
 			else
 			{
@@ -132,6 +132,7 @@ bool ULedgeDetectorComponent::DetectLedge(OUT FLedgeDescription& LedgeDescriptio
 
 			if (!PSTraceUtils::LineTraceSingleByChannel(GetWorld(), ForwardCheckHitResult, Start, End, ECC_Visibility, QueryParams, FCollisionResponseParams::DefaultResponseParam, bIsDebugEnabled, DrawTime, DrawColor))
 			{
+				bIsNeedPush = false;
 				ForwardCkeck = false;
 			}
 			else
@@ -153,6 +154,7 @@ bool ULedgeDetectorComponent::DetectLedge(OUT FLedgeDescription& LedgeDescriptio
 
 			if (!PSTraceUtils::LineTraceSingleByChannel(GetWorld(), ForwardCheckHitResult, Start, End, ECC_Visibility, QueryParams, FCollisionResponseParams::DefaultResponseParam, bIsDebugEnabled, DrawTime, DrawColor))
 			{
+				bIsNeedPush = false;
 				ForwardCkeck = false;
 			}
 			else
@@ -174,6 +176,7 @@ bool ULedgeDetectorComponent::DetectLedge(OUT FLedgeDescription& LedgeDescriptio
 
 			if (!PSTraceUtils::LineTraceSingleByChannel(GetWorld(), ForwardCheckHitResult, Start, End, ECC_Visibility, QueryParams, FCollisionResponseParams::DefaultResponseParam, bIsDebugEnabled, DrawTime, DrawColor))
 			{
+				bIsNeedPush = false;
 				ForwardCkeck = false;
 			}
 			else
@@ -370,49 +373,55 @@ bool ULedgeDetectorComponent::BoxDetectLedge(OUT FLedgeDescription& LedgeDescrip
 bool ULedgeDetectorComponent::DetectHitBlock(FHitResult Hit)
 {
 	//AMovePlatformPart* Box = Cast<AMovePlatformPart>(Hit.Actor);
-	
-	APSPlatformPart* BoxPart = Cast<APSPlatformPart>(Hit.Actor);
 
-	EBoxType PartType = BoxPart->GetBoxType();
+	bIsNeedPush = false;
+	HitActor = Cast<APSPlatformPart>(Hit.Actor);
+
+	EBoxType PartType = HitActor->GetBoxType();
 
 	switch (PartType)
 	{
 		case EBoxType::Dynamic:
 		{
-			AMovePlatformPart* Box = Cast<AMovePlatformPart>(Hit.Actor);
+			AMovePlatformPart* Box = Cast<AMovePlatformPart>(HitActor);
 
 			if (IsValid(Box))
 			{
 				if (Box->MoveDirection(CharacterDirection))
 				{
+					bIsNeedPush = true;
 					return true;
 				}
 			}
+			bIsNeedPush = false;
 			return false;
 		}
 
 		case EBoxType::Mirrored:
 		{
-			AMirroredPlatformPart* Box = Cast<AMirroredPlatformPart>(Hit.Actor);
+			AMirroredPlatformPart* Box = Cast<AMirroredPlatformPart>(HitActor);
 
 			if (IsValid(Box))
 			{
 				if (Box->MoveDirection(CharacterDirection))
 				{
+					bIsNeedPush = true;
 					return true;
 				}
 			}
+			bIsNeedPush = false;
 			return false;
 		}
 
 		case EBoxType::MirroredClone:
-		{			
+		{	
+			bIsNeedPush = false;
 			return false;
 		}
 
 		case EBoxType::Wall:
 		{
-			AWallColorPlatformPart* WallColor = Cast<AWallColorPlatformPart>(Hit.Actor);
+			AWallColorPlatformPart* WallColor = Cast<AWallColorPlatformPart>(HitActor);
 				
 			if (IsValid(WallColor))
 			{
@@ -420,16 +429,18 @@ bool ULedgeDetectorComponent::DetectHitBlock(FHitResult Hit)
 				{
 					if (WallColor->GetWallType() == EWallType::ColorWall)
 					{
+						bIsNeedPush = true;
 						return true;	
 					}
 					
 				}
 				
 			}
+			bIsNeedPush = false;
 			return false;
 		}
 	}
-
+	bIsNeedPush = false;
 	return true;
 }
 

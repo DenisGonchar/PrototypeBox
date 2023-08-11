@@ -42,6 +42,7 @@ enum class EBoxType : uint8
 	Polarizator,
 	Mirrored,
 	MirroredClone,
+	Construct,
 };
 
 UENUM(BlueprintType)

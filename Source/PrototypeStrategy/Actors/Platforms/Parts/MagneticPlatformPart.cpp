@@ -221,7 +221,7 @@ void AMagneticPlatformPart::CheckPlayer()
 	traceEndLocation = GetActorLocation() + (GetActorForwardVector() * 650);
 	TArray<AActor*> actToIgnore;
 	actToIgnore.Add(this);
-	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(),startLocation,traceEndLocation,ETraceTypeQuery::TraceTypeQuery1,false, actToIgnore, EDrawDebugTrace::ForDuration, traceResult, true))
+	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), startLocation, traceEndLocation, ETraceTypeQuery::TraceTypeQuery1,false, actToIgnore, EDrawDebugTrace::ForDuration, traceResult, true))
 	{
 		if (traceResult.Actor != nullptr)
 		{
@@ -254,7 +254,7 @@ void AMagneticPlatformPart::MoveMagnetic(EMoveCharacterDirection moveDirection)
 	TArray<AActor*> actToIgnore;
 	actToIgnore.Add(this);
 	FVector location = GetLocationByDirection(moveDirection);
-	if (!UKismetSystemLibrary::BoxTraceSingle(GetWorld(), location, location, FVector(25.f,25.f,25.f), FRotator(), TraceTypeQuery1, true, actToIgnore, EDrawDebugTrace::ForDuration, hit, true))
+	if (!UKismetSystemLibrary::BoxTraceSingle(GetWorld(), location, location, FVector(25.f,25.f,25.f), FRotator(), ETraceTypeQuery::TraceTypeQuery1, true, actToIgnore, EDrawDebugTrace::ForDuration, hit, true))
 	{
 		//if (hit.Actor == nullptr)
 		//{

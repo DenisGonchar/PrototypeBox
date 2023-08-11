@@ -28,6 +28,9 @@ APSBaseCharacter::APSBaseCharacter()
 	Flipbook->SetupAttachment(BoxComponent);
 	Flipbook->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 
+	CharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	CharacterMesh->SetupAttachment(BoxComponent);
+
 	LedgeDetertorComponent = CreateDefaultSubobject<ULedgeDetectorComponent>(TEXT("LedgeDetector"));
 
 }
@@ -153,13 +156,22 @@ void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 	FLedgeDescription LedgeDescription;
 	if (LedgeDetertorComponent->DetectLedge(LedgeDescription, Direction))
 	{
-		MoveToLocationType(LedgeDescription.BoxMesh);
+		detectedBlock = LedgeDescription.BoxMesh;
+		if (LedgeDetertorComponent->bIsNeedPush)
+		{
+			GEngine->AddOnScreenDebugMessage(-1,5.f, FColor::Red, LedgeDetertorComponent->bIsNeedPush ? "true" : "false");
+			GetWorldTimerManager().SetTimer(pushTimer, this, &APSBaseCharacter::MoveToLocationType, 0.1f, false, 0.6f);
+		}
+		else
+		{
+			MoveToLocationType();
+		}		
 	}
 }
 
-void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
+void APSBaseCharacter::MoveToLocationType()
 {	
-	ABlockPlatformPart* BoxBlock = Cast<ABlockPlatformPart>(Box);
+	ABlockPlatformPart* BoxBlock = Cast<ABlockPlatformPart>(detectedBlock);
 	
 	if (IsValid(BoxBlock))
 	{
@@ -170,13 +182,13 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 	{
 		case EBoxType::Path:
 		{
-			APathPlatformPart* Path = Cast<APathPlatformPart>(Box);
+			APathPlatformPart* Path = Cast<APathPlatformPart>(detectedBlock);
 			Path->PlaySound(Path->interactSound);
 			switch (LevelType)
 			{
 				case ELevelType::Level:
 				{
-					MoveToPosition(Box);
+					MoveToPosition(detectedBlock);
 
 					break;
 				}
@@ -189,7 +201,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 						{
 							BoxBlock->ActivatorCover();
 
-							MoveToPosition(Box);
+							MoveToPosition(detectedBlock);
 						}
 					}
 					
@@ -204,7 +216,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 		case EBoxType::Exit:
 		{
 			AExitPlatformPart* ExitPart = Cast<AExitPlatformPart>(BoxBlock);
-			MoveToPosition(Box);
+			MoveToPosition(detectedBlock);
 			ExitPart->PlaySound(ExitPart->interactSound);
 			if (ExitPart->GetLevelType() == ELevelType::UnderCover)
 			{
@@ -241,7 +253,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			
 			if (IsValid(BoxCover))
 			{
-				MoveToPosition(Box);
+				MoveToPosition(detectedBlock);
 				BoxCover->PlaySound(BoxCover->interactSound);
 				BoxCover->ActivatorCover();
 				
@@ -257,7 +269,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 
 			if (BoxTeleport->GetTeleportInfo().TeleportType == ETeleport::Activator)
 			{				
-				MoveToPosition(Box);
+				MoveToPosition(detectedBlock);
 
 				BoxTeleport->SwitchActivator();
 
@@ -281,12 +293,12 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 				}
 				else
 				{
-					MoveToPosition(Box);
+					MoveToPosition(detectedBlock);
 				}
 			}
 			else
 			{
-				MoveToPosition(Box);
+				MoveToPosition(detectedBlock);
 			}
 
 			break;
@@ -299,7 +311,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 
 			if (MagneticBox->MagneticType == EMagneticType::Activator)
 			{
-				MoveToPosition(Box);
+				MoveToPosition(detectedBlock);
 				MagneticBox->PlaySound(MagneticBox->interactSound);
 				MagneticBox->SwitchActivator();
 			}			
@@ -331,7 +343,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 					magneticPart->SwitchSprite(polarizationType);
 				}
 			}
-			MoveToPosition(Box);
+			MoveToPosition(detectedBlock);
 		}
 
 	case EBoxType::Wall:
@@ -342,7 +354,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			
 		}*/
 		BoxBlock->PlaySound(BoxBlock->moveSound);
-		MoveToPosition(Box);
+		MoveToPosition(detectedBlock);
 	}
 		default:
 			break;

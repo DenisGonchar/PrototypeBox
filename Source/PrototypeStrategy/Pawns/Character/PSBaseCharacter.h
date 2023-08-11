@@ -54,8 +54,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UBoxComponent* BoxComponent;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	//class UStaticMeshComponent* CharacterMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	class USkeletalMeshComponent* CharacterMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
 	UPaperFlipbookComponent* Flipbook;
@@ -65,6 +65,32 @@ public:
 
 	EMoveCharacterDirection CharacterDirection = EMoveCharacterDirection::None;
 
+	FTimerHandle pushTimer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* moveForward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* moveBack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* moveLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* moveRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* pushForward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* pushBack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* pushLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* pushRight;
+
 #pragma region Move
 	virtual void MoveTop();
 	virtual void MoveDown();
@@ -72,7 +98,7 @@ public:
 	virtual void MoveLeft();
 	
 	void MovementDirection(EMoveCharacterDirection Direction);
-	void MoveToLocationType(APSPlatformPart* Box);
+	void MoveToLocationType();
 	void MoveToPosition(APSPlatformPart* Box);	
 	void MoveToPosition(FVector Location);
 	void MoveToPositionStart(APSPlatformPart* Box);
@@ -155,4 +181,6 @@ protected:
 	
 	TWeakObjectPtr<class APSPlatform>BasePlatform;
 
+
+	APSPlatformPart* detectedBlock;
 };

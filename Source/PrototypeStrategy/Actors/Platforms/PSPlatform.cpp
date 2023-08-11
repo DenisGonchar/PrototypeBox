@@ -78,65 +78,15 @@ TArray<AActor*> APSPlatform::SpawnBlocks(TArray<FConstructedBlockData> blocks)
 
 void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 {
-	/*
-	for (int i = 0; i <= MaxIndex - 1; i++)
-	{
-		Floor.Add(FloorPart);
-
-	}
-
-	for (int j = 0; j < Floor.Num(); j++)
-	{	
-		if (GridParts.Num() - 1 < j)
-		{
-			GridParts.Add(Floor[j]);
-		}
-
-		if (GridParts[j] == nullptr)
-		{
-			GridParts[j] = Floor[j];
-
-		}
-		
-	}
-
-	int X = 0;
-	int Y = 0;
-	*/
 	for (auto part : parts)
 	{
-		/*
-		if (!(Y < HorizontalIndex))
-		{
-			Y = 0;
-			X += 1;
-		}
-
-		FVector SpawnLocation = GetRootComponent()->GetComponentLocation();
-		SpawnLocation.X = SpawnLocation.X + (-X * Distance);
-		SpawnLocation.Y += SpawnLocation.Y + (Y * Distance);
-		
-		APSPlatformPart* SpawnActors = GetWorld()->SpawnActor<APSPlatformPart>(GridParts[l], SpawnLocation, FRotator::ZeroRotator);
-		
-		if (IsValid(SpawnActors))
-		{
-			ArrayPlatformPart.Add(SpawnActors);
-			
-			ABlockPlatformPart* Block = Cast<ABlockPlatformPart>(SpawnActors);
-			if (IsValid(Block->MovePlatform))
-			{
-				FVector SpawnLocationBlock = Block->GetActorLocation();
-				SpawnLocationBlock.Z += Block->GetSpawnDistance();
-
-				APSPlatformPart* SpawnBlock = GetWorld()->SpawnActor<APSPlatformPart>(Block->MovePlatform, SpawnLocationBlock, FRotator::ZeroRotator);
-				if (IsValid(SpawnBlock))
-				{
-					ArrayPlatformPart.Add(SpawnBlock);
-				}
-			}
-		}*/
 		APSPlatformPart* Actor = Cast<APSPlatformPart>(part);
 
+		AConstructPlatformPart* ConstructBlock = Cast<AConstructPlatformPart>(Actor);
+		if (IsValid(ConstructBlock))
+		{
+			constructBlocks.AddUnique(ConstructBlock);
+		}
 
 		ATeleportPlatformPart* Part = Cast<ATeleportPlatformPart>(Actor);
 		if (IsValid(Part))
@@ -220,6 +170,11 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 				mirroredClones.Add(Mirror);
 			}
 		}
+	}
+
+	for (auto contr : constructBlocks)
+	{
+		contr->SetConstractBlocksArray(constructBlocks);
 	}
 
 	if (IsValid(mirroredBlock))

@@ -7,6 +7,7 @@
 #include <PSTypes.h>
 #include "Parts/MirroredPlatformPart.h"
 #include "Parts/LimitedMovePlatformPart.h"
+#include "Parts/ConstructPlatformPart.h"
 #include "PSPlatform.generated.h"
 
 class APSPlatformPart;
@@ -87,5 +88,7 @@ private:
 
 	TArray<AMirroredPlatformPart*> mirroredClones;
 	AMirroredPlatformPart* mirroredBlock;
+
+	TArray<AConstructPlatformPart*> constructBlocks;
 
 };

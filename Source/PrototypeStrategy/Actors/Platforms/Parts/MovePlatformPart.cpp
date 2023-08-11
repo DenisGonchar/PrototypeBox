@@ -26,7 +26,7 @@ bool AMovePlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 {
 	Direction = Direc;	
 	FLedgeDescription LedgeDescription;
-	if (LedgeDetertorComponent->BoxDetectLedge(LedgeDescription, Direc))
+	if (LedgeDetertorComponent->BoxDetectLedge(/*this,*/ LedgeDescription, Direc))
 	{
 		DirectionDynamicType(LedgeDescription.BoxMesh);
 
@@ -100,7 +100,7 @@ void AMovePlatformPart::StartActive()
 	if (Direction != EMoveCharacterDirection::None)
 	{
 		FLedgeDescription LedgeDescription;
-		if (LedgeDetertorComponent->BoxDetectLedge(LedgeDescription, Direction))
+		if (LedgeDetertorComponent->BoxDetectLedge(/*this,*/ LedgeDescription, Direction))
 		{
 			MoveToLocationFloor(LedgeDescription.BoxMesh);
 			UE_LOG(LogTemp, Warning, TEXT(" Move"));

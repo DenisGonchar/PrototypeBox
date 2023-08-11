@@ -57,9 +57,7 @@ void APSPlatformPart::PlaySound(USoundBase* soudToPlay)
 
 void APSPlatformPart::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
-	
+	Super::Tick(DeltaTime);	
 }
 
 UActivatorCoverComponent* APSPlatformPart::GetActivatorCoverComponent() const
@@ -69,7 +67,9 @@ UActivatorCoverComponent* APSPlatformPart::GetActivatorCoverComponent() const
 
 EBoxType APSPlatformPart::GetBoxType() const
 {
-	return BoxType;
+	if(IsValid(this))
+		return BoxType;
+	return EBoxType::None;
 }
 
 void APSPlatformPart::SetCoverPart(TArray<ACoverPlatformPart*> Actors)
@@ -77,10 +77,8 @@ void APSPlatformPart::SetCoverPart(TArray<ACoverPlatformPart*> Actors)
 	if (Actors.Num() > 0)
 	{
 		BaseCover = Actors;
-
 		GetActivatorCoverComponent()->SetCover();
 	}
-
 }
 
 TArray<ACoverPlatformPart*> APSPlatformPart::GetCoverPart() const
@@ -92,11 +90,7 @@ void APSPlatformPart::SetLevelType(ELevelType World)
 {
 	LevelType = World;
 
-	//TODO
-	//add new virtual void 
-
 	NewLevelType();
-
 }
 
 ELevelType APSPlatformPart::GetLevelType() const

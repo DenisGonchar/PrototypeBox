@@ -15,16 +15,17 @@ struct FLedgeDescription
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ledge description")
-	APSPlatform* Platform;
+		APSPlatform* Platform;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ledge description")
-	FVector Location;
+		FVector Location;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ledge description")
-	APSPlatformPart* BoxMesh;
+		APSPlatformPart* BoxMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ledge description")
-	EBoxType Type = EBoxType::None;
+		EBoxType Type = EBoxType::None;
+
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -50,6 +51,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 	FColor DrawColor = FColor::Red;
 
+	FLedgeDescription ledgeDisrcription;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		APSPlatformPart* HitActor;
+
+	bool bIsNeedPush = false;
+
+
+	TWeakObjectPtr<class AMovePlatformPart> CachedActorOwner;
 protected:
 	
 	virtual void BeginPlay() override;
@@ -58,6 +68,6 @@ protected:
 private:
 	
 	TWeakObjectPtr<class APSBaseCharacter> CachedPawnOwner;
-	TWeakObjectPtr<class AMovePlatformPart> CachedActorOwner;
+	
 
 };
