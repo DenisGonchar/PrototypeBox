@@ -6,15 +6,17 @@
 #include <PSTypes.h>
 #include <Components/LedgeDetectorComponent.h>
 #include <Actors/Platforms/PSPlatformPart.h>
+#include "../../GameInstance/PSGameInstance.h"
 #include "PSBaseCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOpenLevel, bool, bIsWin);
+
 
 USTRUCT(BlueprintType)
 struct FGetTeleportInfo
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY()
 	FName GetTeleportName = FName("None");
 
@@ -30,11 +32,14 @@ class PROTOTYPESTRATEGY_API APSBaseCharacter : public APawn
 {
 	GENERATED_BODY()
 
+private:
+	UPSGameInstance* gameInstance;
+
 public:
 	APSBaseCharacter();
-	
+
 	UPROPERTY(BlueprintAssignable)
-	FOpenLevel OpenLevel;
+		FOpenLevel OpenLevel;
 
 	virtual void BeginPlay() override;
 
@@ -65,8 +70,6 @@ public:
 
 	EMoveCharacterDirection CharacterDirection = EMoveCharacterDirection::None;
 
-	FTimerHandle pushTimer;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
 		UAnimationAsset* moveForward;
 
@@ -91,6 +94,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
 		UAnimationAsset* pushRight;
 
+
+
 #pragma region Move
 	virtual void MoveTop();
 	virtual void MoveDown();
@@ -103,7 +108,6 @@ public:
 	void MoveToPosition(FVector Location);
 	void MoveToPositionStart(APSPlatformPart* Box);
 
-	void NormalizePlayerFlipbook();
 	FTimerHandle spriteTimer;
 
 	void Step(int Index);
@@ -124,10 +128,6 @@ public:
 	void MoveCharacterOnTimer();
 
 	FTimerHandle playFlipbookAnimHandle;
-	void PlayFlipbookAnim();
-	FVector targetScale;
-	FVector startScale;
-	FVector deltaScale;
 
 #pragma endregion
 
@@ -162,10 +162,14 @@ public:
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	float MoveDistance = 150.0f;
+		float MoveDistance = 150.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
-	int StepIndex = 1;
+		int StepIndex = 1;
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void CharacterMoved();
+
 	int FullStepIndex = 1;
 
 	EBoxType BoxType = EBoxType::None;
@@ -183,4 +187,16 @@ protected:
 
 
 	APSPlatformPart* detectedBlock;
+
+	EMoveCharacterDirection lastDirection;
+	void PlayAnimation(UAnimationAsset* animToPlay);
+	void PushAndMove();
+	void MoveWithAnim();
+	UAnimationAsset* GetAnimationByDirection(EMoveCharacterDirection direction, bool bIsPushAnim = false);
+
+	FTimerHandle moveTimer;
+	FTimerHandle pushTimer;
+
+	float pushDelay = 0.8f;
+	float moveDelay = 0.2f;
 };

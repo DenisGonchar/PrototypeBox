@@ -8,13 +8,14 @@
 #include "Parts/MirroredPlatformPart.h"
 #include "Parts/LimitedMovePlatformPart.h"
 #include "Parts/ConstructPlatformPart.h"
+#include "Parts/PacmanPlatformPart.h"
 #include "PSPlatform.generated.h"
 
 class APSPlatformPart;
 class ATeleportPlatformPart;
 class ACoverPlatformPart;
 class AMagneticPlatformPart;
-//class AMirroredPlatformPart;
+//class APacmacPlatformPart;
 
 UCLASS()
 class PROTOTYPESTRATEGY_API APSPlatform : public AActor
@@ -31,6 +32,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	TArray<TSubclassOf<APSPlatformPart>> GetGridParts() const;
+
+	TArray<ACoverPlatformPart*> GetCoverPartsArray();
+
+	void SpawnAndAssignPathPart(FVector spawnLocation);
 
 protected:
 	/*
@@ -68,6 +73,12 @@ protected:
 		FName ExitMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
+		TArray<FPacmanSteps> PacmanStepsArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
+		UClass* pathPartClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 		FString levelName;
 
 	TArray<AActor*> spawnedBlocks;
@@ -77,7 +88,7 @@ private:
 	AMagneticPlatformPart* MagneticActivator;
 	TArray<AMagneticPlatformPart*> MagneticArray;
 	
-	TArray<ACoverPlatformPart*> CoverPart;	
+	TArray<ACoverPlatformPart*> CoverParts;	
 
 	ATeleportPlatformPart* ActivatorTeleport;
 	TArray<ATeleportPlatformPart*> ArrayTeleport;
@@ -91,4 +102,5 @@ private:
 
 	TArray<AConstructPlatformPart*> constructBlocks;
 
+	TArray<APacmanPlatformPart*> pacmansArray;
 };

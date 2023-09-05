@@ -24,25 +24,27 @@ void AMovePlatformPart::BeginPlay()
 
 bool AMovePlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 {
-	Direction = Direc;	
+	lastDirection = Direc;
 	FLedgeDescription LedgeDescription;
+	LedgeDetertorComponent->lastPlatformPart = this;
 	if (LedgeDetertorComponent->BoxDetectLedge(/*this,*/ LedgeDescription, Direc))
 	{
-		DirectionDynamicType(LedgeDescription.BoxMesh);
-
+		lastBox = LedgeDescription.BoxMesh;
+		//DirectionDynamicType();
+		GetWorldTimerManager().SetTimer( moveDelayTimer, this, &AMovePlatformPart::DirectionDynamicType, moveDelay, false, 0.3f);
 		return true;
 	}
 
 	return false;
 }
 
-void AMovePlatformPart::DirectionDynamicType(APSPlatformPart* Box)
+void AMovePlatformPart::DirectionDynamicType()
 {
 	switch (DynamicType)
 	{	
 		case EDynamic::Active:
 		{
-			MoveToLocationFloor(Box);
+			MoveToLocationFloor(lastBox);
 			PlaySound(moveSound);
 			GetWorldTimerManager().SetTimer(DynamicTimer, this, &AMovePlatformPart::StartActive, ActiveTimeStep, true);
 		
@@ -50,7 +52,7 @@ void AMovePlatformPart::DirectionDynamicType(APSPlatformPart* Box)
 		}
 		default:
 			PlaySound(moveSound);
-			MoveToLocationFloor(Box);
+			MoveToLocationFloor(lastBox);
 			break;
 	}
 }

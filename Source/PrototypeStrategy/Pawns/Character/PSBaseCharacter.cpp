@@ -7,8 +7,8 @@
 #include <Actors/Platforms/PSPlatformPart.h>
 #include <Kismet/GameplayStatics.h>
 #include <Actors/Platforms/Parts/BlockPlatformPart.h>
-#include <GameMode/PSGameMode.h>
 #include <GameState/PSGameState.h>
+#include <GameMode/PSGameMode.h>
 #include "Actors/Platforms/Parts/MagneticPlatformPart.h"
 #include "Actors/Platforms/Parts/TeleportPlatformPart.h"
 #include "Actors/Platforms/Parts/CoverPlatformPart.h"
@@ -40,7 +40,7 @@ void APSBaseCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	GMode = Cast<APSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	
+	gameInstance = Cast<UPSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	FullStep();
 	
 	FLedgeDescription LedgeDescription;
@@ -76,6 +76,7 @@ void APSBaseCharacter::EndPlay(const EEndPlayReason::Type Reason)
 void APSBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Purple, bIsMoveFinished ? "true" : "false");
 
 }
 
@@ -122,15 +123,6 @@ void APSBaseCharacter::MoveLeft()
 	MovementDirection(CharacterDirection);
 }
 
-void APSBaseCharacter::PlayFlipbookAnim()
-{
-	if (Flipbook->GetRelativeScale3D().Equals(targetScale, 0.1f))
-	{
-		GetWorldTimerManager().PauseTimer(playFlipbookAnimHandle);
-		GetWorldTimerManager().ClearTimer(playFlipbookAnimHandle);
-	}
-	Flipbook->SetRelativeScale3D(Flipbook->GetRelativeScale3D() + deltaScale);
-}
 
 void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 {
@@ -138,41 +130,33 @@ void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 	{
 		return;
 	}
-	
-	if (Direction == EMoveCharacterDirection::Top || Direction == EMoveCharacterDirection::Down)
-	{		
-		startScale = Flipbook->GetRelativeScale3D();
-		targetScale = FVector(0.6f, 0.5f, 0.4f);
-		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
-	}
-	else if (Direction == EMoveCharacterDirection::Left || Direction == EMoveCharacterDirection::Right)
-	{
-		startScale = Flipbook->GetRelativeScale3D();
-		targetScale = FVector(0.4f, 0.5f, 0.6f);
-		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
-	}
-	GetWorldTimerManager().SetTimer(playFlipbookAnimHandle, this, &APSBaseCharacter::PlayFlipbookAnim, scaleChangeSpeed, true);
+	bIsMoveFinished = false;
 
 	FLedgeDescription LedgeDescription;
 	if (LedgeDetertorComponent->DetectLedge(LedgeDescription, Direction))
 	{
+		lastDirection = Direction;
 		detectedBlock = LedgeDescription.BoxMesh;
 		if (LedgeDetertorComponent->bIsNeedPush)
 		{
-			GEngine->AddOnScreenDebugMessage(-1,5.f, FColor::Red, LedgeDetertorComponent->bIsNeedPush ? "true" : "false");
-			GetWorldTimerManager().SetTimer(pushTimer, this, &APSBaseCharacter::MoveToLocationType, 0.1f, false, 0.6f);
+			PushAndMove();
 		}
 		else
 		{
-			MoveToLocationType();
+			MoveWithAnim();
 		}		
+	}
+	else
+	{
+		bIsMoveFinished = true;
+		return;
 	}
 }
 
 void APSBaseCharacter::MoveToLocationType()
 {	
 	ABlockPlatformPart* BoxBlock = Cast<ABlockPlatformPart>(detectedBlock);
-	
+
 	if (IsValid(BoxBlock))
 	{
 		BoxType = BoxBlock->GetBoxType();
@@ -183,9 +167,11 @@ void APSBaseCharacter::MoveToLocationType()
 		case EBoxType::Path:
 		{
 			APathPlatformPart* Path = Cast<APathPlatformPart>(detectedBlock);
-			Path->PlaySound(Path->interactSound);
-			switch (LevelType)
+			if (IsValid(Path))
 			{
+				Path->PlaySound(Path->interactSound);
+				switch (LevelType)
+				{
 				case ELevelType::Level:
 				{
 					MoveToPosition(detectedBlock);
@@ -204,12 +190,12 @@ void APSBaseCharacter::MoveToLocationType()
 							MoveToPosition(detectedBlock);
 						}
 					}
-					
+
 				}
 				default:
-					break;			
+					break;
+				}
 			}
-
 			break;
 		}
 
@@ -389,17 +375,19 @@ void APSBaseCharacter::MoveCharacterOnTimer()
 	{		
 		GetWorldTimerManager().PauseTimer(moveTimerHandle);
 		GetWorldTimerManager().ClearTimer(moveTimerHandle);
-		bIsMoveFinished = true;
 		if (GetWorldTimerManager().IsTimerActive(playFlipbookAnimHandle))
 		{
 			GetWorldTimerManager().PauseTimer(playFlipbookAnimHandle);
 			GetWorldTimerManager().ClearTimer(playFlipbookAnimHandle);
 		}
-		startScale = Flipbook->GetRelativeScale3D();
-		targetScale = FVector(0.5f, 0.5f, 0.5f);
-		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
 
-		GetWorldTimerManager().SetTimer(playFlipbookAnimHandle, this, &APSBaseCharacter::PlayFlipbookAnim, scaleChangeSpeed, true);
+		bIsMoveFinished = true;
+
+		if (gameInstance->OnMove.IsBound())
+		{
+			gameInstance->OnMove.Broadcast();
+		}
+
 		return;
 	}
 	SetActorLocation(GetActorLocation() + deltaLocation);
@@ -508,5 +496,58 @@ FName APSBaseCharacter::GetNestLevel() const
 void APSBaseCharacter::SetNextLevel(FName Map)
 {
 	NextLevel = Map;
+}
+
+void APSBaseCharacter::PlayAnimation(UAnimationAsset* animToPlay)
+{
+	CharacterMesh->PlayAnimation(animToPlay, false);
+}
+
+void APSBaseCharacter::PushAndMove()
+{
+	PlayAnimation(GetAnimationByDirection(lastDirection, true));
+	GetWorldTimerManager().SetTimer(pushTimer, this, &APSBaseCharacter::MoveWithAnim, 0.1f, false , pushDelay);
+}
+
+void APSBaseCharacter::MoveWithAnim()
+{
+	PlayAnimation(GetAnimationByDirection(lastDirection));
+	GetWorldTimerManager().SetTimer(moveTimer, this, &APSBaseCharacter::MoveToLocationType, 0.1f, false, moveDelay);
+}
+
+UAnimationAsset* APSBaseCharacter::GetAnimationByDirection(EMoveCharacterDirection direction, bool bIsPushAnim)
+{
+	switch (direction)
+	{
+		case EMoveCharacterDirection::Top:
+			if (bIsPushAnim)
+			{
+				return pushForward;
+			}
+			return moveForward;
+			break;
+		case EMoveCharacterDirection::Down:			
+			if (bIsPushAnim)
+			{
+				return pushBack;
+			}
+			return moveBack;
+			break;
+		case EMoveCharacterDirection::Left:
+			if (bIsPushAnim)
+			{
+				return pushLeft;
+			}
+			return moveLeft;
+			break;
+		case EMoveCharacterDirection::Right:
+			if (bIsPushAnim)
+			{
+				return pushRight;
+			}
+			return moveRight;
+			break;
+	}
+	return nullptr;
 }
 

@@ -34,6 +34,7 @@ class PROTOTYPESTRATEGY_API ULedgeDetectorComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
+	AActor* lastPlatformPart;
 
 	bool StartDetectDown(OUT FLedgeDescription& LedgeDescription);
 	bool StartBoxDetectDown(OUT FLedgeDescription& LedgeDescription);

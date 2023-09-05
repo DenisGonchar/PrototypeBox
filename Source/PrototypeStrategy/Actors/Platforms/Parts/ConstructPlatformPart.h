@@ -38,7 +38,7 @@ protected:
 
 	class ULedgeDetectorComponent* LedgeDetectorComponent;
 
-	void DetectConbstructedBlock(TArray<AConstructPlatformPart*> DetectedBlocks);
+	void DetectConstructedBlock(TArray<AConstructPlatformPart*> DetectedBlocks);
 
 
 	FVector LocationByDirection(EMoveCharacterDirection moveDirection);

@@ -216,32 +216,72 @@ EMoveCharacterDirection AMagneticPlatformPart::ReversDirection(EMoveCharacterDir
 
 void AMagneticPlatformPart::CheckPlayer()
 {
-	FVector traceEndLocation, startLocation;
+	FVector traceBackEndLocation, startLocation, traceForwardEndLocation, traceRightEndLocation, traceLeftEndLocation;
 	startLocation = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
-	traceEndLocation = GetActorLocation() + (GetActorForwardVector() * 650);
+	traceForwardEndLocation = GetActorLocation() + (GetActorForwardVector() * 650);
+	traceBackEndLocation = GetActorLocation() + (GetActorForwardVector() * -650);
+	traceRightEndLocation = GetActorLocation() + (GetActorRightVector() * 650);
+	traceLeftEndLocation = GetActorLocation() + (GetActorRightVector() * -650);
 	TArray<AActor*> actToIgnore;
 	actToIgnore.Add(this);
-	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), startLocation, traceEndLocation, ETraceTypeQuery::TraceTypeQuery1,false, actToIgnore, EDrawDebugTrace::ForDuration, traceResult, true))
+
+	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), startLocation, traceForwardEndLocation, ETraceTypeQuery::TraceTypeQuery1,false, actToIgnore, EDrawDebugTrace::ForDuration, traceResult, true))
 	{
 		if (traceResult.Actor != nullptr)
 		{
-			APSBaseCharacter* player = Cast<APSBaseCharacter>(traceResult.Actor);
-			if (IsValid(player))
+			MagneticFinded(Cast<AActor>(traceResult.Actor));
+		}
+	}
+	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), startLocation, traceBackEndLocation, ETraceTypeQuery::TraceTypeQuery1, false, actToIgnore, EDrawDebugTrace::ForDuration, traceResult, true))
+	{
+		if (traceResult.Actor != nullptr)
+		{
+			MagneticFinded(Cast<AActor>(traceResult.Actor));
+		}
+	}
+	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), startLocation, traceRightEndLocation, ETraceTypeQuery::TraceTypeQuery1, false, actToIgnore, EDrawDebugTrace::ForDuration, traceResult, true))
+	{
+		if (traceResult.Actor != nullptr)
+		{
+			MagneticFinded(Cast<AActor>(traceResult.Actor));
+		}
+	}
+	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), startLocation, traceLeftEndLocation, ETraceTypeQuery::TraceTypeQuery1, false, actToIgnore, EDrawDebugTrace::ForDuration, traceResult, true))
+	{
+		if (traceResult.Actor != nullptr)
+		{
+			MagneticFinded(Cast<AActor>(traceResult.Actor));
+		}
+	}
+
+	
+}
+
+void AMagneticPlatformPart::MagneticFinded(AActor* actor)
+{
+	if (GetActorLocation().Equals(actor->GetActorLocation(), 151.f))
+	{
+		return;
+	}
+
+
+	APSBaseCharacter* player = Cast<APSBaseCharacter>(actor);
+	if (IsValid(player))
+	{
+		player->AddActualMagnetics(this);
+		return;
+	}
+	else
+	{
+		AMagneticPlatformPart* magnetic = Cast<AMagneticPlatformPart>(actor);
+		if (IsValid(magnetic))
+		{
+			if (magnetic->MagneticType == EMagneticType::Magnetic)
 			{
-				player->AddActualMagnetics(this);
-			}
-			else
-			{
-				AMagneticPlatformPart* magnetic = Cast<AMagneticPlatformPart>(traceResult.Actor);
-				if (IsValid(magnetic))
+				if (!magnetic->bIsHaveBadplate)
 				{
-					if (magnetic->MagneticType == EMagneticType::Magnetic)
-					{
-						if (!magnetic->bIsHaveBadplate)
-						{
-							magnetic->Magnetic(this);
-						}
-					}					
+					magnetic->Magnetic(this);
+					return;
 				}
 			}
 		}

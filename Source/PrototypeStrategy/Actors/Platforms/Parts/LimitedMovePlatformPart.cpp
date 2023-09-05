@@ -47,9 +47,9 @@ bool ALimitedMovePlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 	return false;
 }
 
-void ALimitedMovePlatformPart::DirectionDynamicType(APSPlatformPart* Box)
+void ALimitedMovePlatformPart::DirectionDynamicType()
 {
-	Super::DirectionDynamicType(Box);
+	Super::DirectionDynamicType();
 }
 
 void ALimitedMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)

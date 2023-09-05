@@ -10,8 +10,10 @@
 #include <Kismet/GameplayStatics.h>
 #include "Parts/CoverPlatformPart.h"
 #include "Parts/MagneticPlatformPart.h"
-#include "../../GameInstance/PSGameInstance.h"
+#include "Parts/PathPlatformPart.h"
+#include "GameInstance/PSGameInstance.h"
 #include "Parts/ExitPlatformPart.h"
+#include "GameMode/PSGameMode.h"
 #include "Parts/MirroredPlatformPart.h"
 
 APSPlatform::APSPlatform()
@@ -38,6 +40,8 @@ void APSPlatform::BeginPlay()
 		BSCharacter->SetNameMap(NameMap);
 	}
 
+	APSGameMode* gm = Cast<APSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	gm->SetLevelPlatform(this);
 }
 
 void APSPlatform::OnConstruction(const FTransform& Transform)
@@ -48,6 +52,24 @@ void APSPlatform::OnConstruction(const FTransform& Transform)
 void APSPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+TArray<ACoverPlatformPart*> APSPlatform::GetCoverPartsArray()
+{
+	return CoverParts;
+}
+void APSPlatform::SpawnAndAssignPathPart(FVector spawnLocation)
+{
+	APathPlatformPart* newPathPart;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, pathPartClass->GetName());
+	newPathPart = Cast<APathPlatformPart>(GetWorld()->SpawnActor<AActor>(pathPartClass, spawnLocation, FRotator::ZeroRotator));
+	if (IsValid(newPathPart))
+	{
+		newPathPart->SetLevelType(ELevelType::UnderCover);
+		if (CoverParts.Num() > 0)
+		{
+			newPathPart->SetCoverPart(CoverParts);
+		}
+	}
 }
 /*
 TArray<TSubclassOf<APSPlatformPart>> APSPlatform::GetGridParts() const
@@ -144,7 +166,7 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 
 			if (GetType == EBoxType::Cover)
 			{
-				CoverPart.Add(Cover);
+				CoverParts.Add(Cover);
 			}
 		}
 
@@ -170,6 +192,13 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 				mirroredClones.Add(Mirror);
 			}
 		}
+
+
+		APacmanPlatformPart* pacman = Cast<APacmanPlatformPart>(Actor);
+		if (IsValid(pacman))
+		{
+			pacmansArray.AddUnique(pacman);
+		}
 	}
 
 	for (auto contr : constructBlocks)
@@ -191,15 +220,15 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 		MagneticActivator->MagneticParts = MagneticArray;
 	}
 	
-	if (CoverPart.Num() > 0)
+	if (CoverParts.Num() > 0)
 	{
 		for (auto part : parts)
 		{
 			APSPlatformPart* prt = Cast<APSPlatformPart>(part);
 			if(IsValid(prt))
 			{
-				prt->SetCoverPart(CoverPart);
-				UE_LOG(LogTemp, Warning, TEXT("Type Level %i = %s"), -1, *UEnum::GetValueAsString(prt->GetLevelType()));
+				prt->SetCoverPart(CoverParts);
+				//UE_LOG(LogTemp, Warning, TEXT("Type Level %i = %s"), -1, *UEnum::GetValueAsString(prt->GetLevelType()));
 			}
 		}
 	}
@@ -221,11 +250,15 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 		ArrayTeleport[t]->SetActivator(ActivatorTeleport);		
 	}
 
+	for (int t = 0; t < pacmansArray.Num(); t++)
+	{
+		pacmansArray[t]->SetSteps(PacmanStepsArray[t]);
+	}
+
 	for (int t = 0; t < limitedBlocks.Num(); t++)
 	{
 		if (moveLimits.IsValidIndex(t))
 		{
-			GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Blue, limitedBlocks[t]->GetName());
 			limitedBlocks[t]->moveLimit = moveLimits[t];
 		}
 		else

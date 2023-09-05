@@ -21,7 +21,7 @@ public:
 	float GetMoveDistance() const;
 
 	virtual bool MoveDirection(EMoveCharacterDirection Direc);
-	virtual void DirectionDynamicType(APSPlatformPart* Box);
+	virtual void DirectionDynamicType();
 	virtual void MoveToLocationFloor(APSPlatformPart* Box);
 	
 	void StartActive();
@@ -48,4 +48,10 @@ protected:
 	EMoveCharacterDirection Direction;
 
 	FTimerHandle DynamicTimer;
+	FTimerHandle moveDelayTimer;
+
+	void StartMove();
+	float moveDelay = 0.3f;
+	APSPlatformPart* lastBox;
+	EMoveCharacterDirection lastDirection;
 };

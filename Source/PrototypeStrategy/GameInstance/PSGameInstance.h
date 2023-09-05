@@ -9,6 +9,8 @@
 #include "../SaveGame/PSSaveGame.h"
 #include "PSGameInstance.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterMove);
 /**
  * 
  */
@@ -18,6 +20,9 @@ class PROTOTYPESTRATEGY_API UPSGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintAssignable)
+		FOnCharacterMove OnMove;
+
 	UFUNCTION(BlueprintCallable)
 		void SaveLevel(FLevelData levelData);
 
@@ -36,5 +41,6 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void RemoveSaveInSlot(FString slotName);
 
-	
+
+
 };

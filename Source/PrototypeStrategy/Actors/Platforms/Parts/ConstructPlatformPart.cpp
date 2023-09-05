@@ -3,39 +3,49 @@
 
 #include "Actors/Platforms/Parts/ConstructPlatformPart.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include <Kismet/GameplayStatics.h>
+#include "GameMode/PSGameMode.h"
 #include "WallPlatformPart.h"
 
 bool AConstructPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 {
 	if (IsMovedByCharacter)
 	{
-		IsMovedByCharacter = false;
-		DetectConbstructedBlock(constructBlocks);
-		if (blocksToMove.Num() > 0)
+		if (CheckObstacles(Direc))
 		{
-			for (auto block : blocksToMove)
+			IsMovedByCharacter = false;
+			DetectConstructedBlock(constructBlocks);
+			if (blocksToMove.Num() > 0)
 			{
-				if (IsValid(block))
+				for (auto block : blocksToMove)
 				{
-					if (!block->CheckObstacles(Direc))
+					if (IsValid(block))
 					{
-						return false;
+						if (!block->CheckObstacles(Direc))
+						{
+							return false;
+						}
 					}
 				}
-			}
 
-			for (auto block : blocksToMove)
-			{
-				if (IsValid(block))
+				for (auto block : blocksToMove)
 				{
-					block->MoveDirection(Direc);
+					if (IsValid(block))
+					{
+						block->MoveDirection(Direc);
+					}
 				}
+				return Super::MoveDirection(Direc);
 			}
-			return Super::MoveDirection(Direc);
-		}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "else");
+				return Super::MoveDirection(Direc);
+			}
+		}	
 		else
 		{
-			return Super::MoveDirection(Direc);
+			return false;
 		}
 	}
 	else
@@ -62,7 +72,7 @@ TArray<AConstructPlatformPart*> AConstructPlatformPart::GetConstractBlocksArray(
 	return constructBlocks;
 }
 
-void AConstructPlatformPart::DetectConbstructedBlock(TArray<AConstructPlatformPart*> DetectedBlocks)
+void AConstructPlatformPart::DetectConstructedBlock(TArray<AConstructPlatformPart*> DetectedBlocks)
 {
 	blocksToMove.Empty();
 	FVector location = GetActorLocation();
@@ -133,10 +143,18 @@ bool AConstructPlatformPart::CheckObstacles(EMoveCharacterDirection directionToC
 			if (LevelType == ELevelType::UnderCover)
 			{
 				AWallPlatformPart* wall = Cast<AWallPlatformPart>(frontHit.Actor);
-				if (!IsValid(wall))
+				if (IsValid(wall))
 				{
+					FVector spawnLocation = wall->GetActorLocation();
+					spawnLocation.Z = 0;
 					wall->Destroy();
+					APSGameMode* gm = Cast<APSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+					gm->GetLevelPlatform()->SpawnAndAssignPathPart(spawnLocation);
 					return true;
+				}
+				else
+				{
+					return false;
 				}
 			}
 			AConstructPlatformPart* constract = Cast<AConstructPlatformPart>(frontHit.Actor);

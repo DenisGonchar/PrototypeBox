@@ -42,7 +42,9 @@ enum class EBoxType : uint8
 	Polarizator,
 	Mirrored,
 	MirroredClone,
+	MirroredBorder,
 	Construct,
+	PacmanTrap,
 };
 
 UENUM(BlueprintType)
@@ -183,8 +185,20 @@ struct FColorsType : public FTableRowBase
 {
 	GENERATED_BODY()
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Params");
 	TMap<float, FMaterialsType> Materials;
 	
 };
+
+USTRUCT(BlueprintType)
+struct FPacmanSteps
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params");
+		TArray<EMoveCharacterDirection> directions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params");
+		TArray<int> directionCount;
+};
+

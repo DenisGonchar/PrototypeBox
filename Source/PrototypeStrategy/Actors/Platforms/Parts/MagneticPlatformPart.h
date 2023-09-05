@@ -24,6 +24,8 @@ class PROTOTYPESTRATEGY_API AMagneticPlatformPart : public ABlockPlatformPart
 private:
 	FTimerHandle magneticTimer;
 	FHitResult traceResult;
+
+	void MagneticFinded(AActor* actor);
 	
 public:
 	void BeginPlay() override;
