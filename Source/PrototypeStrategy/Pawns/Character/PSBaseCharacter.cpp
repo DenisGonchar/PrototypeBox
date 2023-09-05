@@ -271,7 +271,7 @@ void APSBaseCharacter::MoveToLocationType()
 						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), BoxTeleport->interactSound, BoxTeleport->GetActorLocation());
 						BoxTeleport->PlaySound(BoxTeleport->interactSound);
 						SetActorLocation(FloorLocation);
-						
+						bIsMoveFinished = true;
 						Step(StepIndex);
 
 					}					

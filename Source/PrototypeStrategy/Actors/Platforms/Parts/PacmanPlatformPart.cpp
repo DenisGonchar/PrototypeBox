@@ -32,7 +32,7 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 			{
 				case EBoxType::None:
 					break;
-				case EBoxType::Path:
+				/*case EBoxType::Path:
 					SetActorLocation(traceLocation);
 					return true;
 					break;
@@ -116,10 +116,15 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 					SetActorLocation(traceLocation);
 					this->Destroy();
 					return false;
-					break;
+					break;*/
 				default:
 					break;
 			}
+		}
+		else
+		{
+			SetActorLocation(traceLocation);
+			return true;
 		}
 	}
 	else
@@ -127,6 +132,7 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 		SetActorLocation(traceLocation);
 		return true;
 	}
+	return false;
 	//return Super::MoveDirection(Direc);
 }
 
@@ -146,18 +152,17 @@ void APacmanPlatformPart::NextStep()
 			{
 				if (directionCount[i] > 0)
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Emerald, "Move");
 					MoveDirection(directions[i]);
 					directionCount[i] -= 1;
 					//currentStep = i;
 					break;
 				}
 			}
-		}/*
+		}
 		if (directionCount.Last() == 0)
 		{
-			currentStep = 0;
-		}*/
+			UpdateMoveData();
+		}
 	}
 }
 
@@ -166,20 +171,20 @@ FVector APacmanPlatformPart::FindTraceLocationByDirection(EMoveCharacterDirectio
 	FVector currentLocation = this->GetActorLocation();
 	switch (direction)
 	{
-	case EMoveCharacterDirection::Top:
-		return FVector(currentLocation.X + traceDistance, currentLocation.Y, currentLocation.Z);
-		break;
-	case EMoveCharacterDirection::Down:
-		return FVector(currentLocation.X - traceDistance, currentLocation.Y, currentLocation.Z);
-		break;
-	case EMoveCharacterDirection::Right:
-		return FVector(currentLocation.X, currentLocation.Y + traceDistance, currentLocation.Z);
-		break;
-	case EMoveCharacterDirection::Left:
-		return FVector(currentLocation.X, currentLocation.Y - traceDistance, currentLocation.Z);
-		break;
-	default:
-		break;
+		case EMoveCharacterDirection::Top:
+			return FVector(currentLocation.X + traceDistance, currentLocation.Y, currentLocation.Z);
+			break;
+		case EMoveCharacterDirection::Down:
+			return FVector(currentLocation.X - traceDistance, currentLocation.Y, currentLocation.Z);
+			break;
+		case EMoveCharacterDirection::Right:
+			return FVector(currentLocation.X, currentLocation.Y + traceDistance, currentLocation.Z);
+			break;
+		case EMoveCharacterDirection::Left:
+			return FVector(currentLocation.X, currentLocation.Y - traceDistance, currentLocation.Z);
+			break;
+		default:
+			break;
 	}
 	return FVector();
 }
@@ -187,7 +192,7 @@ FVector APacmanPlatformPart::FindTraceLocationByDirection(EMoveCharacterDirectio
 
 bool APacmanPlatformPart::CheckObstacles(EMoveCharacterDirection directionToCheck)
 {
-	FVector location = FindTraceLocationByDirection(directionToCheck);
+	FVector location = FindTraceLocationByDirection(directionToCheck, 150.f);
 	FVector buttomLocation = location;
 	buttomLocation.Z = 0;
 	TArray<AActor*> actToIngnore;

@@ -6,6 +6,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "GameMode/PSGameMode.h"
 #include "WallPlatformPart.h"
+#include "EmptyWallPlatformPart.h"
 
 bool AConstructPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 {
@@ -80,17 +81,17 @@ void AConstructPlatformPart::DetectConstructedBlock(TArray<AConstructPlatformPar
 	{
 		if (location.Equals(block->GetActorLocation(),151))
 		{
-			blocksToMove.Add(block);
+			blocksToMove.AddUnique(block);
 		}
 	}
 
-	for (auto block : blocksToMove)
+	/*for (auto block : blocksToMove)
 	{
 		if (location.Equals(block->GetActorLocation(), 151))
 		{
 			blocksToMove.AddUnique(block);
 		}
-	}
+	}*/
 }
 
 FVector AConstructPlatformPart::LocationByDirection(EMoveCharacterDirection moveDirection)
@@ -140,14 +141,23 @@ bool AConstructPlatformPart::CheckObstacles(EMoveCharacterDirection directionToC
 	{
 		if (frontHit.bBlockingHit)
 		{
+			//construct wall
 			if (LevelType == ELevelType::UnderCover)
 			{
+				
 				AWallPlatformPart* wall = Cast<AWallPlatformPart>(frontHit.Actor);
 				if (IsValid(wall))
 				{
 					FVector spawnLocation = wall->GetActorLocation();
 					spawnLocation.Z = 0;
-					wall->Destroy();
+					if (wall->GetWallType() == EWallType::CrackedWall)
+					{
+						wall->StartDeadBox();
+					}
+					else
+					{
+						wall->Destroy();
+					}
 					APSGameMode* gm = Cast<APSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 					gm->GetLevelPlatform()->SpawnAndAssignPathPart(spawnLocation);
 					return true;
@@ -157,18 +167,33 @@ bool AConstructPlatformPart::CheckObstacles(EMoveCharacterDirection directionToC
 					return false;
 				}
 			}
+			//
 			AConstructPlatformPart* constract = Cast<AConstructPlatformPart>(frontHit.Actor);
-			if (!IsValid(constract))
-			{
-				return false;
-			}
-			else
+			if (IsValid(constract))
 			{
 				return true;
 			}
+			return false;
 		}
 		else
 		{
+			APSPlatformPart* floorPart = Cast<APSPlatformPart>(buttomHit.Actor);
+			if (IsValid(floorPart))
+			{
+				TArray<AEmptyWallPlatformPart*> emptyBlocks;
+				AEmptyWallPlatformPart* currEmptyBlock = Cast<AEmptyWallPlatformPart>(buttomHit.Actor);
+				switch (floorPart->GetBoxType())
+				{
+					case EBoxType::Empty:						
+						break;
+					case EBoxType::Path:
+						return true;
+						break;
+					default:
+						return false;
+						break;
+				}
+			}
 			return true;
 		}
 	}

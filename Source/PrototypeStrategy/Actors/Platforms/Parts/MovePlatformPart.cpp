@@ -99,10 +99,10 @@ void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 void AMovePlatformPart::StartActive()
 {
 	
-	if (Direction != EMoveCharacterDirection::None)
+	if (lastDirection != EMoveCharacterDirection::None)
 	{
 		FLedgeDescription LedgeDescription;
-		if (LedgeDetertorComponent->BoxDetectLedge(/*this,*/ LedgeDescription, Direction))
+		if (LedgeDetertorComponent->BoxDetectLedge(/*this,*/ LedgeDescription, lastDirection))
 		{
 			MoveToLocationFloor(LedgeDescription.BoxMesh);
 			UE_LOG(LogTemp, Warning, TEXT(" Move"));
