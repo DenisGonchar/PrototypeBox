@@ -13,5 +13,12 @@ UCLASS()
 class PROTOTYPESTRATEGY_API AEmptyWallPlatformPart : public AWallPlatformPart
 {
 	GENERATED_BODY()
+
+private:
+	TArray<AEmptyWallPlatformPart*> nearEmptyWalls;
+
+public:
+	TArray<AEmptyWallPlatformPart*> GetNearEmptyWallParts();
 	
+	void SetNearEmptyWallParts(TArray<AEmptyWallPlatformPart*> parts);
 };

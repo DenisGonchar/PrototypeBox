@@ -9,6 +9,7 @@
 #include "Parts/LimitedMovePlatformPart.h"
 #include "Parts/ConstructPlatformPart.h"
 #include "Parts/PacmanPlatformPart.h"
+#include "Parts/EmptyWallPlatformPart.h"
 #include "PSPlatform.generated.h"
 
 class APSPlatformPart;
@@ -35,7 +36,7 @@ public:
 
 	TArray<ACoverPlatformPart*> GetCoverPartsArray();
 
-	void SpawnAndAssignPathPart(FVector spawnLocation);
+	void SpawnAndAssignPathPart(FVector spawnLocation, bool IsUndecover = false);
 
 protected:
 	/*
@@ -103,4 +104,6 @@ private:
 	TArray<AConstructPlatformPart*> constructBlocks;
 
 	TArray<APacmanPlatformPart*> pacmansArray;
+
+	TArray<AEmptyWallPlatformPart*> emptyWallArray;
 };
