@@ -59,7 +59,7 @@ void ALimitedMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 	EBoxType Type = Box->GetBoxType();
 	switch (Type)
 	{
-	case EBoxType::Wall:
+		case EBoxType::Wall:
 		{
 			AWallColorPlatformPart* ColorWall = Cast<AWallColorPlatformPart>(Box);
 			if (IsValid(ColorWall))

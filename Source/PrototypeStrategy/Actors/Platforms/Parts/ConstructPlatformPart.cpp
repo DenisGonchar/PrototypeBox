@@ -147,12 +147,17 @@ bool AConstructPlatformPart::CheckObstacles(EMoveCharacterDirection directionToC
 					if (wall->GetWallType() == EWallType::CrackedWall)
 					{
 						wall->StartDeadBox();
+						gm->GetLevelPlatform()->SpawnAndAssignPathPart(spawnLocation, true);
+					}
+					else if (wall->GetWallType() == EWallType::HiddenWall)
+					{
+						wall->Destroy();
 					}
 					else
 					{
 						wall->Destroy();
+						gm->GetLevelPlatform()->SpawnAndAssignPathPart(spawnLocation, true);
 					}					
-					gm->GetLevelPlatform()->SpawnAndAssignPathPart(spawnLocation, true);
 					return true;
 				}
 				else
