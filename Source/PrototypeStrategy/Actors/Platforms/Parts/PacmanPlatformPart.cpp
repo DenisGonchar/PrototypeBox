@@ -28,11 +28,16 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 		{
 			EBoxType boxType;
 			boxType = hitActor->GetBoxType();
+
+
+			AMovePlatformPart* movePlatform = Cast<AMovePlatformPart>(hitActor);
+			AConstructPlatformPart* constrPlatform = Cast<AConstructPlatformPart>(hitActor);
+			AMirroredPlatformPart* mirroredPlatform = Cast<AMirroredPlatformPart>(hitActor);
 			switch (boxType)
 			{
 				case EBoxType::None:
 					break;
-				/*case EBoxType::Path:
+				case EBoxType::Path:
 					SetActorLocation(traceLocation);
 					return true;
 					break;
@@ -42,7 +47,6 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 					return true;
 					break;
 				case EBoxType::Dynamic:
-					AMovePlatformPart* movePlatform = Cast<AMovePlatformPart>(hitActor);
 					if (IsValid(movePlatform))
 					{
 						if (!movePlatform->MoveDirection(Direc))
@@ -76,7 +80,6 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 					return true;
 					break;
 				case EBoxType::Mirrored:
-					AMirroredPlatformPart* mirroredPlatform = Cast<AMirroredPlatformPart>(hitActor);
 					if (IsValid(mirroredPlatform))
 					{
 						if (!mirroredPlatform->MoveDirection(Direc))
@@ -97,8 +100,7 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 					SetActorLocation(traceLocation);
 					return true;
 					break;
-				case EBoxType::Construct:
-					AConstructPlatformPart* constrPlatform = Cast<AConstructPlatformPart>(hitActor);
+				case EBoxType::Construct:					
 					if (IsValid(constrPlatform))
 					{
 						constrPlatform->IsMovedByCharacter = true;
@@ -116,7 +118,7 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 					SetActorLocation(traceLocation);
 					this->Destroy();
 					return false;
-					break;*/
+					break;
 				default:
 					break;
 			}

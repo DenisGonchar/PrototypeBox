@@ -70,7 +70,7 @@ public:
 
 	EMoveCharacterDirection CharacterDirection = EMoveCharacterDirection::None;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
 		UAnimationAsset* moveForward;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
@@ -92,8 +92,31 @@ public:
 		UAnimationAsset* pushLeft;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
-		UAnimationAsset* pushRight;
+		UAnimationAsset* pushRight;*/
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveForward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveBack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushForward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushBack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushRight;
 
 
 #pragma region Move

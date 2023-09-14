@@ -28,8 +28,8 @@ APSBaseCharacter::APSBaseCharacter()
 	Flipbook->SetupAttachment(BoxComponent);
 	Flipbook->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 
-	CharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	CharacterMesh->SetupAttachment(BoxComponent);
+	/*CharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	CharacterMesh->SetupAttachment(BoxComponent);*/
 
 	LedgeDetertorComponent = CreateDefaultSubobject<ULedgeDetectorComponent>(TEXT("LedgeDetector"));
 
@@ -505,19 +505,19 @@ void APSBaseCharacter::PlayAnimation(UAnimationAsset* animToPlay)
 
 void APSBaseCharacter::PushAndMove()
 {
-	PlayAnimation(GetAnimationByDirection(lastDirection, true));
+	//PlayAnimation(GetAnimationByDirection(lastDirection, true));
 	GetWorldTimerManager().SetTimer(pushTimer, this, &APSBaseCharacter::MoveWithAnim, 0.1f, false , pushDelay);
 }
 
 void APSBaseCharacter::MoveWithAnim()
 {
-	PlayAnimation(GetAnimationByDirection(lastDirection));
+	//PlayAnimation(GetAnimationByDirection(lastDirection));
 	GetWorldTimerManager().SetTimer(moveTimer, this, &APSBaseCharacter::MoveToLocationType, 0.1f, false, moveDelay);
 }
 
 UAnimationAsset* APSBaseCharacter::GetAnimationByDirection(EMoveCharacterDirection direction, bool bIsPushAnim)
 {
-	switch (direction)
+	/*switch (direction)
 	{
 		case EMoveCharacterDirection::Top:
 			if (bIsPushAnim)
@@ -547,7 +547,7 @@ UAnimationAsset* APSBaseCharacter::GetAnimationByDirection(EMoveCharacterDirecti
 			}
 			return moveRight;
 			break;
-	}
+	}*/
 	return nullptr;
 }
 
