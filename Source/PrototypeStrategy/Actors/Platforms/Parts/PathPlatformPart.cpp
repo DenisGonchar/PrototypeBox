@@ -16,13 +16,13 @@ void APathPlatformPart::ActivatorCover()
 		if (IsValid(ActivatiorFlipbook))
 		{
 			Flipbook->SetFlipbook(ActivatiorFlipbook);
-
+			IsStepedInCover = true;
 			bIsActivatorCover = false;
 		}
 		if (IsValid(ActivatiorSprite))
 		{
 			Sprite->SetSprite(ActivatiorSprite);
-
+			IsStepedInCover = true;
 			bIsActivatorCover = false;
 		}
 		
@@ -35,17 +35,31 @@ void APathPlatformPart::NewLevelType()
 	
 	if (LevelType == ELevelType::UnderCover)
 	{
-		if (!bIsActivatorCover)
+		if (!bIsActivatorCover && IsStepedInCover)
 		{
 			if (IsValid(ActivatiorFlipbook))
 			{
 				Flipbook->SetFlipbook(ActivatiorFlipbook);
-
+				Sprite->SetSprite(nullptr);
 			}
 			if (IsValid(ActivatiorSprite))
 			{
 				Sprite->SetSprite(ActivatiorSprite);
+				Flipbook->SetFlipbook(nullptr);
 			}
+		}
+	}
+	else if (LevelType == ELevelType::Level)
+	{
+		if (IsValid(BaseFlipbook))
+		{
+			Flipbook->SetFlipbook(BaseFlipbook);
+			Sprite->SetSprite(nullptr);
+		}
+		if (IsValid(BaseSprite))
+		{
+			Sprite->SetSprite(BaseSprite);
+			Flipbook->SetFlipbook(nullptr);
 		}
 	}
 }

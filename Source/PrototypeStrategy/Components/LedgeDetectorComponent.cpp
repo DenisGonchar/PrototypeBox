@@ -525,6 +525,9 @@ bool ULedgeDetectorComponent::BoxDetectHitBlock(FHitResult Hit)
 			return false;
 			break;
 		}
+		default:
+			return false;
+			break;
 
 	}
 

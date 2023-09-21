@@ -93,6 +93,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
 		UAnimationAsset* pushRight;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* idleAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* idleSleepAnim;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
 		UPaperFlipbook* moveForward;
@@ -212,14 +217,18 @@ protected:
 	APSPlatformPart* detectedBlock;
 
 	EMoveCharacterDirection lastDirection;
-	void PlayAnimation(UAnimationAsset* animToPlay);
+	void PlayAnimation(UPaperFlipbook* animToPlay);
 	void PushAndMove();
 	void MoveWithAnim();
-	UAnimationAsset* GetAnimationByDirection(EMoveCharacterDirection direction, bool bIsPushAnim = false);
+	UPaperFlipbook* GetAnimationByDirection(EMoveCharacterDirection direction, bool bIsPushAnim = false);
+	FVector GetPushImpulseMoveLocation(EMoveCharacterDirection direc);
+	void PrepearMove();
 
 	FTimerHandle moveTimer;
 	FTimerHandle pushTimer;
 
-	float pushDelay = 0.8f;
+	float pushDelay = 0.1f;
 	float moveDelay = 0.2f;
+	float deltaEquals = 30.f;
+	bool bIsPushMove = false;
 };

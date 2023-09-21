@@ -47,7 +47,7 @@ void AMovePlatformPart::DirectionDynamicType()
 			MoveToLocationFloor(lastBox);
 			PlaySound(moveSound);
 			GetWorldTimerManager().SetTimer(DynamicTimer, this, &AMovePlatformPart::StartActive, ActiveTimeStep, true);
-		
+			RotateAndTurnOnVFX(lastDirection);
 			break;
 		}
 		default:
@@ -58,8 +58,7 @@ void AMovePlatformPart::DirectionDynamicType()
 }
 
 void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
-{
-	
+{	
 	EBoxType Type = Box->GetBoxType();
 
 	FVector FloorLocation = Box->GetActorLocation();
@@ -92,13 +91,10 @@ void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 			SetActorLocation(FloorLocation);
 			break;
 	}
-	
-
 }
 
 void AMovePlatformPart::StartActive()
-{
-	
+{	
 	if (lastDirection != EMoveCharacterDirection::None)
 	{
 		FLedgeDescription LedgeDescription;
@@ -112,6 +108,7 @@ void AMovePlatformPart::StartActive()
 		{
 			UE_LOG(LogTemp, Warning, TEXT(" else"));
 			PlaySound(interactSound);
+			TurnOffVFX();
 			GetWorldTimerManager().ClearTimer(DynamicTimer);				
 		}
 	}
@@ -119,7 +116,6 @@ void AMovePlatformPart::StartActive()
 	{
 		GetWorldTimerManager().ClearTimer(DynamicTimer);
 	}
-
 }
 
 EDynamic AMovePlatformPart::GetDynamicType() const
@@ -130,8 +126,6 @@ EDynamic AMovePlatformPart::GetDynamicType() const
 void AMovePlatformPart::NewLevelType()
 {
 	Super::NewLevelType();
-
-
 }
 
 
