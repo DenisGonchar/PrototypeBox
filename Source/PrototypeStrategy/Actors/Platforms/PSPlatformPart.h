@@ -35,7 +35,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
 		UPaperFlipbookComponent* Flipbook;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio")
 		UAudioComponent* Audio;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
@@ -50,11 +50,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
 		FConstructedBlockData constructionData;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
 		USoundBase* interactSound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
 		USoundBase* moveSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+		USoundBase* activateSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+		USoundBase* deactivateSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+		USoundBase* destroySound;
 
 	virtual void BeginPlay() override;
 

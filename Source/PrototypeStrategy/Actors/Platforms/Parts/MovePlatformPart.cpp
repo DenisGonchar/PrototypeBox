@@ -31,6 +31,7 @@ bool AMovePlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 	{
 		lastBox = LedgeDescription.BoxMesh;
 		//DirectionDynamicType();
+		PlaySound(moveSound);
 		GetWorldTimerManager().SetTimer( moveDelayTimer, this, &AMovePlatformPart::DirectionDynamicType, moveDelay, false, 0.3f);
 		return true;
 	}
@@ -45,13 +46,11 @@ void AMovePlatformPart::DirectionDynamicType()
 		case EDynamic::Active:
 		{
 			MoveToLocationFloor(lastBox);
-			PlaySound(moveSound);
 			GetWorldTimerManager().SetTimer(DynamicTimer, this, &AMovePlatformPart::StartActive, ActiveTimeStep, true);
 			RotateAndTurnOnVFX(lastDirection);
 			break;
 		}
 		default:
-			PlaySound(moveSound);
 			MoveToLocationFloor(lastBox);
 			break;
 	}
@@ -107,7 +106,7 @@ void AMovePlatformPart::StartActive()
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT(" else"));
-			PlaySound(interactSound);
+			PlaySound(deactivateSound);
 			TurnOffVFX();
 			GetWorldTimerManager().ClearTimer(DynamicTimer);				
 		}

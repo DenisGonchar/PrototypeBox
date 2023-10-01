@@ -258,7 +258,7 @@ void APSBaseCharacter::MoveToLocationType()
 			if (BoxTeleport->GetTeleportInfo().TeleportType == ETeleport::Activator)
 			{				
 				MoveToPosition(detectedBlock);
-
+				BoxTeleport->PlaySound(BoxTeleport->activateSound);
 				BoxTeleport->SwitchActivator();
 
 			}
@@ -341,7 +341,7 @@ void APSBaseCharacter::MoveToLocationType()
 		{
 			
 		}*/
-		BoxBlock->PlaySound(BoxBlock->moveSound);
+		BoxBlock->PlaySound(BoxBlock->interactSound);
 		MoveToPosition(detectedBlock);
 	}
 		default:
