@@ -28,8 +28,8 @@ APSBaseCharacter::APSBaseCharacter()
 	Flipbook->SetupAttachment(BoxComponent);
 	Flipbook->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 
-	CharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	CharacterMesh->SetupAttachment(BoxComponent);
+	/*CharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	CharacterMesh->SetupAttachment(BoxComponent);*/
 
 	LedgeDetertorComponent = CreateDefaultSubobject<ULedgeDetectorComponent>(TEXT("LedgeDetector"));
 
@@ -139,10 +139,12 @@ void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 		detectedBlock = LedgeDescription.BoxMesh;
 		if (LedgeDetertorComponent->bIsNeedPush)
 		{
+			deltaEquals = 5.f;
 			PushAndMove();
 		}
 		else
 		{
+			deltaEquals = 40.f;
 			MoveWithAnim();
 		}		
 	}
@@ -256,7 +258,7 @@ void APSBaseCharacter::MoveToLocationType()
 			if (BoxTeleport->GetTeleportInfo().TeleportType == ETeleport::Activator)
 			{				
 				MoveToPosition(detectedBlock);
-
+				BoxTeleport->PlaySound(BoxTeleport->activateSound);
 				BoxTeleport->SwitchActivator();
 
 			}
@@ -271,7 +273,7 @@ void APSBaseCharacter::MoveToLocationType()
 						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), BoxTeleport->interactSound, BoxTeleport->GetActorLocation());
 						BoxTeleport->PlaySound(BoxTeleport->interactSound);
 						SetActorLocation(FloorLocation);
-						
+						bIsMoveFinished = true;
 						Step(StepIndex);
 
 					}					
@@ -339,7 +341,7 @@ void APSBaseCharacter::MoveToLocationType()
 		{
 			
 		}*/
-		BoxBlock->PlaySound(BoxBlock->moveSound);
+		BoxBlock->PlaySound(BoxBlock->interactSound);
 		MoveToPosition(detectedBlock);
 	}
 		default:
@@ -363,16 +365,19 @@ void APSBaseCharacter::MoveToPosition(APSPlatformPart* Box)
 		startLocation = GetActorLocation();
 		targetLocation = FloorLocation;
 		deltaLocation = (startLocation - targetLocation) * moveTimerSpeed;
-		deltaLocation = deltaLocation * -2.f;
+		deltaLocation = deltaLocation * -8.f;
 		bIsMoveFinished = false;
+		bIsPushMove = false;
 		GetWorldTimerManager().SetTimer(moveTimerHandle, this, &APSBaseCharacter::MoveCharacterOnTimer, moveTimerSpeed, true);					
 	}	
 }
 
 void APSBaseCharacter::MoveCharacterOnTimer()
 {
-	if (targetLocation == GetActorLocation())
-	{		
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Some variable values: x = %f"), deltaEquals));
+	if (targetLocation.Equals(GetActorLocation(), deltaEquals))
+	{	
+		SetActorLocation(targetLocation);
 		GetWorldTimerManager().PauseTimer(moveTimerHandle);
 		GetWorldTimerManager().ClearTimer(moveTimerHandle);
 		if (GetWorldTimerManager().IsTimerActive(playFlipbookAnimHandle))
@@ -382,7 +387,7 @@ void APSBaseCharacter::MoveCharacterOnTimer()
 		}
 
 		bIsMoveFinished = true;
-
+		PlayAnimation(idleAnim);
 		if (gameInstance->OnMove.IsBound())
 		{
 			gameInstance->OnMove.Broadcast();
@@ -398,8 +403,9 @@ void APSBaseCharacter::MoveToPosition(FVector location)
 	startLocation = GetActorLocation();
 	targetLocation = location;
 	deltaLocation = (deltaLocation - targetLocation) * moveTimerSpeed;
-	deltaLocation = deltaLocation * -2.f;
+	deltaLocation = deltaLocation * -8.f;
 	bIsMoveFinished = false;
+	bIsPushMove = false;
 	GetWorldTimerManager().SetTimer(moveTimerHandle, this, &APSBaseCharacter::MoveCharacterOnTimer, moveTimerSpeed, true);
 }
 
@@ -498,24 +504,38 @@ void APSBaseCharacter::SetNextLevel(FName Map)
 	NextLevel = Map;
 }
 
-void APSBaseCharacter::PlayAnimation(UAnimationAsset* animToPlay)
+void APSBaseCharacter::PlayAnimation(UPaperFlipbook* animToPlay)
 {
-	CharacterMesh->PlayAnimation(animToPlay, false);
+	//CharacterMesh->PlayAnimation(animToPlay, false);
+	Flipbook->SetFlipbook(animToPlay);
 }
 
 void APSBaseCharacter::PushAndMove()
 {
 	PlayAnimation(GetAnimationByDirection(lastDirection, true));
-	GetWorldTimerManager().SetTimer(pushTimer, this, &APSBaseCharacter::MoveWithAnim, 0.1f, false , pushDelay);
+	PrepearMove();
+}
+
+void APSBaseCharacter::PrepearMove()
+{
+	startLocation = GetActorLocation();
+	targetLocation = GetPushImpulseMoveLocation(lastDirection);
+	deltaLocation = (startLocation - targetLocation) * moveTimerSpeed;
+	deltaLocation = deltaLocation * -2.f;
+	bIsMoveFinished = false;	
+	GetWorldTimerManager().SetTimer(moveTimerHandle, this, &APSBaseCharacter::MoveCharacterOnTimer, moveTimerSpeed, true);
+	GetWorldTimerManager().SetTimer(pushTimer, this, &APSBaseCharacter::MoveWithAnim, 0.1f, false, pushDelay);
 }
 
 void APSBaseCharacter::MoveWithAnim()
 {
+	deltaEquals = 40.f;
+	bIsPushMove = true;
 	PlayAnimation(GetAnimationByDirection(lastDirection));
 	GetWorldTimerManager().SetTimer(moveTimer, this, &APSBaseCharacter::MoveToLocationType, 0.1f, false, moveDelay);
 }
 
-UAnimationAsset* APSBaseCharacter::GetAnimationByDirection(EMoveCharacterDirection direction, bool bIsPushAnim)
+UPaperFlipbook* APSBaseCharacter::GetAnimationByDirection(EMoveCharacterDirection direction, bool bIsPushAnim)
 {
 	switch (direction)
 	{
@@ -534,6 +554,8 @@ UAnimationAsset* APSBaseCharacter::GetAnimationByDirection(EMoveCharacterDirecti
 			return moveBack;
 			break;
 		case EMoveCharacterDirection::Left:
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Left");
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, moveLeft ? "true" : "false");
 			if (bIsPushAnim)
 			{
 				return pushLeft;
@@ -549,5 +571,27 @@ UAnimationAsset* APSBaseCharacter::GetAnimationByDirection(EMoveCharacterDirecti
 			break;
 	}
 	return nullptr;
+}
+
+FVector APSBaseCharacter::GetPushImpulseMoveLocation(EMoveCharacterDirection direc)
+{
+	switch (direc)
+	{
+		case EMoveCharacterDirection::Top:
+			return GetActorLocation() - FVector( 25.f, 0.f, 0.f);
+			break;
+		case EMoveCharacterDirection::Down:
+			return GetActorLocation() - FVector( -25.f, 0.f, 0.f);
+			break;
+		case EMoveCharacterDirection::Right:
+			return GetActorLocation() - FVector( 0.f, 25.f, 0.f);
+			break;
+		case EMoveCharacterDirection::Left:
+			return GetActorLocation() - FVector( 0.f, -25.f, 0.f);
+			break;
+		default:
+			return GetActorLocation();
+			break;
+	}
 }
 

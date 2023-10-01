@@ -23,9 +23,16 @@ public:
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
-	UPaperFlipbook* ActivatiorFlipbook;
+		UPaperFlipbook* ActivatiorFlipbook;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
-	UPaperSprite* ActivatiorSprite;
+		UPaperSprite* ActivatiorSprite;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
+		UPaperFlipbook* BaseFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
+		UPaperSprite* BaseSprite;
+
+	bool IsStepedInCover = false;
 
 };

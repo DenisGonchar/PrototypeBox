@@ -57,14 +57,17 @@ TArray<ACoverPlatformPart*> APSPlatform::GetCoverPartsArray()
 {
 	return CoverParts;
 }
-void APSPlatform::SpawnAndAssignPathPart(FVector spawnLocation)
+void APSPlatform::SpawnAndAssignPathPart(FVector spawnLocation, bool IsUndecover)
 {
 	APathPlatformPart* newPathPart;
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, pathPartClass->GetName());
 	newPathPart = Cast<APathPlatformPart>(GetWorld()->SpawnActor<AActor>(pathPartClass, spawnLocation, FRotator::ZeroRotator));
 	if (IsValid(newPathPart))
 	{
-		newPathPart->SetLevelType(ELevelType::UnderCover);
+		if (IsUndecover)
+		{
+			newPathPart->SetLevelType(ELevelType::UnderCover);
+		}
 		if (CoverParts.Num() > 0)
 		{
 			newPathPart->SetCoverPart(CoverParts);
@@ -199,6 +202,12 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 		{
 			pacmansArray.AddUnique(pacman);
 		}
+
+		AEmptyWallPlatformPart* emptyWall = Cast<AEmptyWallPlatformPart>(Actor);
+		if (IsValid(emptyWall))
+		{
+			emptyWallArray.AddUnique(emptyWall);
+		}
 	}
 
 	for (auto contr : constructBlocks)
@@ -264,6 +273,19 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 		else
 		{
 			limitedBlocks[t]->bUseRandomLimit = true;
+		}
+	}
+
+	FVector emptyWallLocation;
+	for (int i = 0; i < emptyWallArray.Num() -1; i++)
+	{
+		emptyWallLocation = emptyWallArray[i]->GetActorLocation();
+		for (int j = 0; j < emptyWallArray.Num() -1; j++)
+		{
+			if (emptyWallLocation.Equals(emptyWallArray[j]->GetActorLocation(), 151))
+			{
+				emptyWallArray[i]->GetNearEmptyWallParts().AddUnique(emptyWallArray[j]);
+			}
 		}
 	}
 }

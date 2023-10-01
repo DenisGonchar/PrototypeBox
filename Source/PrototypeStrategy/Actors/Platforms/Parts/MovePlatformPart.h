@@ -54,4 +54,10 @@ protected:
 	float moveDelay = 0.3f;
 	APSPlatformPart* lastBox;
 	EMoveCharacterDirection lastDirection;
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void RotateAndTurnOnVFX(EMoveCharacterDirection direction);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void TurnOffVFX();
 };

@@ -70,7 +70,7 @@ public:
 
 	EMoveCharacterDirection CharacterDirection = EMoveCharacterDirection::None;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
 		UAnimationAsset* moveForward;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
@@ -92,8 +92,36 @@ public:
 		UAnimationAsset* pushLeft;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
-		UAnimationAsset* pushRight;
+		UAnimationAsset* pushRight;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* idleAnim;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* idleSleepAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveForward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveBack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushForward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushBack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushRight;
 
 
 #pragma region Move
@@ -189,14 +217,18 @@ protected:
 	APSPlatformPart* detectedBlock;
 
 	EMoveCharacterDirection lastDirection;
-	void PlayAnimation(UAnimationAsset* animToPlay);
+	void PlayAnimation(UPaperFlipbook* animToPlay);
 	void PushAndMove();
 	void MoveWithAnim();
-	UAnimationAsset* GetAnimationByDirection(EMoveCharacterDirection direction, bool bIsPushAnim = false);
+	UPaperFlipbook* GetAnimationByDirection(EMoveCharacterDirection direction, bool bIsPushAnim = false);
+	FVector GetPushImpulseMoveLocation(EMoveCharacterDirection direc);
+	void PrepearMove();
 
 	FTimerHandle moveTimer;
 	FTimerHandle pushTimer;
 
-	float pushDelay = 0.8f;
+	float pushDelay = 0.1f;
 	float moveDelay = 0.2f;
+	float deltaEquals = 30.f;
+	bool bIsPushMove = false;
 };

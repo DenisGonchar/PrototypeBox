@@ -46,10 +46,12 @@ void AMagneticPlatformPart::UpdateStatus(bool newStatus)
 
 	if(bIsActive && MagneticType == EMagneticType::Magnetic)
 	{
+		PlaySound(activateSound);
 		GetWorldTimerManager().SetTimer(magneticTimer, this, &AMagneticPlatformPart::CheckPlayer, 0.2f, true);
 	}
 	else
 	{
+		PlaySound(deactivateSound);
 		if(GetWorldTimerManager().TimerExists(magneticTimer))
 		{
 			GetWorldTimerManager().ClearTimer(magneticTimer);
@@ -77,8 +79,6 @@ void AMagneticPlatformPart::NewLevelType()
 		}
 
 	}
-
-
 }
 
 void AMagneticPlatformPart::ChangeMagneticsStatus(TArray<AMagneticPlatformPart*> parts, bool newStatus)

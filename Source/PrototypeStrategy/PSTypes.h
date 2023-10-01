@@ -45,6 +45,7 @@ enum class EBoxType : uint8
 	MirroredBorder,
 	Construct,
 	PacmanTrap,
+	Empty,
 };
 
 UENUM(BlueprintType)
@@ -88,8 +89,8 @@ enum class EWallType : uint8
 	None,
 	DefaultWall,
 	CrackedWall,
-	ColorWall
-
+	ColorWall,
+	HiddenWall,
 };
 
 UENUM(BlueprintType)

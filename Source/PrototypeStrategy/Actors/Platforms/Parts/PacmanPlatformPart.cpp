@@ -28,6 +28,11 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 		{
 			EBoxType boxType;
 			boxType = hitActor->GetBoxType();
+
+
+			AMovePlatformPart* movePlatform = Cast<AMovePlatformPart>(hitActor);
+			AConstructPlatformPart* constrPlatform = Cast<AConstructPlatformPart>(hitActor);
+			AMirroredPlatformPart* mirroredPlatform = Cast<AMirroredPlatformPart>(hitActor);
 			switch (boxType)
 			{
 				case EBoxType::None:
@@ -42,7 +47,6 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 					return true;
 					break;
 				case EBoxType::Dynamic:
-					AMovePlatformPart* movePlatform = Cast<AMovePlatformPart>(hitActor);
 					if (IsValid(movePlatform))
 					{
 						if (!movePlatform->MoveDirection(Direc))
@@ -76,7 +80,6 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 					return true;
 					break;
 				case EBoxType::Mirrored:
-					AMirroredPlatformPart* mirroredPlatform = Cast<AMirroredPlatformPart>(hitActor);
 					if (IsValid(mirroredPlatform))
 					{
 						if (!mirroredPlatform->MoveDirection(Direc))
@@ -97,8 +100,7 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 					SetActorLocation(traceLocation);
 					return true;
 					break;
-				case EBoxType::Construct:
-					AConstructPlatformPart* constrPlatform = Cast<AConstructPlatformPart>(hitActor);
+				case EBoxType::Construct:					
 					if (IsValid(constrPlatform))
 					{
 						constrPlatform->IsMovedByCharacter = true;
@@ -121,12 +123,18 @@ bool APacmanPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 					break;
 			}
 		}
+		else
+		{
+			SetActorLocation(traceLocation);
+			return true;
+		}
 	}
 	else
 	{
 		SetActorLocation(traceLocation);
 		return true;
 	}
+	return false;
 	//return Super::MoveDirection(Direc);
 }
 
@@ -146,18 +154,17 @@ void APacmanPlatformPart::NextStep()
 			{
 				if (directionCount[i] > 0)
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Emerald, "Move");
 					MoveDirection(directions[i]);
 					directionCount[i] -= 1;
 					//currentStep = i;
 					break;
 				}
 			}
-		}/*
+		}
 		if (directionCount.Last() == 0)
 		{
-			currentStep = 0;
-		}*/
+			UpdateMoveData();
+		}
 	}
 }
 
@@ -166,20 +173,20 @@ FVector APacmanPlatformPart::FindTraceLocationByDirection(EMoveCharacterDirectio
 	FVector currentLocation = this->GetActorLocation();
 	switch (direction)
 	{
-	case EMoveCharacterDirection::Top:
-		return FVector(currentLocation.X + traceDistance, currentLocation.Y, currentLocation.Z);
-		break;
-	case EMoveCharacterDirection::Down:
-		return FVector(currentLocation.X - traceDistance, currentLocation.Y, currentLocation.Z);
-		break;
-	case EMoveCharacterDirection::Right:
-		return FVector(currentLocation.X, currentLocation.Y + traceDistance, currentLocation.Z);
-		break;
-	case EMoveCharacterDirection::Left:
-		return FVector(currentLocation.X, currentLocation.Y - traceDistance, currentLocation.Z);
-		break;
-	default:
-		break;
+		case EMoveCharacterDirection::Top:
+			return FVector(currentLocation.X + traceDistance, currentLocation.Y, currentLocation.Z);
+			break;
+		case EMoveCharacterDirection::Down:
+			return FVector(currentLocation.X - traceDistance, currentLocation.Y, currentLocation.Z);
+			break;
+		case EMoveCharacterDirection::Right:
+			return FVector(currentLocation.X, currentLocation.Y + traceDistance, currentLocation.Z);
+			break;
+		case EMoveCharacterDirection::Left:
+			return FVector(currentLocation.X, currentLocation.Y - traceDistance, currentLocation.Z);
+			break;
+		default:
+			break;
 	}
 	return FVector();
 }
@@ -187,7 +194,7 @@ FVector APacmanPlatformPart::FindTraceLocationByDirection(EMoveCharacterDirectio
 
 bool APacmanPlatformPart::CheckObstacles(EMoveCharacterDirection directionToCheck)
 {
-	FVector location = FindTraceLocationByDirection(directionToCheck);
+	FVector location = FindTraceLocationByDirection(directionToCheck, 150.f);
 	FVector buttomLocation = location;
 	buttomLocation.Z = 0;
 	TArray<AActor*> actToIngnore;

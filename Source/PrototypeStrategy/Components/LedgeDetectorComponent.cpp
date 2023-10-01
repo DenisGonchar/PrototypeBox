@@ -476,7 +476,7 @@ bool ULedgeDetectorComponent::BoxDetectHitBlock(FHitResult Hit)
 	{
 		case EBoxType::Wall :
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("ULedgeDetectorComponent::BoxDetectHitBlock = Wall")));
+			//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("ULedgeDetectorComponent::BoxDetectHitBlock = Wall")));
 
 			if (CachedActorOwner->GetDynamicType() == EDynamic::Active)
 			{
@@ -488,7 +488,6 @@ bool ULedgeDetectorComponent::BoxDetectHitBlock(FHitResult Hit)
 						if (BoxWall->GetWallType() == EWallType::CrackedWall)
 						{
 							BoxWall->StartDeadBox();
-							BoxWall->PlaySound(BoxWall->moveSound);
 							return true;
 						}
 					}
@@ -525,6 +524,9 @@ bool ULedgeDetectorComponent::BoxDetectHitBlock(FHitResult Hit)
 			return false;
 			break;
 		}
+		default:
+			return false;
+			break;
 
 	}
 

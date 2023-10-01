@@ -6,6 +6,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "GameMode/PSGameMode.h"
 #include "WallPlatformPart.h"
+#include "EmptyWallPlatformPart.h"
 
 bool AConstructPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 {
@@ -27,7 +28,7 @@ bool AConstructPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 						}
 					}
 				}
-
+				blocksToMove.Add(this);
 				for (auto block : blocksToMove)
 				{
 					if (IsValid(block))
@@ -35,7 +36,8 @@ bool AConstructPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 						block->MoveDirection(Direc);
 					}
 				}
-				return Super::MoveDirection(Direc);
+				//return Super::MoveDirection(Direc);
+				return true;
 			}
 			else
 			{
@@ -80,14 +82,6 @@ void AConstructPlatformPart::DetectConstructedBlock(TArray<AConstructPlatformPar
 	{
 		if (location.Equals(block->GetActorLocation(),151))
 		{
-			blocksToMove.Add(block);
-		}
-	}
-
-	for (auto block : blocksToMove)
-	{
-		if (location.Equals(block->GetActorLocation(), 151))
-		{
 			blocksToMove.AddUnique(block);
 		}
 	}
@@ -127,6 +121,7 @@ bool AConstructPlatformPart::CheckObstacles(EMoveCharacterDirection directionToC
 	TArray<AActor*> actToIngnore;
 	actToIngnore.Add(this);
 	UObject* world = GetWorld();
+	APSGameMode* gm = Cast<APSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	FHitResult frontHit;
 	FHitResult buttomHit;
@@ -140,16 +135,29 @@ bool AConstructPlatformPart::CheckObstacles(EMoveCharacterDirection directionToC
 	{
 		if (frontHit.bBlockingHit)
 		{
+			//construct wall
 			if (LevelType == ELevelType::UnderCover)
 			{
+				
 				AWallPlatformPart* wall = Cast<AWallPlatformPart>(frontHit.Actor);
 				if (IsValid(wall))
 				{
 					FVector spawnLocation = wall->GetActorLocation();
 					spawnLocation.Z = 0;
-					wall->Destroy();
-					APSGameMode* gm = Cast<APSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-					gm->GetLevelPlatform()->SpawnAndAssignPathPart(spawnLocation);
+					if (wall->GetWallType() == EWallType::CrackedWall)
+					{
+						wall->StartDeadBox();
+						gm->GetLevelPlatform()->SpawnAndAssignPathPart(spawnLocation, true);
+					}
+					else if (wall->GetWallType() == EWallType::HiddenWall)
+					{
+						wall->Destroy();
+					}
+					else
+					{
+						wall->Destroy();
+						gm->GetLevelPlatform()->SpawnAndAssignPathPart(spawnLocation, true);
+					}					
 					return true;
 				}
 				else
@@ -157,18 +165,75 @@ bool AConstructPlatformPart::CheckObstacles(EMoveCharacterDirection directionToC
 					return false;
 				}
 			}
+			//
 			AConstructPlatformPart* constract = Cast<AConstructPlatformPart>(frontHit.Actor);
-			if (!IsValid(constract))
-			{
-				return false;
-			}
-			else
+			if (IsValid(constract))
 			{
 				return true;
 			}
+			return false;
 		}
 		else
 		{
+			APSPlatformPart* floorPart = Cast<APSPlatformPart>(buttomHit.Actor);
+			if (IsValid(floorPart))
+			{
+				TArray<AEmptyWallPlatformPart*> emptyBlocks;
+				AEmptyWallPlatformPart* currEmptyBlock = Cast<AEmptyWallPlatformPart>(buttomHit.Actor);
+				AEmptyWallPlatformPart* emptyW;
+				int count = 0;
+				switch (floorPart->GetBoxType())
+				{
+					case EBoxType::Empty:
+						emptyW = Cast<AEmptyWallPlatformPart>(buttomHit.Actor);
+						if (IsValid(emptyW))
+						{
+							emptyBlocks = emptyW->GetNearEmptyWallParts();
+							if ((emptyBlocks.Num() == blocksToMove.Num()) && (emptyBlocks.Num() > 0))
+							{
+								for (auto block : blocksToMove)
+								{
+									buttomLocation = block->GetActorLocation() * FVector::DownVector;
+									UKismetSystemLibrary::BoxTraceSingle(world, buttomLocation, buttomLocation, FVector(5.f, 5.f, 5.f), FRotator::ZeroRotator, ETraceTypeQuery::TraceTypeQuery1, false,
+										actToIngnore, EDrawDebugTrace::ForDuration, buttomHit, true);
+
+									AEmptyWallPlatformPart* emptyBlock = Cast<AEmptyWallPlatformPart>(buttomHit.Actor);
+									if (IsValid(emptyBlock))
+									{
+										count++;
+									}
+									else
+									{
+										break;
+									}
+								}
+
+								if (count == blocksToMove.Num())
+								{
+									for (int i = 0; i < blocksToMove.Num() - 1; i++)
+									{
+										gm->GetLevelPlatform()->SpawnAndAssignPathPart(emptyBlocks[i]->GetActorLocation(), this->LevelType == ELevelType::UnderCover ? true : false);
+										emptyBlocks[i]->Destroy();
+										blocksToMove[i]->Destroy();
+									}
+								}
+							}
+							else if ((emptyBlocks.Num() == 0) && ( blocksToMove.Num() == 0))
+							{
+								gm->GetLevelPlatform()->SpawnAndAssignPathPart(emptyW->GetActorLocation(), this->LevelType == ELevelType::UnderCover ? true : false);
+								emptyW->Destroy();
+								this->Destroy();
+							}
+						}
+						break;
+					case EBoxType::Path:
+						return true;
+						break;
+					default:
+						return false;
+						break;
+				}
+			}
 			return true;
 		}
 	}
