@@ -55,15 +55,14 @@ void APSBaseCharacter::BeginPlay()
 			{
 				case EBoxType::Path:
 				{
-					MoveToPositionStart(BoxBlock);
-				
+					MoveToPositionStart(BoxBlock);				
 					break;
 				}
 			}
 		}	
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Purple, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(LevelType)));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Purple, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(LevelType)));
 
 }
 
@@ -76,7 +75,7 @@ void APSBaseCharacter::EndPlay(const EEndPlayReason::Type Reason)
 void APSBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Purple, bIsMoveFinished ? "true" : "false");
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Purple, bIsMoveFinished ? "true" : "false");
 
 }
 
@@ -174,28 +173,32 @@ void APSBaseCharacter::MoveToLocationType()
 				Path->PlaySound(Path->interactSound);
 				switch (LevelType)
 				{
-				case ELevelType::Level:
-				{
-					MoveToPosition(detectedBlock);
-
-					break;
-				}
-
-				case ELevelType::UnderCover:
-				{
-					if (IsValid(BoxBlock))
+					case ELevelType::Level:
 					{
-						if (BoxBlock->GetbIsActivatorCover())
-						{
-							BoxBlock->ActivatorCover();
-
-							MoveToPosition(detectedBlock);
-						}
+						MoveToPosition(detectedBlock);
+						break;
 					}
 
-				}
-				default:
-					break;
+					case ELevelType::UnderCover:
+					{
+						if (IsValid(BoxBlock))
+						{
+							if (BoxBlock->GetbIsActivatorCover())
+							{
+								BoxBlock->ActivatorCover();
+								MoveToPosition(detectedBlock);
+							}
+							else
+							{
+								bIsMoveFinished = true;
+								GetWorldTimerManager().PauseTimer(moveTimerHandle);
+								GetWorldTimerManager().ClearTimer(moveTimerHandle);
+								PlayAnimation(idleAnim);
+							}
+						}
+					}
+					default:
+						break;
 				}
 			}
 			break;
@@ -380,11 +383,11 @@ void APSBaseCharacter::MoveCharacterOnTimer()
 		SetActorLocation(targetLocation);
 		GetWorldTimerManager().PauseTimer(moveTimerHandle);
 		GetWorldTimerManager().ClearTimer(moveTimerHandle);
-		if (GetWorldTimerManager().IsTimerActive(playFlipbookAnimHandle))
+		/*if (GetWorldTimerManager().IsTimerActive(playFlipbookAnimHandle))
 		{
 			GetWorldTimerManager().PauseTimer(playFlipbookAnimHandle);
 			GetWorldTimerManager().ClearTimer(playFlipbookAnimHandle);
-		}
+		}*/
 
 		bIsMoveFinished = true;
 		PlayAnimation(idleAnim);

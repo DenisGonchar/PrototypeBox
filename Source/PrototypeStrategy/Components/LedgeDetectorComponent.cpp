@@ -15,6 +15,7 @@
 #include "Actors/Platforms/Parts/MovePlatformPart.h"
 #include "Actors/Platforms/Parts/WallPlatformPart.h"
 #include "Actors/Platforms/Parts/MirroredPlatformPart.h"
+#include "Actors/Platforms/Parts/PathPlatformPart.h"
 #include "Actors/Platforms/Parts/WallColorPlatformPart.h"
 
 
@@ -387,6 +388,17 @@ bool ULedgeDetectorComponent::DetectHitBlock(FHitResult Hit)
 
 	switch (PartType)
 	{
+		case EBoxType::Path:
+		{
+			APathPlatformPart * path = Cast<APathPlatformPart>(HitActor);
+
+			if (path->GetLevelType() == ELevelType::UnderCover && !path->GetbIsActivatorCover())
+			{
+				return false;
+			}
+			bIsNeedPush = false;
+			return true;
+		}
 		case EBoxType::Dynamic:
 		{
 			AMovePlatformPart* Box = Cast<AMovePlatformPart>(HitActor);
