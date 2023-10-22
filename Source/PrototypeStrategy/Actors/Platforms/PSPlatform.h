@@ -39,6 +39,12 @@ public:
 	void SpawnAndAssignPathPart(FVector spawnLocation, bool IsUndecover = false);
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scene")
+		USceneComponent* SceneComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+		UAudioComponent* Audio;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+		USoundBase* levelSound;
 	/*
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 	TSubclassOf<class APSPlatformPart> FloorPart; 
