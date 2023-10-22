@@ -18,7 +18,11 @@
 
 APSPlatform::APSPlatform()
 {
- 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;
+	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+	SetRootComponent(SceneComponent);
+	Audio = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
+	Audio->SetupAttachment(SceneComponent);
 
 }
 
@@ -42,6 +46,13 @@ void APSPlatform::BeginPlay()
 
 	APSGameMode* gm = Cast<APSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	gm->SetLevelPlatform(this);
+
+	if (IsValid(levelSound))
+	{
+		Audio->SetSound(levelSound);
+		Audio->FadeIn(2.f);
+		Audio->Play();
+	}
 }
 
 void APSPlatform::OnConstruction(const FTransform& Transform)

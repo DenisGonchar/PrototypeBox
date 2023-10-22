@@ -13,7 +13,6 @@ ABlockPlatformPart::ABlockPlatformPart()
 void ABlockPlatformPart::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 FTeleportInfo ABlockPlatformPart::GetTeleportInfo() const
@@ -33,13 +32,10 @@ float ABlockPlatformPart::GetSpawnDistance() const
 
 void ABlockPlatformPart::NewLevelType()
 {
-	Super::NewLevelType();
-
-	
-	
+	Super::NewLevelType();	
 }
 
 void ABlockPlatformPart::ActivatorCover()
 {
-
 }
+
