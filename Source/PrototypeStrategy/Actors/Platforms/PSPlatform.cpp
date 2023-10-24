@@ -10,13 +10,19 @@
 #include <Kismet/GameplayStatics.h>
 #include "Parts/CoverPlatformPart.h"
 #include "Parts/MagneticPlatformPart.h"
-#include "../../GameInstance/PSGameInstance.h"
+#include "Parts/PathPlatformPart.h"
+#include "GameInstance/PSGameInstance.h"
 #include "Parts/ExitPlatformPart.h"
+#include "GameMode/PSGameMode.h"
 #include "Parts/MirroredPlatformPart.h"
 
 APSPlatform::APSPlatform()
 {
- 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;
+	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+	SetRootComponent(SceneComponent);
+	Audio = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
+	Audio->SetupAttachment(SceneComponent);
 
 }
 
@@ -38,6 +44,15 @@ void APSPlatform::BeginPlay()
 		BSCharacter->SetNameMap(NameMap);
 	}
 
+	APSGameMode* gm = Cast<APSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	gm->SetLevelPlatform(this);
+
+	if (IsValid(levelSound))
+	{
+		Audio->SetSound(levelSound);
+		Audio->FadeIn(2.f);
+		Audio->Play();
+	}
 }
 
 void APSPlatform::OnConstruction(const FTransform& Transform)
@@ -48,6 +63,27 @@ void APSPlatform::OnConstruction(const FTransform& Transform)
 void APSPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+TArray<ACoverPlatformPart*> APSPlatform::GetCoverPartsArray()
+{
+	return CoverParts;
+}
+void APSPlatform::SpawnAndAssignPathPart(FVector spawnLocation, bool IsUndecover)
+{
+	APathPlatformPart* newPathPart;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, pathPartClass->GetName());
+	newPathPart = Cast<APathPlatformPart>(GetWorld()->SpawnActor<AActor>(pathPartClass, spawnLocation, FRotator::ZeroRotator));
+	if (IsValid(newPathPart))
+	{
+		if (IsUndecover)
+		{
+			newPathPart->SetLevelType(ELevelType::UnderCover);
+		}
+		if (CoverParts.Num() > 0)
+		{
+			newPathPart->SetCoverPart(CoverParts);
+		}
+	}
 }
 /*
 TArray<TSubclassOf<APSPlatformPart>> APSPlatform::GetGridParts() const
@@ -78,65 +114,15 @@ TArray<AActor*> APSPlatform::SpawnBlocks(TArray<FConstructedBlockData> blocks)
 
 void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 {
-	/*
-	for (int i = 0; i <= MaxIndex - 1; i++)
-	{
-		Floor.Add(FloorPart);
-
-	}
-
-	for (int j = 0; j < Floor.Num(); j++)
-	{	
-		if (GridParts.Num() - 1 < j)
-		{
-			GridParts.Add(Floor[j]);
-		}
-
-		if (GridParts[j] == nullptr)
-		{
-			GridParts[j] = Floor[j];
-
-		}
-		
-	}
-
-	int X = 0;
-	int Y = 0;
-	*/
 	for (auto part : parts)
 	{
-		/*
-		if (!(Y < HorizontalIndex))
-		{
-			Y = 0;
-			X += 1;
-		}
-
-		FVector SpawnLocation = GetRootComponent()->GetComponentLocation();
-		SpawnLocation.X = SpawnLocation.X + (-X * Distance);
-		SpawnLocation.Y += SpawnLocation.Y + (Y * Distance);
-		
-		APSPlatformPart* SpawnActors = GetWorld()->SpawnActor<APSPlatformPart>(GridParts[l], SpawnLocation, FRotator::ZeroRotator);
-		
-		if (IsValid(SpawnActors))
-		{
-			ArrayPlatformPart.Add(SpawnActors);
-			
-			ABlockPlatformPart* Block = Cast<ABlockPlatformPart>(SpawnActors);
-			if (IsValid(Block->MovePlatform))
-			{
-				FVector SpawnLocationBlock = Block->GetActorLocation();
-				SpawnLocationBlock.Z += Block->GetSpawnDistance();
-
-				APSPlatformPart* SpawnBlock = GetWorld()->SpawnActor<APSPlatformPart>(Block->MovePlatform, SpawnLocationBlock, FRotator::ZeroRotator);
-				if (IsValid(SpawnBlock))
-				{
-					ArrayPlatformPart.Add(SpawnBlock);
-				}
-			}
-		}*/
 		APSPlatformPart* Actor = Cast<APSPlatformPart>(part);
 
+		AConstructPlatformPart* ConstructBlock = Cast<AConstructPlatformPart>(Actor);
+		if (IsValid(ConstructBlock))
+		{
+			constructBlocks.AddUnique(ConstructBlock);
+		}
 
 		ATeleportPlatformPart* Part = Cast<ATeleportPlatformPart>(Actor);
 		if (IsValid(Part))
@@ -194,7 +180,7 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 
 			if (GetType == EBoxType::Cover)
 			{
-				CoverPart.Add(Cover);
+				CoverParts.Add(Cover);
 			}
 		}
 
@@ -220,6 +206,24 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 				mirroredClones.Add(Mirror);
 			}
 		}
+
+
+		APacmanPlatformPart* pacman = Cast<APacmanPlatformPart>(Actor);
+		if (IsValid(pacman))
+		{
+			pacmansArray.AddUnique(pacman);
+		}
+
+		AEmptyWallPlatformPart* emptyWall = Cast<AEmptyWallPlatformPart>(Actor);
+		if (IsValid(emptyWall))
+		{
+			emptyWallArray.AddUnique(emptyWall);
+		}
+	}
+
+	for (auto contr : constructBlocks)
+	{
+		contr->SetConstractBlocksArray(constructBlocks);
 	}
 
 	if (IsValid(mirroredBlock))
@@ -236,15 +240,15 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 		MagneticActivator->MagneticParts = MagneticArray;
 	}
 	
-	if (CoverPart.Num() > 0)
+	if (CoverParts.Num() > 0)
 	{
 		for (auto part : parts)
 		{
 			APSPlatformPart* prt = Cast<APSPlatformPart>(part);
 			if(IsValid(prt))
 			{
-				prt->SetCoverPart(CoverPart);
-				UE_LOG(LogTemp, Warning, TEXT("Type Level %i = %s"), -1, *UEnum::GetValueAsString(prt->GetLevelType()));
+				prt->SetCoverPart(CoverParts);
+				//UE_LOG(LogTemp, Warning, TEXT("Type Level %i = %s"), -1, *UEnum::GetValueAsString(prt->GetLevelType()));
 			}
 		}
 	}
@@ -266,16 +270,33 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 		ArrayTeleport[t]->SetActivator(ActivatorTeleport);		
 	}
 
+	for (int t = 0; t < pacmansArray.Num(); t++)
+	{
+		pacmansArray[t]->SetSteps(PacmanStepsArray[t]);
+	}
+
 	for (int t = 0; t < limitedBlocks.Num(); t++)
 	{
 		if (moveLimits.IsValidIndex(t))
 		{
-			GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Blue, limitedBlocks[t]->GetName());
 			limitedBlocks[t]->moveLimit = moveLimits[t];
 		}
 		else
 		{
 			limitedBlocks[t]->bUseRandomLimit = true;
+		}
+	}
+
+	FVector emptyWallLocation;
+	for (int i = 0; i < emptyWallArray.Num() -1; i++)
+	{
+		emptyWallLocation = emptyWallArray[i]->GetActorLocation();
+		for (int j = 0; j < emptyWallArray.Num() -1; j++)
+		{
+			if (emptyWallLocation.Equals(emptyWallArray[j]->GetActorLocation(), 151))
+			{
+				emptyWallArray[i]->GetNearEmptyWallParts().AddUnique(emptyWallArray[j]);
+			}
 		}
 	}
 }

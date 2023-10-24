@@ -57,3 +57,13 @@ void APSGameMode::CheckWin()
 	FName CurrentName = (FName)UGameplayStatics::GetCurrentLevelName(GetWorld());
 	UGameplayStatics::OpenLevel(GetWorld(), CurrentName);
 }
+
+void APSGameMode::SetLevelPlatform(APSPlatform* platf)
+{
+	levelPlatform = platf;
+}
+
+APSPlatform* APSGameMode::GetLevelPlatform()
+{
+	return levelPlatform;
+}

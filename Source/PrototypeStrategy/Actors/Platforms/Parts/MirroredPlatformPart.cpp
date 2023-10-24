@@ -7,10 +7,23 @@
 
 bool AMirroredPlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 {
-
 	if (!IsClone)
 	{
+		FHitResult hitResult;
+		TArray<AActor*> actToIgnore;
+		actToIgnore.Add(this);
 		lastDirection = Direc;
+		UKismetSystemLibrary::LineTraceSingle(GetWorld(), GetActorLocation(), FindTraceLocationByDirection(lastDirection), ETraceTypeQuery::TraceTypeQuery1, true, actToIgnore, EDrawDebugTrace::ForDuration, hitResult, false);
+		if (hitResult.bBlockingHit)
+		{
+			AMirroredPlatformPart* hitActor = Cast<AMirroredPlatformPart>(hitResult.Actor);
+			if (hitActor->GetBoxType() == EBoxType::MirroredBorder)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, "BorderMirrored");
+				return false;
+			}
+		}
+
 		for (auto clone : clones)
 		{
 			clone->MoveDirection(Direc);

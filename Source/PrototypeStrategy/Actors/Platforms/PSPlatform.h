@@ -7,13 +7,16 @@
 #include <PSTypes.h>
 #include "Parts/MirroredPlatformPart.h"
 #include "Parts/LimitedMovePlatformPart.h"
+#include "Parts/ConstructPlatformPart.h"
+#include "Parts/PacmanPlatformPart.h"
+#include "Parts/EmptyWallPlatformPart.h"
 #include "PSPlatform.generated.h"
 
 class APSPlatformPart;
 class ATeleportPlatformPart;
 class ACoverPlatformPart;
 class AMagneticPlatformPart;
-//class AMirroredPlatformPart;
+//class APacmacPlatformPart;
 
 UCLASS()
 class PROTOTYPESTRATEGY_API APSPlatform : public AActor
@@ -31,7 +34,17 @@ public:
 
 	TArray<TSubclassOf<APSPlatformPart>> GetGridParts() const;
 
+	TArray<ACoverPlatformPart*> GetCoverPartsArray();
+
+	void SpawnAndAssignPathPart(FVector spawnLocation, bool IsUndecover = false);
+
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scene")
+		USceneComponent* SceneComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+		UAudioComponent* Audio;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+		USoundBase* levelSound;
 	/*
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 	TSubclassOf<class APSPlatformPart> FloorPart; 
@@ -67,6 +80,12 @@ protected:
 		FName ExitMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
+		TArray<FPacmanSteps> PacmanStepsArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
+		UClass* pathPartClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
 		FString levelName;
 
 	TArray<AActor*> spawnedBlocks;
@@ -76,7 +95,7 @@ private:
 	AMagneticPlatformPart* MagneticActivator;
 	TArray<AMagneticPlatformPart*> MagneticArray;
 	
-	TArray<ACoverPlatformPart*> CoverPart;	
+	TArray<ACoverPlatformPart*> CoverParts;	
 
 	ATeleportPlatformPart* ActivatorTeleport;
 	TArray<ATeleportPlatformPart*> ArrayTeleport;
@@ -88,4 +107,9 @@ private:
 	TArray<AMirroredPlatformPart*> mirroredClones;
 	AMirroredPlatformPart* mirroredBlock;
 
+	TArray<AConstructPlatformPart*> constructBlocks;
+
+	TArray<APacmanPlatformPart*> pacmansArray;
+
+	TArray<AEmptyWallPlatformPart*> emptyWallArray;
 };

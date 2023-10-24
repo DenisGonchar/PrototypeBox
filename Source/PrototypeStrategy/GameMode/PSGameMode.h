@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Actors/Platforms/PSPlatform.h"
 #include "PSGameMode.generated.h"
+
+
 
 UCLASS(minimalapi)
 class APSGameMode : public AGameModeBase
@@ -31,10 +34,15 @@ public:
 
 	int FullSteps = 1;
 
+	void SetLevelPlatform(APSPlatform* platf);
+	APSPlatform* GetLevelPlatform();
 protected:
 
 	class APSGameState* WState;
 	class APSBaseCharacter* BaseCharacter;
+
+private:
+	APSPlatform* levelPlatform;
 };
 
 

@@ -19,7 +19,7 @@ public:
 	void GenerateMoveLimit();
 	virtual bool MoveDirection(EMoveCharacterDirection Direc) override;
 
-	virtual void DirectionDynamicType(APSPlatformPart* Box);
+	virtual void DirectionDynamicType();
 	virtual void MoveToLocationFloor(APSPlatformPart* Box);
 	
 	virtual void BeginPlay() override;

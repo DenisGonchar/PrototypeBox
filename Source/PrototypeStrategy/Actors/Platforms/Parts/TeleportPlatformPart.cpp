@@ -56,14 +56,11 @@ void ATeleportPlatformPart::SwitchActivator()
 
 		if (bIsActive)
 		{
-			PlaySound(moveSound);
+			PlaySound(interactSound);
 		}
 		else
 		{
-			if (!Audio->bIsPaused)
-			{
-				Audio->Stop();
-			}
+			PlaySound(deactivateSound);
 		}
 		for (auto telep : teleports)
 		{

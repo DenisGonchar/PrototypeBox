@@ -24,40 +24,40 @@ void AMovePlatformPart::BeginPlay()
 
 bool AMovePlatformPart::MoveDirection(EMoveCharacterDirection Direc)
 {
-	Direction = Direc;	
+	lastDirection = Direc;
 	FLedgeDescription LedgeDescription;
-	if (LedgeDetertorComponent->BoxDetectLedge(LedgeDescription, Direc))
+	LedgeDetertorComponent->lastPlatformPart = this;
+	if (LedgeDetertorComponent->BoxDetectLedge(/*this,*/ LedgeDescription, Direc))
 	{
-		DirectionDynamicType(LedgeDescription.BoxMesh);
-
+		lastBox = LedgeDescription.BoxMesh;
+		//DirectionDynamicType();
+		PlaySound(moveSound);
+		GetWorldTimerManager().SetTimer( moveDelayTimer, this, &AMovePlatformPart::DirectionDynamicType, moveDelay, false, 0.3f);
 		return true;
 	}
 
 	return false;
 }
 
-void AMovePlatformPart::DirectionDynamicType(APSPlatformPart* Box)
+void AMovePlatformPart::DirectionDynamicType()
 {
 	switch (DynamicType)
 	{	
 		case EDynamic::Active:
 		{
-			MoveToLocationFloor(Box);
-			PlaySound(moveSound);
+			MoveToLocationFloor(lastBox);
 			GetWorldTimerManager().SetTimer(DynamicTimer, this, &AMovePlatformPart::StartActive, ActiveTimeStep, true);
-		
+			RotateAndTurnOnVFX(lastDirection);
 			break;
 		}
 		default:
-			PlaySound(moveSound);
-			MoveToLocationFloor(Box);
+			MoveToLocationFloor(lastBox);
 			break;
 	}
 }
 
 void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
-{
-	
+{	
 	EBoxType Type = Box->GetBoxType();
 
 	FVector FloorLocation = Box->GetActorLocation();
@@ -90,17 +90,14 @@ void AMovePlatformPart::MoveToLocationFloor(APSPlatformPart* Box)
 			SetActorLocation(FloorLocation);
 			break;
 	}
-	
-
 }
 
 void AMovePlatformPart::StartActive()
-{
-	
-	if (Direction != EMoveCharacterDirection::None)
+{	
+	if (lastDirection != EMoveCharacterDirection::None)
 	{
 		FLedgeDescription LedgeDescription;
-		if (LedgeDetertorComponent->BoxDetectLedge(LedgeDescription, Direction))
+		if (LedgeDetertorComponent->BoxDetectLedge(/*this,*/ LedgeDescription, lastDirection))
 		{
 			MoveToLocationFloor(LedgeDescription.BoxMesh);
 			UE_LOG(LogTemp, Warning, TEXT(" Move"));
@@ -109,7 +106,8 @@ void AMovePlatformPart::StartActive()
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT(" else"));
-			PlaySound(interactSound);
+			PlaySound(deactivateSound);
+			TurnOffVFX();
 			GetWorldTimerManager().ClearTimer(DynamicTimer);				
 		}
 	}
@@ -117,7 +115,6 @@ void AMovePlatformPart::StartActive()
 	{
 		GetWorldTimerManager().ClearTimer(DynamicTimer);
 	}
-
 }
 
 EDynamic AMovePlatformPart::GetDynamicType() const
@@ -128,8 +125,6 @@ EDynamic AMovePlatformPart::GetDynamicType() const
 void AMovePlatformPart::NewLevelType()
 {
 	Super::NewLevelType();
-
-
 }
 
 

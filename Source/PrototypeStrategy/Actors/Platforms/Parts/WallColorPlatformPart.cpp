@@ -21,14 +21,14 @@ void AWallColorPlatformPart::NewLevelType()
 
 	switch (LevelType)
 	{
-	case ELevelType::Level:
+		case ELevelType::Level:
 		{
 			BoxComponent->SetBoxExtent(StartBoxExtent);
 			BoxComponent->SetWorldLocation(StartBoxLocation);
 			
 			break;
 		}
-	case ELevelType::UnderCover:
+		case ELevelType::UnderCover:
 		{
 			StartBoxExtent = BoxComponent->GetScaledBoxExtent();
 			StartBoxLocation = BoxComponent->GetComponentLocation();
@@ -37,7 +37,8 @@ void AWallColorPlatformPart::NewLevelType()
 			BoxComponent->SetWorldLocation(FVector(StartBoxLocation.X, StartBoxLocation.Y, StartBoxLocation.Z - StartBoxExtent.Z - 15.0f));
 			break;
 		}
-	default: ;
+		default: 
+			break;
 	}
 	
 }

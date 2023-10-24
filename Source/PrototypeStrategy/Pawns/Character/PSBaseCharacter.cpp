@@ -7,8 +7,8 @@
 #include <Actors/Platforms/PSPlatformPart.h>
 #include <Kismet/GameplayStatics.h>
 #include <Actors/Platforms/Parts/BlockPlatformPart.h>
-#include <GameMode/PSGameMode.h>
 #include <GameState/PSGameState.h>
+#include <GameMode/PSGameMode.h>
 #include "Actors/Platforms/Parts/MagneticPlatformPart.h"
 #include "Actors/Platforms/Parts/TeleportPlatformPart.h"
 #include "Actors/Platforms/Parts/CoverPlatformPart.h"
@@ -28,6 +28,9 @@ APSBaseCharacter::APSBaseCharacter()
 	Flipbook->SetupAttachment(BoxComponent);
 	Flipbook->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 
+	/*CharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	CharacterMesh->SetupAttachment(BoxComponent);*/
+
 	LedgeDetertorComponent = CreateDefaultSubobject<ULedgeDetectorComponent>(TEXT("LedgeDetector"));
 
 }
@@ -37,7 +40,7 @@ void APSBaseCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	GMode = Cast<APSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	
+	gameInstance = Cast<UPSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	FullStep();
 	
 	FLedgeDescription LedgeDescription;
@@ -52,15 +55,14 @@ void APSBaseCharacter::BeginPlay()
 			{
 				case EBoxType::Path:
 				{
-					MoveToPositionStart(BoxBlock);
-				
+					MoveToPositionStart(BoxBlock);				
 					break;
 				}
 			}
 		}	
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Purple, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(LevelType)));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Purple, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(LevelType)));
 
 }
 
@@ -73,6 +75,7 @@ void APSBaseCharacter::EndPlay(const EEndPlayReason::Type Reason)
 void APSBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Purple, bIsMoveFinished ? "true" : "false");
 
 }
 
@@ -119,15 +122,6 @@ void APSBaseCharacter::MoveLeft()
 	MovementDirection(CharacterDirection);
 }
 
-void APSBaseCharacter::PlayFlipbookAnim()
-{
-	if (Flipbook->GetRelativeScale3D().Equals(targetScale, 0.1f))
-	{
-		GetWorldTimerManager().PauseTimer(playFlipbookAnimHandle);
-		GetWorldTimerManager().ClearTimer(playFlipbookAnimHandle);
-	}
-	Flipbook->SetRelativeScale3D(Flipbook->GetRelativeScale3D() + deltaScale);
-}
 
 void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 {
@@ -135,32 +129,35 @@ void APSBaseCharacter::MovementDirection(EMoveCharacterDirection Direction)
 	{
 		return;
 	}
-	
-	if (Direction == EMoveCharacterDirection::Top || Direction == EMoveCharacterDirection::Down)
-	{		
-		startScale = Flipbook->GetRelativeScale3D();
-		targetScale = FVector(0.6f, 0.5f, 0.4f);
-		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
-	}
-	else if (Direction == EMoveCharacterDirection::Left || Direction == EMoveCharacterDirection::Right)
-	{
-		startScale = Flipbook->GetRelativeScale3D();
-		targetScale = FVector(0.4f, 0.5f, 0.6f);
-		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
-	}
-	GetWorldTimerManager().SetTimer(playFlipbookAnimHandle, this, &APSBaseCharacter::PlayFlipbookAnim, scaleChangeSpeed, true);
+	bIsMoveFinished = false;
 
 	FLedgeDescription LedgeDescription;
 	if (LedgeDetertorComponent->DetectLedge(LedgeDescription, Direction))
 	{
-		MoveToLocationType(LedgeDescription.BoxMesh);
+		lastDirection = Direction;
+		detectedBlock = LedgeDescription.BoxMesh;
+		if (LedgeDetertorComponent->bIsNeedPush)
+		{
+			deltaEquals = 5.f;
+			PushAndMove();
+		}
+		else
+		{
+			deltaEquals = 40.f;
+			MoveWithAnim();
+		}		
+	}
+	else
+	{
+		bIsMoveFinished = true;
+		return;
 	}
 }
 
-void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
+void APSBaseCharacter::MoveToLocationType()
 {	
-	ABlockPlatformPart* BoxBlock = Cast<ABlockPlatformPart>(Box);
-	
+	ABlockPlatformPart* BoxBlock = Cast<ABlockPlatformPart>(detectedBlock);
+
 	if (IsValid(BoxBlock))
 	{
 		BoxType = BoxBlock->GetBoxType();
@@ -170,41 +167,47 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 	{
 		case EBoxType::Path:
 		{
-			APathPlatformPart* Path = Cast<APathPlatformPart>(Box);
-			Path->PlaySound(Path->interactSound);
-			switch (LevelType)
+			APathPlatformPart* Path = Cast<APathPlatformPart>(detectedBlock);
+			if (IsValid(Path))
 			{
-				case ELevelType::Level:
+				Path->PlaySound(Path->interactSound);
+				switch (LevelType)
 				{
-					MoveToPosition(Box);
-
-					break;
-				}
-
-				case ELevelType::UnderCover:
-				{
-					if (IsValid(BoxBlock))
+					case ELevelType::Level:
 					{
-						if (BoxBlock->GetbIsActivatorCover())
-						{
-							BoxBlock->ActivatorCover();
+						MoveToPosition(detectedBlock);
+						break;
+					}
 
-							MoveToPosition(Box);
+					case ELevelType::UnderCover:
+					{
+						if (IsValid(BoxBlock))
+						{
+							if (BoxBlock->GetbIsActivatorCover())
+							{
+								BoxBlock->ActivatorCover();
+								MoveToPosition(detectedBlock);
+							}
+							else
+							{
+								bIsMoveFinished = true;
+								GetWorldTimerManager().PauseTimer(moveTimerHandle);
+								GetWorldTimerManager().ClearTimer(moveTimerHandle);
+								PlayAnimation(idleAnim);
+							}
 						}
 					}
-					
+					default:
+						break;
 				}
-				default:
-					break;			
 			}
-
 			break;
 		}
 
 		case EBoxType::Exit:
 		{
 			AExitPlatformPart* ExitPart = Cast<AExitPlatformPart>(BoxBlock);
-			MoveToPosition(Box);
+			MoveToPosition(detectedBlock);
 			ExitPart->PlaySound(ExitPart->interactSound);
 			if (ExitPart->GetLevelType() == ELevelType::UnderCover)
 			{
@@ -241,7 +244,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 			
 			if (IsValid(BoxCover))
 			{
-				MoveToPosition(Box);
+				MoveToPosition(detectedBlock);
 				BoxCover->PlaySound(BoxCover->interactSound);
 				BoxCover->ActivatorCover();
 				
@@ -257,8 +260,8 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 
 			if (BoxTeleport->GetTeleportInfo().TeleportType == ETeleport::Activator)
 			{				
-				MoveToPosition(Box);
-
+				MoveToPosition(detectedBlock);
+				BoxTeleport->PlaySound(BoxTeleport->activateSound);
 				BoxTeleport->SwitchActivator();
 
 			}
@@ -273,7 +276,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), BoxTeleport->interactSound, BoxTeleport->GetActorLocation());
 						BoxTeleport->PlaySound(BoxTeleport->interactSound);
 						SetActorLocation(FloorLocation);
-						
+						bIsMoveFinished = true;
 						Step(StepIndex);
 
 					}					
@@ -281,12 +284,12 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 				}
 				else
 				{
-					MoveToPosition(Box);
+					MoveToPosition(detectedBlock);
 				}
 			}
 			else
 			{
-				MoveToPosition(Box);
+				MoveToPosition(detectedBlock);
 			}
 
 			break;
@@ -299,7 +302,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 
 			if (MagneticBox->MagneticType == EMagneticType::Activator)
 			{
-				MoveToPosition(Box);
+				MoveToPosition(detectedBlock);
 				MagneticBox->PlaySound(MagneticBox->interactSound);
 				MagneticBox->SwitchActivator();
 			}			
@@ -331,7 +334,7 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 					magneticPart->SwitchSprite(polarizationType);
 				}
 			}
-			MoveToPosition(Box);
+			MoveToPosition(detectedBlock);
 		}
 
 	case EBoxType::Wall:
@@ -341,8 +344,8 @@ void APSBaseCharacter::MoveToLocationType(APSPlatformPart* Box)
 		{
 			
 		}*/
-		BoxBlock->PlaySound(BoxBlock->moveSound);
-		MoveToPosition(Box);
+		BoxBlock->PlaySound(BoxBlock->interactSound);
+		MoveToPosition(detectedBlock);
 	}
 		default:
 			break;
@@ -365,29 +368,34 @@ void APSBaseCharacter::MoveToPosition(APSPlatformPart* Box)
 		startLocation = GetActorLocation();
 		targetLocation = FloorLocation;
 		deltaLocation = (startLocation - targetLocation) * moveTimerSpeed;
-		deltaLocation = deltaLocation * -2.f;
+		deltaLocation = deltaLocation * -8.f;
 		bIsMoveFinished = false;
+		bIsPushMove = false;
 		GetWorldTimerManager().SetTimer(moveTimerHandle, this, &APSBaseCharacter::MoveCharacterOnTimer, moveTimerSpeed, true);					
 	}	
 }
 
 void APSBaseCharacter::MoveCharacterOnTimer()
 {
-	if (targetLocation == GetActorLocation())
-	{		
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Some variable values: x = %f"), deltaEquals));
+	if (targetLocation.Equals(GetActorLocation(), deltaEquals))
+	{	
+		SetActorLocation(targetLocation);
 		GetWorldTimerManager().PauseTimer(moveTimerHandle);
 		GetWorldTimerManager().ClearTimer(moveTimerHandle);
-		bIsMoveFinished = true;
-		if (GetWorldTimerManager().IsTimerActive(playFlipbookAnimHandle))
+		/*if (GetWorldTimerManager().IsTimerActive(playFlipbookAnimHandle))
 		{
 			GetWorldTimerManager().PauseTimer(playFlipbookAnimHandle);
 			GetWorldTimerManager().ClearTimer(playFlipbookAnimHandle);
-		}
-		startScale = Flipbook->GetRelativeScale3D();
-		targetScale = FVector(0.5f, 0.5f, 0.5f);
-		deltaScale = (targetScale - startScale) * scaleChangeSpeed * 10;
+		}*/
 
-		GetWorldTimerManager().SetTimer(playFlipbookAnimHandle, this, &APSBaseCharacter::PlayFlipbookAnim, scaleChangeSpeed, true);
+		bIsMoveFinished = true;
+		PlayAnimation(idleAnim);
+		if (gameInstance->OnMove.IsBound())
+		{
+			gameInstance->OnMove.Broadcast();
+		}
+
 		return;
 	}
 	SetActorLocation(GetActorLocation() + deltaLocation);
@@ -398,8 +406,9 @@ void APSBaseCharacter::MoveToPosition(FVector location)
 	startLocation = GetActorLocation();
 	targetLocation = location;
 	deltaLocation = (deltaLocation - targetLocation) * moveTimerSpeed;
-	deltaLocation = deltaLocation * -2.f;
+	deltaLocation = deltaLocation * -8.f;
 	bIsMoveFinished = false;
+	bIsPushMove = false;
 	GetWorldTimerManager().SetTimer(moveTimerHandle, this, &APSBaseCharacter::MoveCharacterOnTimer, moveTimerSpeed, true);
 }
 
@@ -496,5 +505,96 @@ FName APSBaseCharacter::GetNestLevel() const
 void APSBaseCharacter::SetNextLevel(FName Map)
 {
 	NextLevel = Map;
+}
+
+void APSBaseCharacter::PlayAnimation(UPaperFlipbook* animToPlay)
+{
+	//CharacterMesh->PlayAnimation(animToPlay, false);
+	Flipbook->SetFlipbook(animToPlay);
+}
+
+void APSBaseCharacter::PushAndMove()
+{
+	PlayAnimation(GetAnimationByDirection(lastDirection, true));
+	PrepearMove();
+}
+
+void APSBaseCharacter::PrepearMove()
+{
+	startLocation = GetActorLocation();
+	targetLocation = GetPushImpulseMoveLocation(lastDirection);
+	deltaLocation = (startLocation - targetLocation) * moveTimerSpeed;
+	deltaLocation = deltaLocation * -2.f;
+	bIsMoveFinished = false;	
+	GetWorldTimerManager().SetTimer(moveTimerHandle, this, &APSBaseCharacter::MoveCharacterOnTimer, moveTimerSpeed, true);
+	GetWorldTimerManager().SetTimer(pushTimer, this, &APSBaseCharacter::MoveWithAnim, 0.1f, false, pushDelay);
+}
+
+void APSBaseCharacter::MoveWithAnim()
+{
+	deltaEquals = 40.f;
+	bIsPushMove = true;
+	PlayAnimation(GetAnimationByDirection(lastDirection));
+	GetWorldTimerManager().SetTimer(moveTimer, this, &APSBaseCharacter::MoveToLocationType, 0.1f, false, moveDelay);
+}
+
+UPaperFlipbook* APSBaseCharacter::GetAnimationByDirection(EMoveCharacterDirection direction, bool bIsPushAnim)
+{
+	switch (direction)
+	{
+		case EMoveCharacterDirection::Top:
+			if (bIsPushAnim)
+			{
+				return pushForward;
+			}
+			return moveForward;
+			break;
+		case EMoveCharacterDirection::Down:			
+			if (bIsPushAnim)
+			{
+				return pushBack;
+			}
+			return moveBack;
+			break;
+		case EMoveCharacterDirection::Left:
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Left");
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, moveLeft ? "true" : "false");
+			if (bIsPushAnim)
+			{
+				return pushLeft;
+			}
+			return moveLeft;
+			break;
+		case EMoveCharacterDirection::Right:
+			if (bIsPushAnim)
+			{
+				return pushRight;
+			}
+			return moveRight;
+			break;
+	}
+	return nullptr;
+}
+
+FVector APSBaseCharacter::GetPushImpulseMoveLocation(EMoveCharacterDirection direc)
+{
+	switch (direc)
+	{
+		case EMoveCharacterDirection::Top:
+			return GetActorLocation() - FVector( 25.f, 0.f, 0.f);
+			break;
+		case EMoveCharacterDirection::Down:
+			return GetActorLocation() - FVector( -25.f, 0.f, 0.f);
+			break;
+		case EMoveCharacterDirection::Right:
+			return GetActorLocation() - FVector( 0.f, 25.f, 0.f);
+			break;
+		case EMoveCharacterDirection::Left:
+			return GetActorLocation() - FVector( 0.f, -25.f, 0.f);
+			break;
+		default:
+			return GetActorLocation();
+			break;
+	}
 }
 

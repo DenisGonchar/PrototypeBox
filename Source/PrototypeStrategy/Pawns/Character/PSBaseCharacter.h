@@ -6,15 +6,17 @@
 #include <PSTypes.h>
 #include <Components/LedgeDetectorComponent.h>
 #include <Actors/Platforms/PSPlatformPart.h>
+#include "../../GameInstance/PSGameInstance.h"
 #include "PSBaseCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOpenLevel, bool, bIsWin);
+
 
 USTRUCT(BlueprintType)
 struct FGetTeleportInfo
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY()
 	FName GetTeleportName = FName("None");
 
@@ -30,11 +32,14 @@ class PROTOTYPESTRATEGY_API APSBaseCharacter : public APawn
 {
 	GENERATED_BODY()
 
+private:
+	UPSGameInstance* gameInstance;
+
 public:
 	APSBaseCharacter();
-	
+
 	UPROPERTY(BlueprintAssignable)
-	FOpenLevel OpenLevel;
+		FOpenLevel OpenLevel;
 
 	virtual void BeginPlay() override;
 
@@ -54,8 +59,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UBoxComponent* BoxComponent;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	//class UStaticMeshComponent* CharacterMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	class USkeletalMeshComponent* CharacterMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipbook")
 	UPaperFlipbookComponent* Flipbook;
@@ -65,6 +70,60 @@ public:
 
 	EMoveCharacterDirection CharacterDirection = EMoveCharacterDirection::None;
 
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* moveForward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* moveBack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* moveLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* moveRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* pushForward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* pushBack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* pushLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UAnimationAsset* pushRight;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* idleAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* idleSleepAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveForward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveBack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* moveRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushForward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushBack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+		UPaperFlipbook* pushRight;
+
+
 #pragma region Move
 	virtual void MoveTop();
 	virtual void MoveDown();
@@ -72,12 +131,11 @@ public:
 	virtual void MoveLeft();
 	
 	void MovementDirection(EMoveCharacterDirection Direction);
-	void MoveToLocationType(APSPlatformPart* Box);
+	void MoveToLocationType();
 	void MoveToPosition(APSPlatformPart* Box);	
 	void MoveToPosition(FVector Location);
 	void MoveToPositionStart(APSPlatformPart* Box);
 
-	void NormalizePlayerFlipbook();
 	FTimerHandle spriteTimer;
 
 	void Step(int Index);
@@ -98,10 +156,6 @@ public:
 	void MoveCharacterOnTimer();
 
 	FTimerHandle playFlipbookAnimHandle;
-	void PlayFlipbookAnim();
-	FVector targetScale;
-	FVector startScale;
-	FVector deltaScale;
 
 #pragma endregion
 
@@ -136,10 +190,14 @@ public:
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	float MoveDistance = 150.0f;
+		float MoveDistance = 150.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Params")
-	int StepIndex = 1;
+		int StepIndex = 1;
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void CharacterMoved();
+
 	int FullStepIndex = 1;
 
 	EBoxType BoxType = EBoxType::None;
@@ -155,4 +213,22 @@ protected:
 	
 	TWeakObjectPtr<class APSPlatform>BasePlatform;
 
+
+	APSPlatformPart* detectedBlock;
+
+	EMoveCharacterDirection lastDirection;
+	void PlayAnimation(UPaperFlipbook* animToPlay);
+	void PushAndMove();
+	void MoveWithAnim();
+	UPaperFlipbook* GetAnimationByDirection(EMoveCharacterDirection direction, bool bIsPushAnim = false);
+	FVector GetPushImpulseMoveLocation(EMoveCharacterDirection direc);
+	void PrepearMove();
+
+	FTimerHandle moveTimer;
+	FTimerHandle pushTimer;
+
+	float pushDelay = 0.1f;
+	float moveDelay = 0.2f;
+	float deltaEquals = 30.f;
+	bool bIsPushMove = false;
 };
