@@ -51,7 +51,7 @@ void APSPlatform::BeginPlay()
 	{
 		Audio->SetSound(levelSound);
 		Audio->FadeIn(2.f);
-		Audio->Play();
+		//Audio->Play();
 	}
 }
 
