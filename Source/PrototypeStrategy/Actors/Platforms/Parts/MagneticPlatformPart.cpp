@@ -19,6 +19,7 @@ void AMagneticPlatformPart::BeginPlay()
 	{
 		polarization = FMath::RandBool() ? EPolarizationType::Negative : EPolarizationType::Positive;
 	}
+	GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Cyan,UEnum::GetValueAsString(polarization));
 }
 
 void AMagneticPlatformPart::SwitchSprite(EPolarizationType newPolarization)

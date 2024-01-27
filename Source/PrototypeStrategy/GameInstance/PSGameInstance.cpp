@@ -63,6 +63,24 @@ bool UPSGameInstance::LoadLevels(TArray<FLevelData>& levels)
 	return false;
 }
 
+void UPSGameInstance::ValidateLevel(TArray<AActor*> actors)
+{
+	for(int i = 0; i < actors.Num(); i++)
+	{		
+		AActor* iActor = actors[i];
+		for (int j = 0; j < actors.Num(); j++)
+		{
+			if(i == j) continue;
+			if(iActor == actors[j]) continue;
+			if(iActor->GetActorLocation().Equals(actors[j]->GetActorLocation()))
+			{				
+				actors[j]->Destroy();
+				actors.RemoveAt(j);
+			}
+		}
+	}
+}
+
 void UPSGameInstance::RemoveSaveInSlot(FString slotName)
 {
 	if (slotName != "")

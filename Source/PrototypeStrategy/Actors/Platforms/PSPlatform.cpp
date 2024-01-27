@@ -104,9 +104,17 @@ TArray<AActor*> APSPlatform::SpawnBlocks(TArray<FConstructedBlockData> blocks)
 		}
 		spawnedBlocks.Empty();
 	}
-
+	//GEngine->AddOnScreenDebugMessage(-1, 12.f, FColor::Cyan, FString::FromInt(blocks.Num()));
 	for (auto block : blocks)
 	{
+		/*if (IsValid(block.Block))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 12.f, FColor::Cyan, block.Block->GetName());
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 12.f, FColor::Cyan, "Block doesnt valid");
+		}*/
 		spawnedBlocks.Add(GetWorld()->SpawnActor<AActor>(block.Block, block.location, block.rotation));
 	}
 	return spawnedBlocks;
@@ -114,6 +122,7 @@ TArray<AActor*> APSPlatform::SpawnBlocks(TArray<FConstructedBlockData> blocks)
 
 void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 12.f, FColor::Cyan, FString::FromInt(parts.Num()));
 	for (auto part : parts)
 	{
 		APSPlatformPart* Actor = Cast<APSPlatformPart>(part);
@@ -151,6 +160,7 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 				if (MagneticPart->MagneticType == EMagneticType::Magnetic)
 				{
 					MagneticArray.Add(MagneticPart);
+					if (MagneticStatusOnStart)MagneticPart->SwitchActivator();
 				}
 			}
 			else if (GetType == EBoxType::Magnetic)
@@ -158,6 +168,10 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 				if (MagneticPart->MagneticType == EMagneticType::Activator)
 				{
 					MagneticActivator = MagneticPart;
+					if (MagneticStatusOnStart)MagneticPart->bIsActive = true;
+				}
+				else if(MagneticPart->MagneticType == EMagneticType::Magnetic)
+				{
 				}
 			}
 		}
