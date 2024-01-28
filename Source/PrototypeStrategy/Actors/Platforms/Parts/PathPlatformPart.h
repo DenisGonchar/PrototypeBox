@@ -15,6 +15,7 @@ class PROTOTYPESTRATEGY_API APathPlatformPart : public ABlockPlatformPart
 	GENERATED_BODY()
 	
 public:
+	virtual void BeginPlay() override;
 	
 	virtual void ActivatorCover() override;
 
