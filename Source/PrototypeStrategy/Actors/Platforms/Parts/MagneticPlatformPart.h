@@ -49,6 +49,8 @@ public:
 		UPaperSprite* PositivePolarizationSprite;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Polarizer")
 		UPaperSprite* NegativePolarizationSprite;
+	UFUNCTION()
+		void SwitchPolarization();
 	
 	UFUNCTION(BlueprintImplementableEvent)
 		void ChangeBlockSprite(UPaperSprite* newSprite);
