@@ -7,6 +7,11 @@
 #include "PaperSpriteComponent.h"
 
 
+void APathPlatformPart::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void APathPlatformPart::ActivatorCover()
 {
 	Super::ActivatorCover();
@@ -35,31 +40,13 @@ void APathPlatformPart::NewLevelType()
 	
 	if (LevelType == ELevelType::UnderCover)
 	{
-		if (!bIsActivatorCover && IsStepedInCover)
+		if (!bIsActivatorCover)
 		{
-			if (IsValid(ActivatiorFlipbook))
-			{
-				Flipbook->SetFlipbook(ActivatiorFlipbook);
-				Sprite->SetSprite(nullptr);
-			}
-			if (IsValid(ActivatiorSprite))
-			{
-				Sprite->SetSprite(ActivatiorSprite);
-				Flipbook->SetFlipbook(nullptr);
-			}
+			Flipbook->SetFlipbook(ActivatiorFlipbook);
 		}
 	}
 	else if (LevelType == ELevelType::Level)
 	{
-		if (IsValid(BaseFlipbook))
-		{
-			Flipbook->SetFlipbook(BaseFlipbook);
-			Sprite->SetSprite(nullptr);
-		}
-		if (IsValid(BaseSprite))
-		{
-			Sprite->SetSprite(BaseSprite);
-			Flipbook->SetFlipbook(nullptr);
-		}
+			Flipbook->SetFlipbook(BaseFlipbook);		
 	}
 }

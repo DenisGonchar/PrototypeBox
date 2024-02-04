@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool LoadLevels(TArray<FLevelData>& levels);
 
+	UFUNCTION(BlueprintCallable)
+		void ValidateLevel(TArray<AActor*> actors);
+
 protected:
 	UPSSaveGame* gameSave;
 

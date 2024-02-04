@@ -19,6 +19,7 @@ void AMagneticPlatformPart::BeginPlay()
 	{
 		polarization = FMath::RandBool() ? EPolarizationType::Negative : EPolarizationType::Positive;
 	}
+	GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Cyan,UEnum::GetValueAsString(polarization));
 }
 
 void AMagneticPlatformPart::SwitchSprite(EPolarizationType newPolarization)
@@ -43,19 +44,35 @@ void AMagneticPlatformPart::UpdateStatus(bool newStatus)
 {
 	bIsActive = newStatus;
 	ChangeMaterial(bIsActive);
-
+	//SwitchPolarization();
 	if(bIsActive && MagneticType == EMagneticType::Magnetic)
 	{
-		PlaySound(activateSound);
-		GetWorldTimerManager().SetTimer(magneticTimer, this, &AMagneticPlatformPart::CheckPlayer, 0.2f, true);
+		if(!GetWorldTimerManager().IsTimerActive(magneticTimer))
+		{
+			PlaySound(activateSound);
+			GetWorldTimerManager().SetTimer(magneticTimer, this, &AMagneticPlatformPart::CheckPlayer, 0.1f, true);
+		}
 	}
-	else
+	/*else
 	{
 		PlaySound(deactivateSound);
 		if(GetWorldTimerManager().TimerExists(magneticTimer))
 		{
 			GetWorldTimerManager().ClearTimer(magneticTimer);
 		}
+	}*/
+}
+
+void AMagneticPlatformPart::SwitchPolarization()
+{
+	switch (polarization)
+	{
+		case EPolarizationType::Positive:
+			polarization = EPolarizationType::Negative;
+		case EPolarizationType::Negative:
+			polarization = EPolarizationType::Positive;
+		default:
+			break;
 	}
 }
 
@@ -100,6 +117,7 @@ void AMagneticPlatformPart::MagneticPlayer(APSBaseCharacter* player)
 	if (IsValid(this))
 	{
 		EMoveCharacterDirection moveDirection = FindMagneticDirection(player->GetActorLocation());
+		if (!bIsActive) return;
 
 		player->IsPlayerStep = false;
 		
@@ -135,6 +153,7 @@ void AMagneticPlatformPart::Magnetic(AMagneticPlatformPart* magneticPart)
 	if (IsValid(this))
 	{
 		EMoveCharacterDirection moveDirection = FindMagneticDirection(magneticPart->GetActorLocation());
+		if (!bIsActive) moveDirection = ReversDirection(moveDirection);
 
 		if (magneticPart->polarization == EPolarizationType::Negative)
 		{
@@ -218,10 +237,11 @@ void AMagneticPlatformPart::CheckPlayer()
 {
 	FVector traceBackEndLocation, startLocation, traceForwardEndLocation, traceRightEndLocation, traceLeftEndLocation;
 	startLocation = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
-	traceForwardEndLocation = GetActorLocation() + (GetActorForwardVector() * 650);
-	traceBackEndLocation = GetActorLocation() + (GetActorForwardVector() * -650);
-	traceRightEndLocation = GetActorLocation() + (GetActorRightVector() * 650);
-	traceLeftEndLocation = GetActorLocation() + (GetActorRightVector() * -650);
+	int distance = bIsActive ? 650 : 500;
+	traceForwardEndLocation = GetActorLocation() + (GetActorForwardVector() * distance);
+	traceBackEndLocation = GetActorLocation() + (GetActorForwardVector() * -distance);
+	traceRightEndLocation = GetActorLocation() + (GetActorRightVector() * distance);
+	traceLeftEndLocation = GetActorLocation() + (GetActorRightVector() * -distance);
 	TArray<AActor*> actToIgnore;
 	actToIgnore.Add(this);
 
@@ -259,14 +279,14 @@ void AMagneticPlatformPart::CheckPlayer()
 
 void AMagneticPlatformPart::MagneticFinded(AActor* actor)
 {
-	if (GetActorLocation().Equals(actor->GetActorLocation(), 151.f))
+	if (GetActorLocation().Equals(actor->GetActorLocation(), 151.f) && bIsActive)
 	{
 		return;
 	}
 
 
 	APSBaseCharacter* player = Cast<APSBaseCharacter>(actor);
-	if (IsValid(player))
+	if (IsValid(player) && bIsActive)
 	{
 		player->AddActualMagnetics(this);
 		return;
@@ -294,12 +314,12 @@ void AMagneticPlatformPart::MoveMagnetic(EMoveCharacterDirection moveDirection)
 	TArray<AActor*> actToIgnore;
 	actToIgnore.Add(this);
 	FVector location = GetLocationByDirection(moveDirection);
-	if (!UKismetSystemLibrary::BoxTraceSingle(GetWorld(), location, location, FVector(25.f,25.f,25.f), FRotator(), ETraceTypeQuery::TraceTypeQuery1, true, actToIgnore, EDrawDebugTrace::ForDuration, hit, true))
+	if (!UKismetSystemLibrary::BoxTraceSingle(GetWorld(), location, location, FVector(25.f,25.f,180.f), FRotator(), ETraceTypeQuery::TraceTypeQuery1, true, actToIgnore, EDrawDebugTrace::ForDuration, hit, true))
 	{
-		//if (hit.Actor == nullptr)
-		//{
+		if (hit.Actor == nullptr/* || Cast<A>*/)
+		{
 			SetActorLocation(location);
-		//}
+		}
 	}
 }
 
