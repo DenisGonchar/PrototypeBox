@@ -7,12 +7,9 @@
 #include "PSTypes.h"
 #include "MagneticPlatformPart.generated.h"
 
-/**
- * 
- */
-// Fill out your copyright notice in the Description page of Project Settings.
 
 class APSBaseCharacter;
+
 
 UCLASS()
 class PROTOTYPESTRATEGY_API AMagneticPlatformPart : public ABlockPlatformPart
@@ -23,12 +20,18 @@ class PROTOTYPESTRATEGY_API AMagneticPlatformPart : public ABlockPlatformPart
 
 private:
 	FTimerHandle magneticTimer;
+	FTimerHandle moveTimer;
 	FHitResult traceResult;
+
+	bool bIsMagneticPaused;
 
 	void MagneticFinded(AActor* actor);
 	
 public:
 	void BeginPlay() override;
+
+	void InitMagnetic(bool IsMagneticActive = false);
+
 
 	bool bIsActive = false;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -62,8 +65,14 @@ public:
 		bool bIsActivLevel = false;
 
 	virtual void NewLevelType() override;
-		void MoveMagnetic(EMoveCharacterDirection moveDirection);
-		FVector GetLocationByDirection(EMoveCharacterDirection Direction);
+	void MoveMagnetic(EMoveCharacterDirection moveDirection);
+	void CallMoveMagnetic();
+	FVector GetLocationByDirection(EMoveCharacterDirection Direction);
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		FVector TargetLocation;
+	FVector StartLocation;
+	FVector MoveLocation;
 
 	void SwitchSprite(EPolarizationType newPolarization);
 
@@ -85,6 +94,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void ChangeMaterial(bool value);
+
+	UFUNCTION()
+		void MagneticSwitched();
 
 protected:
 

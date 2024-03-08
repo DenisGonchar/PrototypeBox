@@ -160,7 +160,7 @@ void APSPlatform::SpawnPlatformPartFloor(TArray<AActor*> parts)
 				if (MagneticPart->MagneticType == EMagneticType::Magnetic)
 				{
 					MagneticArray.Add(MagneticPart);
-					if (MagneticStatusOnStart)MagneticPart->SwitchActivator();
+					if (MagneticStatusOnStart)MagneticPart->InitMagnetic(MagneticStatusOnStart);
 				}
 			}
 			else if (GetType == EBoxType::Magnetic)
